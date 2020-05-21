@@ -138,11 +138,17 @@
   <data name="OSNotSupport" xml:space="preserve">
     <value>The client requires Windows 10 1709 (build 16299) or later at this time.</value>
   </data>
+  <data name="PackageFound" xml:space="preserve">
+    <value>{0} Packages Found</value>
+  </data>
   <data name="Packages" xml:space="preserve">
     <value>Packages</value>
   </data>
   <data name="R2L" xml:space="preserve">
     <value>LeftToRight</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh Packages</value>
   </data>
   <data name="SearchPlaceHolder" xml:space="preserve">
     <value>Search...</value>

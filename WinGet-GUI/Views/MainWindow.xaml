@@ -13,8 +13,8 @@
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen"
         ShowTitle="True"
-        Height="450" 
-        Width="800">
+        Height="650" 
+        Width="950">
     <hc:Window.NonClientAreaContent>
         <Grid>
             <Grid.ColumnDefinitions>

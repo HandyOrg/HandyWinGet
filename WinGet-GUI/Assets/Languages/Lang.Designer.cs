@@ -124,6 +124,15 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} Packages Found.
+        /// </summary>
+        public static string PackageFound {
+            get {
+                return ResourceManager.GetString("PackageFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Packages.
         /// </summary>
         public static string Packages {
@@ -138,6 +147,15 @@ namespace WinGet_GUI.Assets.Languages {
         public static string R2L {
             get {
                 return ResourceManager.GetString("R2L", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh Packages.
+        /// </summary>
+        public static string Refresh {
+            get {
+                return ResourceManager.GetString("Refresh", resourceCulture);
             }
         }
         

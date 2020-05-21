@@ -11,15 +11,16 @@
                 <RowDefinition/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <hc:SearchBar Margin="0,16,16,0" hc:InfoElement.Placeholder="{hc:Localization SearchPlaceHolder}" Style="{StaticResource SearchBarExtend}" IsRealTime="True"/>
+            <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,16,16,0" hc:InfoElement.Placeholder="{hc:Localization SearchPlaceHolder}" IsRealTime="True" ShowClearButton="True" Style="{StaticResource SearchBarPlus}"/>
+
             <Border Grid.Row="1" hc:ScrollViewer.IsInertiaEnabled="True" Background="{DynamicResource RegionBrush}" Margin="0,10,16,10" CornerRadius="10" Effect="{StaticResource EffectShadow4}">
                 <hc:BusyIndicator IsBusy="{Binding IsBusy}" Foreground="White" FlowDirection="LeftToRight" ProgressBarStyle="{StaticResource ProgressBarPrimaryStripe}" OverlayStyle="{StaticResource RectangleCircular}" BusyContent="{hc:Localization Loading}">
-                    <ListBox hc:ListBoxAttach.IsOddEvenRow="True" AlternationCount="2" Margin="5" BorderThickness="0" FlowDirection="LeftToRight" ItemsSource="{Binding DataList}">
+                    <ListBox hc:ListBoxAttach.IsOddEvenRow="True" AlternationCount="2" Margin="5" FlowDirection="LeftToRight" BorderThickness="0" ItemsSource="{Binding ItemsView}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock TextWrapping="Wrap" Margin="10" Text="{Binding Name}"/>
-                                    <TextBlock TextWrapping="Wrap" Text="{Binding Version}"/>
+                                    <TextBlock Style="{StaticResource TextBlockTitle}" TextWrapping="Wrap" Margin="10" Text="{Binding Name}"/>
+                                    <TextBlock Style="{StaticResource TextBlockSubTitle}" TextWrapping="Wrap" Margin="0,11" Text="{Binding Version}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -31,7 +32,15 @@
                     </ListBox>
                 </hc:BusyIndicator>
             </Border>
-            <Button hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" Width="150" Margin="16,10" HorizontalAlignment="Right" Grid.Row="2" Content="{hc:Localization Install}"/>
+            <Label Style="{DynamicResource LabelDanger}" HorizontalAlignment="Left" Grid.Row="2" Margin="16,10" Width="150">
+                <Label.Content>
+                    <hc:Localization Key="PackageFound">
+                        <Binding Path="ItemsView.Count" />
+                    </hc:Localization>
+                </Label.Content>
+            </Label>
+            <Button Command="{Binding RefreshCommand}" hc:IconElement.Geometry="{DynamicResource RefreshGeometry}" Width="180" Margin="16,10" HorizontalAlignment="Center" Grid.Row="2" Content="{hc:Localization Refresh}"/>
+            <Button Command="{Binding InstallCommand}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" Width="150" Margin="16,10" HorizontalAlignment="Right" Grid.Row="2" Content="{hc:Localization Install}"/>
         </Grid>
     </hc:TransitioningContentControl>
 </UserControl>

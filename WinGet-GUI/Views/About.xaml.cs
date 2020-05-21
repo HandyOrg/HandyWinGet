@@ -11,5 +11,10 @@ namespace WinGet_GUI.Views
         {
             InitializeComponent();
         }
+
+        private void SearchBar_SearchStarted(object sender, HandyControl.Data.FunctionEventArgs<string> e)
+        {
+
+        }
     }
 }

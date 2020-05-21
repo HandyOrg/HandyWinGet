@@ -138,11 +138,17 @@
   <data name="OSNotSupport" xml:space="preserve">
     <value>در حال حاظر شما برای اجرای این برنامه نیاز به ویندوز 10 بیلد 1709 (16299) یا بالاتر دارید</value>
   </data>
+  <data name="PackageFound" xml:space="preserve">
+    <value>{0} پکیج پیدا شد</value>
+  </data>
   <data name="Packages" xml:space="preserve">
     <value>بسته ها</value>
   </data>
   <data name="R2L" xml:space="preserve">
     <value>RightToLeft</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>بروزرسانی لیست پکیج ها</value>
   </data>
   <data name="SearchPlaceHolder" xml:space="preserve">
     <value>جستجو...</value>
