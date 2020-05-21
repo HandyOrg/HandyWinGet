@@ -115,6 +115,15 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The client requires Windows 10 1709 (build 16299) or later at this time..
+        /// </summary>
+        public static string OSNotSupport {
+            get {
+                return ResourceManager.GetString("OSNotSupport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Packages.
         /// </summary>
         public static string Packages {
