@@ -26,21 +26,25 @@
                         </ListBox.ItemTemplate>
                         <hc:Interaction.Triggers>
                             <hc:EventTrigger EventName="SelectionChanged">
-                                <hc:EventToCommand Command="{Binding}" PassEventArgsToCommand="True"/>
+                                <hc:EventToCommand Command="{Binding SwitchItemCmd}" PassEventArgsToCommand="True"/>
                             </hc:EventTrigger>
                         </hc:Interaction.Triggers>
                     </ListBox>
                 </hc:BusyIndicator>
             </Border>
-            <Label Style="{DynamicResource LabelDanger}" HorizontalAlignment="Left" Grid.Row="2" Margin="16,10" Width="150">
-                <Label.Content>
-                    <hc:Localization Key="PackageFound">
-                        <Binding Path="ItemsView.Count" />
-                    </hc:Localization>
-                </Label.Content>
-            </Label>
-            <Button Command="{Binding RefreshCommand}" hc:IconElement.Geometry="{DynamicResource RefreshGeometry}" Width="180" Margin="16,10" HorizontalAlignment="Center" Grid.Row="2" Content="{hc:Localization Refresh}"/>
-            <Button Command="{Binding InstallCommand}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" Width="150" Margin="16,10" HorizontalAlignment="Right" Grid.Row="2" Content="{hc:Localization Install}"/>
+            <StackPanel HorizontalAlignment="Right" Margin="16,10" Grid.Row="2" Orientation="Horizontal">
+                <Label Style="{DynamicResource LabelDanger}" Width="150">
+                    <Label.Content>
+                        <hc:Localization Key="PackageFound">
+                            <Binding Path="ItemsView.Count" />
+                        </hc:Localization>
+                    </Label.Content>
+                </Label>
+                <Label Content="{Binding Status}" Margin="10,0" Style="{DynamicResource LabelPrimary}" Width="230"/>
+
+                <Button Command="{Binding RefreshCommand}" hc:IconElement.Geometry="{DynamicResource RefreshGeometry}" Width="170" Content="{hc:Localization Refresh}"/>
+                <Button IsEnabled="{Binding IsEnabled}" Command="{Binding InstallCommand}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" Width="140" Margin="10,0" Content="{hc:Localization Install}"/>
+            </StackPanel>
         </Grid>
     </hc:TransitioningContentControl>
 </UserControl>

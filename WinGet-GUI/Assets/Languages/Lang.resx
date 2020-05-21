@@ -123,11 +123,32 @@
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Do you want to change language?</value>
   </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>Downloading</value>
+  </data>
+  <data name="DownloadingParameter" xml:space="preserve">
+    <value>Downloading {0}</value>
+  </data>
   <data name="Empty" xml:space="preserve">
     <value>WinGet</value>
   </data>
+  <data name="Hash" xml:space="preserve">
+    <value>Hash valid</value>
+  </data>
   <data name="Install" xml:space="preserve">
     <value>Install Selected</value>
+  </data>
+  <data name="Installed" xml:space="preserve">
+    <value>Installed {0}</value>
+  </data>
+  <data name="InstallFail" xml:space="preserve">
+    <value>Install failed</value>
+  </data>
+  <data name="InstallFailParameter" xml:space="preserve">
+    <value>Installation of {0} failed</value>
+  </data>
+  <data name="Installing" xml:space="preserve">
+    <value>Installing</value>
   </data>
   <data name="L2R" xml:space="preserve">
     <value>RightToLeft</value>
@@ -153,8 +174,20 @@
   <data name="SearchPlaceHolder" xml:space="preserve">
     <value>Search...</value>
   </data>
+  <data name="SelectApp" xml:space="preserve">
+    <value>Select an app first!</value>
+  </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="StartedInstalling" xml:space="preserve">
+    <value>Started installing {0}</value>
+  </data>
+  <data name="StartInstall" xml:space="preserve">
+    <value>Install started</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>

@@ -79,6 +79,24 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Downloading.
+        /// </summary>
+        public static string Downloading {
+            get {
+                return ResourceManager.GetString("Downloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading {0}.
+        /// </summary>
+        public static string DownloadingParameter {
+            get {
+                return ResourceManager.GetString("DownloadingParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to WinGet.
         /// </summary>
         public static string Empty {
@@ -88,11 +106,56 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hash valid.
+        /// </summary>
+        public static string Hash {
+            get {
+                return ResourceManager.GetString("Hash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Install Selected.
         /// </summary>
         public static string Install {
             get {
                 return ResourceManager.GetString("Install", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed {0}.
+        /// </summary>
+        public static string Installed {
+            get {
+                return ResourceManager.GetString("Installed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install failed.
+        /// </summary>
+        public static string InstallFail {
+            get {
+                return ResourceManager.GetString("InstallFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installation of {0} failed.
+        /// </summary>
+        public static string InstallFailParameter {
+            get {
+                return ResourceManager.GetString("InstallFailParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing.
+        /// </summary>
+        public static string Installing {
+            get {
+                return ResourceManager.GetString("Installing", resourceCulture);
             }
         }
         
@@ -169,11 +232,47 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select an app first!.
+        /// </summary>
+        public static string SelectApp {
+            get {
+                return ResourceManager.GetString("SelectApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Started installing {0}.
+        /// </summary>
+        public static string StartedInstalling {
+            get {
+                return ResourceManager.GetString("StartedInstalling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install started.
+        /// </summary>
+        public static string StartInstall {
+            get {
+                return ResourceManager.GetString("StartInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        public static string Status {
+            get {
+                return ResourceManager.GetString("Status", resourceCulture);
             }
         }
         

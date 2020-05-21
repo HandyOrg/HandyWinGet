@@ -159,4 +159,37 @@
   <data name="Update" xml:space="preserve">
     <value>بروزرسانی</value>
   </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>در حال دانلود</value>
+  </data>
+  <data name="DownloadingParameter" xml:space="preserve">
+    <value>در حال دانلود {0}</value>
+  </data>
+  <data name="Hash" xml:space="preserve">
+    <value>هش معتبر</value>
+  </data>
+  <data name="Installed" xml:space="preserve">
+    <value>{0} نصب شد</value>
+  </data>
+  <data name="InstallFail" xml:space="preserve">
+    <value>نصب انجام نشد</value>
+  </data>
+  <data name="InstallFailParameter" xml:space="preserve">
+    <value>نصب {0} انجام نشد</value>
+  </data>
+  <data name="Installing" xml:space="preserve">
+    <value>در حال نصب</value>
+  </data>
+  <data name="SelectApp" xml:space="preserve">
+    <value>ابتدا یک برنامه انتخاب کنید</value>
+  </data>
+  <data name="StartedInstalling" xml:space="preserve">
+    <value>شروع نصب {0}</value>
+  </data>
+  <data name="StartInstall" xml:space="preserve">
+    <value>نصب شروع شد</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>وضعیت</value>
+  </data>
 </root>

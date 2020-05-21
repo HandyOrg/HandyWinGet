@@ -14,7 +14,7 @@
         WindowStartupLocation="CenterScreen"
         ShowTitle="True"
         Height="650" 
-        Width="950">
+        Width="1040">
     <hc:Window.NonClientAreaContent>
         <Grid>
             <Grid.ColumnDefinitions>
