@@ -19,6 +19,15 @@
     <DefineConstants>TRACE;Core</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\Font\IRANSans.ttf" />
+    <None Remove="Resources\Img\cloud.png" />
+    <None Remove="Resources\Img\Flag\en.png" />
+    <None Remove="Resources\Img\Flag\fa.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Img\cloud.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="HandyControls" Version="2.5.2.1" />
     <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
   </ItemGroup>
@@ -28,6 +37,11 @@
       <SubType>Designer</SubType>
       <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Font\IRANSans.ttf" />
+    <Resource Include="Resources\Img\Flag\en.png" />
+    <Resource Include="Resources\Img\Flag\fa.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Assets\Languages\Lang.Designer.cs">

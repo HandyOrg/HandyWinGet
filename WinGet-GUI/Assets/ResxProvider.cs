@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace WinGet_GUI.Assets
 {
@@ -12,7 +11,7 @@ namespace WinGet_GUI.Assets
 
         public object Localize(string key)
         {
-            return Assets.Lang.ResourceManager.GetObject(key);
+            return Assets.Languages.Lang.ResourceManager.GetObject(key);
         }
     }
 }

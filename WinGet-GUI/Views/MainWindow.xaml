@@ -5,9 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:prism="http://prismlibrary.com/"
+        xmlns:userControl="clr-namespace:WinGet_GUI.Views"
         prism:ViewModelLocator.AutoWireViewModel="True"
+        FontFamily="{StaticResource IRANSans}" 
         mc:Ignorable="d"
         Title="{Binding Title}" 
+        ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen"
         ShowTitle="True"
         Height="450" 
@@ -24,10 +27,10 @@
                     <StackPanel Orientation="Horizontal">
                         <StackPanel Button.Click="ButtonLangs_OnClick" Margin="10,10,0,10">
                             <Button Tag="fa-IR" Style="{StaticResource ButtonCustom}">
-                                <Image Width="32" Source="/SubtitleDownloader;component/Resources/Img/Flag/fa.png"/>
+                                <Image Width="32" Source="/WinGet_GUI;component/Resources/Img/Flag/fa.png"/>
                             </Button>
                             <Button Tag="en-US" Style="{StaticResource ButtonCustom}" Margin="0,10,0,0">
-                                <Image Width="32" Source="/SubtitleDownloader;component/Resources/Img/Flag/en.png"/>
+                                <Image Width="32" Source="/WinGet_GUI;component/Resources/Img/Flag/en.png"/>
                             </Button>
                         </StackPanel>
                         <StackPanel Button.Click="ButtonSkins_OnClick"  Margin="10,10,10,10">
@@ -46,7 +49,18 @@
             </Popup>
         </Grid>
     </hc:Window.NonClientAreaContent>
-    <Grid>
-        <ContentControl prism:RegionManager.RegionName="ContentRegion" />
-    </Grid>
+    <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderBrush}" Background="{StaticResource CloudDrawingBrush}">
+        <Grid FlowDirection="{hc:Localization R2L}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" MinWidth="240" MaxWidth="350"/>
+                <ColumnDefinition MinWidth="200"/>
+            </Grid.ColumnDefinitions>
+            <userControl:LeftMainContent/>
+            <ContentControl prism:RegionManager.RegionName="ContentRegion" Grid.Column="1" />
+            <GridSplitter Margin="0,26,10,26" Grid.Column="0" HorizontalAlignment="Right" Width="4" Background="Transparent"/>
+            <hc:ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right" IsInertiaEnabled="True" IsPenetrating="True">
+                <StackPanel hc:Growl.GrowlParent="True" VerticalAlignment="Top" Margin="0,10,10,10"/>
+            </hc:ScrollViewer>
+        </Grid>
+    </Border>
 </hc:Window>

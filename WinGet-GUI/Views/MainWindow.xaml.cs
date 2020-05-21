@@ -15,7 +15,10 @@ namespace WinGet_GUI.Views
         }
 
         #region Change Skin and Language
-        private void ButtonConfig_OnClick(object sender, RoutedEventArgs e) => PopupConfig.IsOpen = true;
+        private void ButtonConfig_OnClick(object sender, RoutedEventArgs e)
+        {
+            PopupConfig.IsOpen = true;
+        }
 
         private void ButtonSkins_OnClick(object sender, RoutedEventArgs e)
         {

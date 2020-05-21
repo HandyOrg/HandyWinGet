@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="WinGet_GUI.Views.Packages"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"   
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <hc:TransitioningContentControl>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <hc:SearchBar Margin="0,16,16,0" hc:InfoElement.Placeholder="{hc:Localization SearchPlaceHolder}" Style="{StaticResource SearchBarExtend}" IsRealTime="True"/>
+            <Border Grid.Row="1" hc:ScrollViewer.IsInertiaEnabled="True" Background="{DynamicResource RegionBrush}" Margin="0,10,16,10" CornerRadius="10" Effect="{StaticResource EffectShadow4}">
+                <hc:BusyIndicator IsBusy="{Binding IsBusy}" Foreground="White" FlowDirection="LeftToRight" ProgressBarStyle="{StaticResource ProgressBarPrimaryStripe}" OverlayStyle="{StaticResource RectangleCircular}" BusyContent="{hc:Localization Loading}">
+                    <ListBox hc:ListBoxAttach.IsOddEvenRow="True" AlternationCount="2" Margin="5" BorderThickness="0" FlowDirection="LeftToRight" ItemsSource="{Binding DataList}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock TextWrapping="Wrap" Margin="10" Text="{Binding Name}"/>
+                                    <TextBlock TextWrapping="Wrap" Text="{Binding Version}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <hc:Interaction.Triggers>
+                            <hc:EventTrigger EventName="SelectionChanged">
+                                <hc:EventToCommand Command="{Binding}" PassEventArgsToCommand="True"/>
+                            </hc:EventTrigger>
+                        </hc:Interaction.Triggers>
+                    </ListBox>
+                </hc:BusyIndicator>
+            </Border>
+            <Button hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" Width="150" Margin="16,10" HorizontalAlignment="Right" Grid.Row="2" Content="{hc:Localization Install}"/>
+        </Grid>
+    </hc:TransitioningContentControl>
+</UserControl>
