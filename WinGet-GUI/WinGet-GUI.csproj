@@ -14,6 +14,7 @@
     <SatelliteResourceLanguages>en;fa</SatelliteResourceLanguages>
     <ApplicationIcon>Resources\Img\icon.ico</ApplicationIcon>
     <Authors>Mahdi Hosseini</Authors>
+    <IncludeSymbolsInSingleFile>true</IncludeSymbolsInSingleFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;Core</DefineConstants>
