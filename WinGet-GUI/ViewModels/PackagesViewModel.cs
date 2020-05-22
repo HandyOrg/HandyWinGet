@@ -39,6 +39,13 @@ namespace WinGet_GUI.ViewModels
             set => SetProperty(ref _IsEnabled, value);
         }
 
+        private bool _IsEnabledRefresh = false;
+        public bool IsEnabledRefresh
+        {
+            get => _IsEnabledRefresh;
+            set => SetProperty(ref _IsEnabledRefresh, value);
+        }
+
         private string _Status = "Status";
         public string Status
         {
@@ -85,6 +92,7 @@ namespace WinGet_GUI.ViewModels
         private void OnInstall()
         {
             IsEnabled = false;
+            IsEnabledRefresh = false;
             Status = string.Format(Lang.ResourceManager.GetString("StartedInstalling"), SelectedPackage.Name);
 
             Status = Lang.ResourceManager.GetString("StartInstall");
@@ -145,6 +153,7 @@ namespace WinGet_GUI.ViewModels
                     Status = text;
 
                     IsEnabled = true;
+                    IsEnabledRefresh = true;
                 });
             };
 
@@ -176,12 +185,21 @@ namespace WinGet_GUI.ViewModels
             if (e.AddedItems[0] is PackagesModel item)
             {
                 SelectedPackage = item;
+                if (item.IsInstalled)
+                {
+                    IsEnabled = false;
+                }
+                else
+                {
+                    IsEnabled = true;
+                }
             }
         }
         private void GetDirectories()
         {
             Tools.DeleteDirectory(path);
             IsEnabled = false;
+            IsEnabledRefresh = false;
             IsBusy = true;
             CloneOptions cloneOptions = new CloneOptions();
             Task.Run(() =>
@@ -219,6 +237,7 @@ namespace WinGet_GUI.ViewModels
                 CleanRepo();
                 IsBusy = false;
                 IsEnabled = true;
+                IsEnabledRefresh = true;
             });
         }
 
