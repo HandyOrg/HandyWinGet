@@ -210,7 +210,7 @@ namespace WinGet_GUI.ViewModels
                 foreach (string item in pkgs)
                 {
                     string fixName = item.Replace(@"pkgs\manifests\", "");
-                    string version = fixName.Substring(fixName.LastIndexOf('\\') + 1).Replace(".yaml","").Replace(".Yaml","").Trim();
+                    string version = fixName.Substring(fixName.LastIndexOf('\\') + 1).Replace(".yaml", "").Replace(".Yaml", "").Trim();
 
                     int nameWithCompany = fixName.LastIndexOf('\\');
                     if (nameWithCompany > 0)

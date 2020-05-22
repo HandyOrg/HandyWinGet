@@ -34,6 +34,8 @@
   <ItemGroup>
     <PackageReference Include="HandyControls" Version="2.5.2.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.2.1" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
   </ItemGroup>

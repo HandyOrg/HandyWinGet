@@ -1,6 +1,9 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Microsoft.Win32;
 using Prism.Ioc;
 using Prism.Regions;
@@ -17,10 +20,14 @@ namespace WinGet_GUI
     {
         public App()
         {
+            AppCenter.Start("0153dc1d-eda3-4da2-98c9-ce29361d622d",
+                   typeof(Analytics), typeof(Crashes));
+
             GlobalDataHelper<AppConfig>.Init();
             LocalizationManager.Instance.LocalizationProvider = new ResxProvider();
             LocalizationManager.Instance.CurrentCulture = new System.Globalization.CultureInfo(GlobalDataHelper<AppConfig>.Config.Lang);
         }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -78,6 +85,7 @@ namespace WinGet_GUI
             {
                 UpdateSkin(GlobalDataHelper<AppConfig>.Config.Skin);
             }
+
             return shell;
         }
 
