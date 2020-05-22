@@ -201,4 +201,52 @@
   <data name="General" xml:space="preserve">
     <value>عمومی</value>
   </data>
+  <data name="WingetNotInstalled" xml:space="preserve">
+    <value>وینگت روی سیستم شما نصب نشده است، ما یک لینک را برای شما باز میکنیم بعد از دانلود و نصب شما میتوانید از این برنامه استفاده کنید</value>
+  </data>
+  <data name="CheckForUpdate" xml:space="preserve">
+    <value>بررسی بروزرسانی</value>
+  </data>
+  <data name="ContactUs" xml:space="preserve">
+    <value>تماس با ما</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>ایجاد در</value>
+  </data>
+  <data name="CurrentVer" xml:space="preserve">
+    <value>نسخه فعلی </value>
+  </data>
+  <data name="Developer" xml:space="preserve">
+    <value>برنامه نویس مهدی حسینی</value>
+  </data>
+  <data name="DownloadLink" xml:space="preserve">
+    <value>لینک دانلود</value>
+  </data>
+  <data name="DownloadNewVer" xml:space="preserve">
+    <value>دانلود بروزرسانی جدید</value>
+  </data>
+  <data name="NewVer" xml:space="preserve">
+    <value>نسخه جدید </value>
+  </data>
+  <data name="Published" xml:space="preserve">
+    <value>انتشار در</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>آماده</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>نسخه {0}</value>
+  </data>
+  <data name="NoNewVersion" xml:space="preserve">
+    <value>هیچ نسخه ای پیدا نشد</value>
+  </data>
+  <data name="NewVersionFound" xml:space="preserve">
+    <value>نسخه جدید پیدا شد!</value>
+  </data>
+  <data name="LatestVersion" xml:space="preserve">
+    <value>شما از آخرین نسخه استفاده میکنید</value>
+  </data>
+  <data name="ComingSoon" xml:space="preserve">
+    <value>بزودی</value>
+  </data>
 </root>

@@ -14,7 +14,6 @@ namespace WinGet_GUI.Views
             InitializeComponent();
         }
 
-
         #region Change Skin and Language
         private void ButtonConfig_OnClick(object sender, RoutedEventArgs e)
         {

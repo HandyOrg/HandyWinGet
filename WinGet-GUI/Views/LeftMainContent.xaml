@@ -13,7 +13,7 @@
         <Button Command="{Binding EmptyContentCommand}" DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="10,10,10,4" Content="{hc:Localization Empty}" BorderThickness="0" Background="{DynamicResource SecondaryRegionBrush}"/>
         <ListBox SelectedIndex="0" VirtualizingStackPanel.IsVirtualizing="True" BorderThickness="0" SelectionMode="Single" Style="{StaticResource ListBoxTransparentStyle}">
             <ListBoxItem Tag="Packages" Margin="10,5,10,0" Content="{hc:Localization Packages}"/>
-            <ListBoxItem Tag="CreatePackages" Margin="10,5,10,0" Content="{hc:Localization CreatePackage}"/>
+            <ListBoxItem Tag="UnderConstruction" Margin="10,5,10,0" Content="{hc:Localization CreatePackage}"/>
             <ListBoxItem Tag="Settings" Margin="10,5,10,0" Content="{hc:Localization Settings}"/>
             <ListBoxItem Tag="Updater" Margin="10,5,10,0" Content="{hc:Localization Update}"/>
             <ListBoxItem Tag="About" Margin="10,5,10,0" Content="{hc:Localization AboutUs}"/>

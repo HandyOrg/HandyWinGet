@@ -88,11 +88,65 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check for Update.
+        /// </summary>
+        public static string CheckForUpdate {
+            get {
+                return ResourceManager.GetString("CheckForUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Coming Soon.
+        /// </summary>
+        public static string ComingSoon {
+            get {
+                return ResourceManager.GetString("ComingSoon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contact Us.
+        /// </summary>
+        public static string ContactUs {
+            get {
+                return ResourceManager.GetString("ContactUs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created at .
+        /// </summary>
+        public static string Created {
+            get {
+                return ResourceManager.GetString("Created", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Package.
         /// </summary>
         public static string CreatePackage {
             get {
                 return ResourceManager.GetString("CreatePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current Version .
+        /// </summary>
+        public static string CurrentVer {
+            get {
+                return ResourceManager.GetString("CurrentVer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Programmer Mahdi Hosseini.
+        /// </summary>
+        public static string Developer {
+            get {
+                return ResourceManager.GetString("Developer", resourceCulture);
             }
         }
         
@@ -111,6 +165,24 @@ namespace WinGet_GUI.Assets.Languages {
         public static string DownloadingParameter {
             get {
                 return ResourceManager.GetString("DownloadingParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Link.
+        /// </summary>
+        public static string DownloadLink {
+            get {
+                return ResourceManager.GetString("DownloadLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download New Update.
+        /// </summary>
+        public static string DownloadNewVer {
+            get {
+                return ResourceManager.GetString("DownloadNewVer", resourceCulture);
             }
         }
         
@@ -196,11 +268,47 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are using Latest Version.
+        /// </summary>
+        public static string LatestVersion {
+            get {
+                return ResourceManager.GetString("LatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading....
         /// </summary>
         public static string Loading {
             get {
                 return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Version.
+        /// </summary>
+        public static string NewVer {
+            get {
+                return ResourceManager.GetString("NewVer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Version Found!.
+        /// </summary>
+        public static string NewVersionFound {
+            get {
+                return ResourceManager.GetString("NewVersionFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We cant find any version.
+        /// </summary>
+        public static string NoNewVersion {
+            get {
+                return ResourceManager.GetString("NoNewVersion", resourceCulture);
             }
         }
         
@@ -232,11 +340,29 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Published At.
+        /// </summary>
+        public static string Published {
+            get {
+                return ResourceManager.GetString("Published", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LeftToRight.
         /// </summary>
         public static string R2L {
             get {
                 return ResourceManager.GetString("R2L", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        public static string Ready {
+            get {
+                return ResourceManager.GetString("Ready", resourceCulture);
             }
         }
         
@@ -309,6 +435,24 @@ namespace WinGet_GUI.Assets.Languages {
         public static string Update {
             get {
                 return ResourceManager.GetString("Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version {0}.
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Winget Is Not Installed on your machine, we open a link and you can download and install winget, after that you can use this app..
+        /// </summary>
+        public static string WingetNotInstalled {
+            get {
+                return ResourceManager.GetString("WingetNotInstalled", resourceCulture);
             }
         }
     }

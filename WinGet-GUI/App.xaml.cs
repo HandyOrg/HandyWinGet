@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using Prism.Ioc;
 using Prism.Regions;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using WinGet_GUI.Assets;
 using WinGet_GUI.Assets.Languages;
@@ -61,6 +62,18 @@ namespace WinGet_GUI
                 Environment.Exit(0);
             }
 
+            if (!Tools.IsWingetInstalled())
+            {
+                HandyControl.Controls.MessageBox.Show(Lang.ResourceManager.GetString("WingetNotInstalled"), "Install Winget");
+                ProcessStartInfo ps = new ProcessStartInfo("https://github.com/microsoft/winget-cli/releases")
+                {
+                    UseShellExecute = true,
+                    Verb = "open"
+                };
+                Process.Start(ps);
+                Environment.Exit(0);
+            }
+
             if (GlobalDataHelper<AppConfig>.Config.Skin != SkinType.Default)
             {
                 UpdateSkin(GlobalDataHelper<AppConfig>.Config.Skin);
@@ -74,6 +87,7 @@ namespace WinGet_GUI
             containerRegistry.RegisterForNavigation<About>();
             containerRegistry.RegisterForNavigation<Settings>();
             containerRegistry.RegisterForNavigation<Updater>();
+            containerRegistry.RegisterForNavigation<UnderConstruction>();
         }
         internal void UpdateSkin(SkinType skin)
         {

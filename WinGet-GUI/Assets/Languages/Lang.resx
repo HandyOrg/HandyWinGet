@@ -126,14 +126,35 @@
   <data name="CheckedCompanyName" xml:space="preserve">
     <value>Show Company Name in Packages List</value>
   </data>
+  <data name="CheckForUpdate" xml:space="preserve">
+    <value>Check for Update</value>
+  </data>
+  <data name="ContactUs" xml:space="preserve">
+    <value>Contact Us</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Created at </value>
+  </data>
   <data name="CreatePackage" xml:space="preserve">
     <value>Create Package</value>
+  </data>
+  <data name="CurrentVer" xml:space="preserve">
+    <value>Current Version </value>
+  </data>
+  <data name="Developer" xml:space="preserve">
+    <value>Programmer Mahdi Hosseini</value>
   </data>
   <data name="Downloading" xml:space="preserve">
     <value>Downloading</value>
   </data>
   <data name="DownloadingParameter" xml:space="preserve">
     <value>Downloading {0}</value>
+  </data>
+  <data name="DownloadLink" xml:space="preserve">
+    <value>Download Link</value>
+  </data>
+  <data name="DownloadNewVer" xml:space="preserve">
+    <value>Download New Update</value>
   </data>
   <data name="Empty" xml:space="preserve">
     <value>WinGet</value>
@@ -165,6 +186,9 @@
   <data name="Loading" xml:space="preserve">
     <value>Loading...</value>
   </data>
+  <data name="NewVer" xml:space="preserve">
+    <value>New Version</value>
+  </data>
   <data name="OSNotSupport" xml:space="preserve">
     <value>The client requires Windows 10 1709 (build 16299) or later at this time.</value>
   </data>
@@ -174,8 +198,14 @@
   <data name="Packages" xml:space="preserve">
     <value>Packages</value>
   </data>
+  <data name="Published" xml:space="preserve">
+    <value>Published At</value>
+  </data>
   <data name="R2L" xml:space="preserve">
     <value>LeftToRight</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Ready</value>
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>Refresh Packages</value>
@@ -200,5 +230,23 @@
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="WingetNotInstalled" xml:space="preserve">
+    <value>Winget Is Not Installed on your machine, we open a link and you can download and install winget, after that you can use this app.</value>
+  </data>
+  <data name="NewVersionFound" xml:space="preserve">
+    <value>New Version Found!</value>
+  </data>
+  <data name="NoNewVersion" xml:space="preserve">
+    <value>We cant find any version</value>
+  </data>
+  <data name="LatestVersion" xml:space="preserve">
+    <value>You are using Latest Version</value>
+  </data>
+  <data name="ComingSoon" xml:space="preserve">
+    <value>Coming Soon</value>
   </data>
 </root>

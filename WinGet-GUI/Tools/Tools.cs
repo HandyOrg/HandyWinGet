@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 
 namespace WinGet_GUI
 {
@@ -21,6 +23,31 @@ namespace WinGet_GUI
                     fi.Delete();
                 }
                 System.IO.Directory.Delete(d);
+            }
+        }
+
+        public static bool IsWingetInstalled()
+        {
+            try
+            {
+                Process proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "winget",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true
+                    },
+                    EnableRaisingEvents = true
+                };
+                proc.Start();
+                return true;
+            }
+            catch (Win32Exception)
+            {
+
+                return false;
             }
         }
     }

@@ -46,7 +46,7 @@ namespace WinGet_GUI.ViewModels
             set => SetProperty(ref _IsEnabledRefresh, value);
         }
 
-        private string _Status = "Status";
+        private string _Status = "Ready";
         public string Status
         {
             get => _Status;
@@ -226,7 +226,7 @@ namespace WinGet_GUI.ViewModels
                         string id = File.ReadAllLines(item).Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
 
                         //Todo: check if installed
-                        DataList.AddOnUI(new PackagesModel { Name = fixName, IsInstalled = true, Version = ver, Id = id });
+                        DataList.AddOnUI(new PackagesModel { Name = fixName, IsInstalled = false, Version = ver, Id = id });
                     }
                     catch (InvalidOperationException)
                     {

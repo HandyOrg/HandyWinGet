@@ -11,6 +11,9 @@
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <LangVersion>latest</LangVersion>
+    <SatelliteResourceLanguages>en;fa</SatelliteResourceLanguages>
+    <ApplicationIcon>Resources\Img\icon.ico</ApplicationIcon>
+    <Authors>Mahdi Hosseini</Authors>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;Core</DefineConstants>
@@ -23,6 +26,7 @@
     <None Remove="Resources\Img\cloud.png" />
     <None Remove="Resources\Img\Flag\en.png" />
     <None Remove="Resources\Img\Flag\fa.png" />
+    <None Remove="Resources\Img\under_construction.gif" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Img\cloud.png" />
@@ -44,6 +48,7 @@
     <Resource Include="Resources\Font\IRANSans.ttf" />
     <Resource Include="Resources\Img\Flag\en.png" />
     <Resource Include="Resources\Img\Flag\fa.png" />
+    <Resource Include="Resources\Img\under_construction.gif" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Assets\Languages\Lang.Designer.cs">
