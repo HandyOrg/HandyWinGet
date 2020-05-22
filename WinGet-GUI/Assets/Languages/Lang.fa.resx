@@ -166,13 +166,13 @@
     <value>در حال دانلود {0}</value>
   </data>
   <data name="Hash" xml:space="preserve">
-    <value>هش معتبر</value>
+    <value>هش معتبر برای</value>
   </data>
   <data name="Installed" xml:space="preserve">
     <value>{0} نصب شد</value>
   </data>
   <data name="InstallFail" xml:space="preserve">
-    <value>نصب انجام نشد</value>
+    <value>نصب {0} انجام نشد</value>
   </data>
   <data name="InstallFailParameter" xml:space="preserve">
     <value>نصب {0} انجام نشد</value>
@@ -191,5 +191,14 @@
   </data>
   <data name="Status" xml:space="preserve">
     <value>وضعیت</value>
+  </data>
+  <data name="CheckedCompanyName" xml:space="preserve">
+    <value>نمایش نام کمپانی در لیست پکیج ها</value>
+  </data>
+  <data name="CreatePackage" xml:space="preserve">
+    <value>ساخت پکیج</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>عمومی</value>
   </data>
 </root>

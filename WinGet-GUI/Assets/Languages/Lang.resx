@@ -123,6 +123,12 @@
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Do you want to change language?</value>
   </data>
+  <data name="CheckedCompanyName" xml:space="preserve">
+    <value>Show Company Name in Packages List</value>
+  </data>
+  <data name="CreatePackage" xml:space="preserve">
+    <value>Create Package</value>
+  </data>
   <data name="Downloading" xml:space="preserve">
     <value>Downloading</value>
   </data>
@@ -132,8 +138,11 @@
   <data name="Empty" xml:space="preserve">
     <value>WinGet</value>
   </data>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+  </data>
   <data name="Hash" xml:space="preserve">
-    <value>Hash valid</value>
+    <value>Validated hash for</value>
   </data>
   <data name="Install" xml:space="preserve">
     <value>Install Selected</value>
@@ -142,7 +151,7 @@
     <value>Installed {0}</value>
   </data>
   <data name="InstallFail" xml:space="preserve">
-    <value>Install failed</value>
+    <value>Installation of {0} failed</value>
   </data>
   <data name="InstallFailParameter" xml:space="preserve">
     <value>Installation of {0} failed</value>

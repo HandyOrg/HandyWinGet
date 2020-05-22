@@ -14,6 +14,7 @@ namespace WinGet_GUI.Views
             InitializeComponent();
         }
 
+
         #region Change Skin and Language
         private void ButtonConfig_OnClick(object sender, RoutedEventArgs e)
         {
@@ -32,7 +33,7 @@ namespace WinGet_GUI.Views
 
                 GlobalDataHelper<AppConfig>.Config.Skin = tag;
                 GlobalDataHelper<AppConfig>.Save();
-                ((App)Application.Current).UpdateSkin(tag);
+                ((App)System.Windows.Application.Current).UpdateSkin(tag);
             }
         }
 

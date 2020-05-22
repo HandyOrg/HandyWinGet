@@ -9,6 +9,7 @@ namespace WinGet_GUI
         public static readonly string SavePath = $"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json";
 
         public string Lang { get; set; } = "en-US";
+        public bool IsCheckedCompanyName { get; set; } = true;
 
         public SkinType Skin { get; set; } = SkinType.Default;
     }

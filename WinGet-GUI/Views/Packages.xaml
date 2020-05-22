@@ -20,7 +20,7 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Style="{StaticResource TextBlockTitle}" TextWrapping="Wrap" Margin="10" Text="{Binding Name}"/>
-                                    <TextBlock Style="{StaticResource TextBlockSubTitle}" TextWrapping="Wrap" Margin="0,11" Text="{Binding Version}"/>
+                                    <Path FlowDirection="LeftToRight" Visibility="{Binding IsInstalled,Converter={StaticResource Boolean2VisibilityConverter}}" VerticalAlignment="Center" Data="{StaticResource NewGeometry}" Stretch="Uniform" Width="30" Height="14" Fill="{DynamicResource DangerBrush}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -40,9 +40,9 @@
                         </hc:Localization>
                     </Label.Content>
                 </Label>
-                <Label Content="{Binding Status}" Margin="10,0" Style="{DynamicResource LabelPrimary}" Width="230"/>
+                <Label Content="{Binding Status}" Margin="10,0" Style="{DynamicResource LabelPrimary}" Width="240"/>
 
-                <Button Command="{Binding RefreshCommand}" hc:IconElement.Geometry="{DynamicResource RefreshGeometry}" Width="170" Content="{hc:Localization Refresh}"/>
+                <Button IsEnabled="{Binding IsEnabled}" Command="{Binding RefreshCommand}" hc:IconElement.Geometry="{DynamicResource RefreshGeometry}" Width="170" Content="{hc:Localization Refresh}"/>
                 <Button IsEnabled="{Binding IsEnabled}" Command="{Binding InstallCommand}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" Width="140" Margin="10,0" Content="{hc:Localization Install}"/>
             </StackPanel>
         </Grid>

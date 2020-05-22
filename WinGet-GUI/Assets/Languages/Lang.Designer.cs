@@ -79,6 +79,24 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show Company Name in Packages List.
+        /// </summary>
+        public static string CheckedCompanyName {
+            get {
+                return ResourceManager.GetString("CheckedCompanyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Package.
+        /// </summary>
+        public static string CreatePackage {
+            get {
+                return ResourceManager.GetString("CreatePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Downloading.
         /// </summary>
         public static string Downloading {
@@ -106,7 +124,16 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hash valid.
+        ///   Looks up a localized string similar to General.
+        /// </summary>
+        public static string General {
+            get {
+                return ResourceManager.GetString("General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validated hash for.
         /// </summary>
         public static string Hash {
             get {
@@ -133,7 +160,7 @@ namespace WinGet_GUI.Assets.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Install failed.
+        ///   Looks up a localized string similar to Installation of {0} failed.
         /// </summary>
         public static string InstallFail {
             get {
