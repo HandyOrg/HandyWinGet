@@ -210,28 +210,29 @@ namespace WinGet_GUI.ViewModels
                 foreach (string item in pkgs)
                 {
                     string fixName = item.Replace(@"pkgs\manifests\", "");
-                    int index = fixName.LastIndexOf('.');
-                    if (index > 0)
+                    string version = fixName.Substring(fixName.LastIndexOf('\\') + 1).Replace(".yaml","").Replace(".Yaml","").Trim();
+
+                    int nameWithCompany = fixName.LastIndexOf('\\');
+                    if (nameWithCompany > 0)
                     {
-                        fixName = fixName.Substring(0, index).Replace("\\", " - ").Trim();
+                        fixName = fixName.Substring(0, nameWithCompany).Replace("\\", " - ").Trim();
                     }
 
-                    string ver = fixName.Substring(fixName.LastIndexOf('-') + 1).Trim();
                     if (GlobalDataHelper<AppConfig>.Config.IsCheckedCompanyName)
                     {
                         fixName = fixName.Substring(fixName.IndexOf('-') + 1).Trim();
                     }
+
                     try
                     {
                         string id = File.ReadAllLines(item).Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
 
                         //Todo: check if installed
-                        DataList.AddOnUI(new PackagesModel { Name = fixName, IsInstalled = false, Version = ver, Id = id });
+                        DataList.AddOnUI(new PackagesModel { Name = fixName, IsInstalled = false, Version = version, Id = id });
                     }
                     catch (InvalidOperationException)
                     {
                     }
-
                 }
 
                 CleanRepo();
