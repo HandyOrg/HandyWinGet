@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>HandyWinget_GUI</AssemblyName>
+    <RootNamespace>HandyWinget_GUI</RootNamespace>
+    <Version>1.0.0.0</Version>
+    <Configurations>Debug;Release</Configurations>
+    <Copyright>Copyright © HandyOrg 2018-2020</Copyright>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <LangVersion>latest</LangVersion>
+    <SatelliteResourceLanguages>en;fa</SatelliteResourceLanguages>
+    <ApplicationIcon>Resources\Img\icon.ico</ApplicationIcon>
+    <Authors>Mahdi Hosseini</Authors>
+    <IncludeSymbolsInSingleFile>true</IncludeSymbolsInSingleFile>
+    <Company>HandyOrg</Company>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;Core</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;Core</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\Font\IRANSans.ttf" />
+    <None Remove="Resources\Img\cloud.png" />
+    <None Remove="Resources\Img\Flag\en.png" />
+    <None Remove="Resources\Img\Flag\fa.png" />
+    <None Remove="Resources\Img\under_construction.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Img\cloud.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="HandyControls" Version="2.5.2.1" />
+    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.2.1" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Font\IRANSans.ttf" />
+    <Resource Include="Resources\Img\Flag\en.png" />
+    <Resource Include="Resources\Img\Flag\fa.png" />
+    <Resource Include="Resources\Img\under_construction.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Assets\Languages\Lang.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Lang.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Assets\Languages\Lang.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Lang.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

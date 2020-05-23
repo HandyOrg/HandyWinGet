@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="HandyWinget_GUI.Views.Updater"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/" 
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <hc:TransitioningContentControl>
+        <hc:ScrollViewer>
+            <Border hc:ScrollViewer.IsInertiaEnabled="True" Background="{DynamicResource RegionBrush}" Margin="16" CornerRadius="10" Effect="{StaticResource EffectShadow4}">
+                <StackPanel Margin="10">
+                    <Button Margin="10" Content="{hc:Localization CheckForUpdate}" Height="35" Width="300" Command="{Binding CheckUpdateCommand}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Style="{DynamicResource LabelInfo}" Content="{hc:Localization Created}" Margin="5"/>
+                        <hc:TextBox FlowDirection="LeftToRight" Text="{Binding CreatedAt}" IsReadOnly="True" Margin="5"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Style="{DynamicResource LabelInfo}" Content="{hc:Localization Published}" Margin="5"/>
+                        <hc:TextBox FlowDirection="LeftToRight" Text="{Binding PublishedAt}" IsReadOnly="True" Margin="5"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Style="{DynamicResource LabelInfo}" Content="{hc:Localization CurrentVer}" Margin="5"/>
+                        <hc:TextBox Text="{Binding CurrentVersion}" IsReadOnly="True" Margin="5"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Style="{DynamicResource LabelInfo}" Content="{hc:Localization NewVer}" Margin="5"/>
+                        <hc:TextBox Text="{Binding Version}" IsReadOnly="True" Margin="5"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsUpdateExist}">
+                        <Label Style="{DynamicResource LabelInfo}" Content="{hc:Localization DownloadLink}" Margin="5"/>
+                        <Button Margin="5" Content="{hc:Localization DownloadNewVer}" Command="hc:ControlCommands.OpenLink" CommandParameter="{Binding DownloadUrl}"/>
+                    </StackPanel>
+                    <TextBox Text="{Binding ChangeLog}" IsReadOnly="True" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" TextWrapping="Wrap" Margin="10" Height="200" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                </StackPanel>
+            </Border>
+        </hc:ScrollViewer>
+    </hc:TransitioningContentControl>
+
+</UserControl>

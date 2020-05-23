@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="HandyWinget_GUI.Views.Settings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/" 
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <hc:TransitioningContentControl>
+        <hc:ScrollViewer>
+            <Border hc:ScrollViewer.IsInertiaEnabled="True" Background="{DynamicResource RegionBrush}" Margin="16" CornerRadius="10" Effect="{StaticResource EffectShadow4}">
+                <StackPanel Margin="20,10,20,20">
+                    <hc:Divider LineStrokeThickness="2" Content="{hc:Localization General}"/>
+                    
+                    <ToggleButton IsChecked="{Binding IsCheckedCompanyName}" HorizontalAlignment="Left" Command="{Binding IsCheckedCompanyNameCommand}" CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Margin="0,10,0,0" Content="{hc:Localization CheckedCompanyName}" Style="{StaticResource ToggleButtonSwitch}"/>
+                </StackPanel>
+            </Border>
+        </hc:ScrollViewer>
+    </hc:TransitioningContentControl>
+</UserControl>
