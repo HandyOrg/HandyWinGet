@@ -1,4 +1,4 @@
-# WinGet-GUI
+# HandyWinGet-GUI
  
 provides a GUI for installing apps through WinGet.
 
