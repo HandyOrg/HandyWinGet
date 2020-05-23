@@ -22,7 +22,6 @@ namespace HandyWinget_GUI.ViewModels
 {
     public class PackagesViewModel : BindableBase
     {
-        //Todo: Check if Installed
         //Todo: Create Pkg
 
         private readonly string path = Assembly.GetExecutingAssembly().Location.Replace(Path.GetFileName(Assembly.GetExecutingAssembly().Location), "") + @"pkgs";
@@ -230,8 +229,12 @@ namespace HandyWinget_GUI.ViewModels
                     {
                         string id = File.ReadAllLines(item).Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
 
-                        //Todo: check if installed
-                        DataList.AddOnUI(new PackagesModel { Name = name, IsInstalled = false, Version = version, Id = id });
+                        bool isInstalled = false;
+                        if (GlobalDataHelper<AppConfig>.Config.IsCheckAppInstalled)
+                        {
+                            isInstalled = Tools.IsSoftwareInstalled(id.Substring(id.IndexOf('.') + 1), version);
+                        }
+                        DataList.AddOnUI(new PackagesModel { Name = name, IsInstalled = isInstalled, Version = version, Id = id });
                     }
                     catch (InvalidOperationException)
                     {

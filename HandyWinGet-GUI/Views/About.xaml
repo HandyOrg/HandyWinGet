@@ -17,7 +17,8 @@
                         </TextBlock.Text>
                     </TextBlock>
                     <TextBlock Text="{hc:Localization Developer}" Margin="0,16,0,0" HorizontalAlignment="Center" Style="{StaticResource TextBlockLarge}"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                    <Button Content="{hc:Localization Source}" Command="hc:ControlCommands.OpenLink" CommandParameter="https://github.com/handyorg/handywinget-gui" Margin="10,16,0,0" HorizontalAlignment="Center" hc:IconElement.Geometry="{DynamicResource GithubGeometry}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="{hc:Localization ContactUs}" Command="hc:ControlCommands.OpenLink" CommandParameter="mailto:mahdidvb72@gmail.com" Margin="10,16,0,0" HorizontalAlignment="Center" hc:IconElement.Geometry="{DynamicResource EmailGeometry}"/>
                         <Button Content="{hc:Localization ContactUs}" Command="hc:ControlCommands.OpenLink" CommandParameter="https://t.me/KlausM72" Margin="10,16,0,0" HorizontalAlignment="Center" hc:IconElement.Geometry="{DynamicResource TelegramGeometry}"/>
                     </StackPanel>

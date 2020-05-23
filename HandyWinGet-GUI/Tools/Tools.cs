@@ -1,6 +1,9 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Win32;
+using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace HandyWinget_GUI
 {
@@ -49,6 +52,47 @@ namespace HandyWinget_GUI
 
                 return false;
             }
+        }
+
+        public static bool IsSoftwareInstalled(string softwareName, string softwareVersion)
+        {
+            string registryUninstallPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+            string registryUninstallPathFor32BitOn64Bit = @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall";
+
+            if (Is32BitWindows())
+            {
+                return IsSoftwareInstalled(softwareName, softwareVersion, RegistryView.Registry32, registryUninstallPath);
+            }
+
+            bool is64BitSoftwareInstalled = IsSoftwareInstalled(softwareName, softwareVersion, RegistryView.Registry64, registryUninstallPath);
+            bool is32BitSoftwareInstalled = IsSoftwareInstalled(softwareName, softwareVersion, RegistryView.Registry64, registryUninstallPathFor32BitOn64Bit);
+            return is64BitSoftwareInstalled || is32BitSoftwareInstalled;
+        }
+
+        private static bool Is32BitWindows()
+        {
+            return Environment.Is64BitOperatingSystem == false;
+        }
+
+        private static bool IsSoftwareInstalled(string softwareName, string softwareVersion, RegistryView registryView, string installedProgrammsPath)
+        {
+            RegistryKey uninstallKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView)
+                                                  .OpenSubKey(installedProgrammsPath);
+
+            if (uninstallKey == null)
+            {
+                return false;
+            }
+
+            return uninstallKey.GetSubKeyNames()
+                               .Select(installedSoftwareString => uninstallKey.OpenSubKey(installedSoftwareString))
+                               .Select(installedSoftwareKey => new
+                               {
+                                   Name = installedSoftwareKey.GetValue("DisplayName"),
+                                   Version = installedSoftwareKey.GetValue("DisplayVersion")
+                               })
+                               .Where(x => x != null && x.Name != null && x.Version != null)
+                               .Any(installedSoftwareName => installedSoftwareName != null && installedSoftwareName.Name.ToString().Contains(softwareName) && installedSoftwareName.Version.ToString().Contains(softwareVersion));
         }
     }
 }

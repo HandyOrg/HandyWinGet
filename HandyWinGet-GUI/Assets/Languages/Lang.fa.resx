@@ -246,4 +246,13 @@
   <data name="ComingSoon" xml:space="preserve">
     <value>بزودی</value>
   </data>
+  <data name="CheckAppInstalled" xml:space="preserve">
+    <value>بررسی نصب بودن برنامه</value>
+  </data>
+  <data name="CheckAppInstalledNote" xml:space="preserve">
+    <value>نکته:  ممکن است همه برنامه ها شناسایی نشوند و در سرعت بارگذاری پکیج ها تاثیر منفی می گذارد</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>سورس کد</value>
+  </data>
 </root>

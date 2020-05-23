@@ -79,6 +79,24 @@ namespace HandyWinget_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check that the program is installed.
+        /// </summary>
+        public static string CheckAppInstalled {
+            get {
+                return ResourceManager.GetString("CheckAppInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Note: Not all programs may be detected and will negatively affect the loading speed of the packages.
+        /// </summary>
+        public static string CheckAppInstalledNote {
+            get {
+                return ResourceManager.GetString("CheckAppInstalledNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Company Name in Packages List.
         /// </summary>
         public static string CheckedCompanyName {
@@ -390,6 +408,15 @@ namespace HandyWinget_GUI.Assets.Languages {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source Code.
+        /// </summary>
+        public static string Source {
+            get {
+                return ResourceManager.GetString("Source", resourceCulture);
             }
         }
         

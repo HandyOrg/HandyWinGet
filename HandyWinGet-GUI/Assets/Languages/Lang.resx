@@ -246,4 +246,13 @@
   <data name="ComingSoon" xml:space="preserve">
     <value>Coming Soon</value>
   </data>
+  <data name="CheckAppInstalled" xml:space="preserve">
+    <value>Check that the program is installed</value>
+  </data>
+  <data name="CheckAppInstalledNote" xml:space="preserve">
+    <value>Note: Not all programs may be detected and will negatively affect the loading speed of the packages</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Source Code</value>
+  </data>
 </root>

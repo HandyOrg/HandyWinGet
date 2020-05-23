@@ -11,6 +11,12 @@
                     <hc:Divider LineStrokeThickness="2" Content="{hc:Localization General}"/>
                     
                     <ToggleButton IsChecked="{Binding IsCheckedCompanyName}" HorizontalAlignment="Left" Command="{Binding IsCheckedCompanyNameCommand}" CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Margin="0,10,0,0" Content="{hc:Localization CheckedCompanyName}" Style="{StaticResource ToggleButtonSwitch}"/>
+                    <ToggleButton IsChecked="{Binding IsCheckAppInstalled}" HorizontalAlignment="Left" Command="{Binding IsCheckAppInstalledCommand}" CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Margin="0,10,0,0" Content="{hc:Localization CheckAppInstalled}" Style="{StaticResource ToggleButtonSwitch}"/>
+                    <Label HorizontalAlignment="Left" Margin="40,5,0,0" Style="{DynamicResource LabelDanger}">
+                        <Label.Content>
+                            <TextBlock TextWrapping="Wrap" Text="{hc:Localization CheckAppInstalledNote}"/>
+                        </Label.Content>
+                    </Label>
                 </StackPanel>
             </Border>
         </hc:ScrollViewer>
