@@ -71,7 +71,7 @@ namespace HandyWinget_GUI.ViewModels
         {
             try
             {
-                UpdateHelper.GithubReleaseModel ver = UpdateHelper.CheckForUpdateGithubRelease("ghost1372", "WinGet-GUI");
+                UpdateHelper.GithubReleaseModel ver = UpdateHelper.CheckForUpdateGithubRelease("HandyOrg", "HandyWinGet-GUI");
                 CreatedAt = ver.CreatedAt.ToString();
                 PublishedAt = ver.PublishedAt.ToString();
                 DownloadUrl = ver.Asset[0].browser_download_url;
