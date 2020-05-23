@@ -1,6 +1,9 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
+using HandyWinget_GUI.Assets;
+using HandyWinget_GUI.Assets.Languages;
+using HandyWinget_GUI.Views;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
@@ -10,9 +13,6 @@ using Prism.Regions;
 using System;
 using System.Diagnostics;
 using System.Windows;
-using HandyWinget_GUI.Assets;
-using HandyWinget_GUI.Assets.Languages;
-using HandyWinget_GUI.Views;
 
 namespace HandyWinget_GUI
 {
@@ -31,7 +31,6 @@ namespace HandyWinget_GUI
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
             ConfigHelper.Instance.SetLang(GlobalDataHelper<AppConfig>.Config.Lang);
             Container.Resolve<IRegionManager>().RegisterViewWithRegion("ContentRegion", typeof(Packages));
         }

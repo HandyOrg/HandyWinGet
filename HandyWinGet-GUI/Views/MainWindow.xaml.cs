@@ -1,9 +1,9 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools;
+using HandyWinget_GUI.Assets.Languages;
 using System.Windows;
 using System.Windows.Controls;
-using HandyWinget_GUI.Assets.Languages;
 
 namespace HandyWinget_GUI.Views
 {

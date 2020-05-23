@@ -1,4 +1,6 @@
 ﻿using HandyControl.Controls;
+using HandyWinget_GUI.Assets.Languages;
+using HandyWinget_GUI.Models;
 using LibGit2Sharp;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -9,12 +11,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using HandyWinget_GUI.Assets.Languages;
-using HandyWinget_GUI.Models;
+
 namespace HandyWinget_GUI.ViewModels
 {
     public class PackagesViewModel : BindableBase
@@ -22,7 +25,7 @@ namespace HandyWinget_GUI.ViewModels
         //Todo: Check if Installed
         //Todo: Create Pkg
 
-        private readonly string path = @"pkgs";
+        private readonly string path = Assembly.GetExecutingAssembly().Location.Replace(Path.GetFileName(Assembly.GetExecutingAssembly().Location), "") + @"pkgs";
 
         #region Property
         private ObservableCollection<PackagesModel> _dataList = new ObservableCollection<PackagesModel>();
@@ -209,18 +212,18 @@ namespace HandyWinget_GUI.ViewModels
                 IEnumerable<string> pkgs = GetAllDirectories(path + @"\manifests");
                 foreach (string item in pkgs)
                 {
-                    string fixName = item.Replace(@"pkgs\manifests\", "");
-                    string version = fixName.Substring(fixName.LastIndexOf('\\') + 1).Replace(".yaml", "").Replace(".Yaml", "").Trim();
+                    string name = Regex.Replace(item, @".*(?=manifests)", "", RegexOptions.IgnorePatternWhitespace).Replace(@"manifests\", "");
+                    string version = name.Substring(name.LastIndexOf('\\') + 1).Replace(".yaml", "").Replace(".Yaml", "").Trim();
 
-                    int nameWithCompany = fixName.LastIndexOf('\\');
+                    int nameWithCompany = name.LastIndexOf('\\');
                     if (nameWithCompany > 0)
                     {
-                        fixName = fixName.Substring(0, nameWithCompany).Replace("\\", " - ").Trim();
+                        name = name.Substring(0, nameWithCompany).Replace("\\", " - ").Trim();
                     }
 
                     if (GlobalDataHelper<AppConfig>.Config.IsCheckedCompanyName)
                     {
-                        fixName = fixName.Substring(fixName.IndexOf('-') + 1).Trim();
+                        name = name.Substring(name.IndexOf('-') + 1).Trim();
                     }
 
                     try
@@ -228,7 +231,7 @@ namespace HandyWinget_GUI.ViewModels
                         string id = File.ReadAllLines(item).Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
 
                         //Todo: check if installed
-                        DataList.AddOnUI(new PackagesModel { Name = fixName, IsInstalled = false, Version = version, Id = id });
+                        DataList.AddOnUI(new PackagesModel { Name = name, IsInstalled = false, Version = version, Id = id });
                     }
                     catch (InvalidOperationException)
                     {
@@ -263,7 +266,7 @@ namespace HandyWinget_GUI.ViewModels
             Tools.DeleteDirectory(path + @"\.git");
             Tools.DeleteDirectory(path + @"\.github");
 
-            string[] filePaths = System.IO.Directory.GetFiles(@"pkgs");
+            string[] filePaths = System.IO.Directory.GetFiles(path);
             foreach (string filePath in filePaths)
             {
                 File.Delete(filePath);

@@ -1,9 +1,9 @@
 ﻿using HandyControl.Controls;
+using HandyWinget_GUI.Assets.Languages;
 using Prism.Commands;
 using Prism.Mvvm;
 using System.Reflection;
 using System.Windows;
-using HandyWinget_GUI.Assets.Languages;
 
 namespace HandyWinget_GUI.ViewModels
 {
