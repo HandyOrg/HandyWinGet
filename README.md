@@ -8,7 +8,6 @@ provides a GUI for installing apps through WinGet.
 - Light/Dark Theme
 
 Todo:
-- [ ] Detect Installed Apps
 - [ ] Create Package
 
 Check out the Releases to download.
