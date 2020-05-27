@@ -255,4 +255,7 @@
   <data name="Source" xml:space="preserve">
     <value>Source Code</value>
   </data>
+  <data name="PkgInstalled" xml:space="preserve">
+    <value>Installed</value>
+  </data>
 </root>

@@ -5,11 +5,11 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>HandyWinget_GUI</AssemblyName>
     <RootNamespace>HandyWinget_GUI</RootNamespace>
-    <Version>1.1.0.0</Version>
+    <Version>1.2.0.0</Version>
     <Configurations>Debug;Release</Configurations>
     <Copyright>Copyright © HandyOrg 2018-2020</Copyright>
-    <FileVersion>1.1.0.0</FileVersion>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <LangVersion>latest</LangVersion>
     <SatelliteResourceLanguages>en;fa</SatelliteResourceLanguages>
     <ApplicationIcon>Resources\Img\icon.ico</ApplicationIcon>
@@ -34,7 +34,7 @@
     <Resource Include="Resources\Img\cloud.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HandyControls" Version="2.5.2.1" />
+    <PackageReference Include="HandyControls" Version="2.5.3" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.2.1" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.2.1" />

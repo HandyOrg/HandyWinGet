@@ -3,7 +3,7 @@ namespace HandyWinget_GUI.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private string _title = "WinGet GUI";
+        private string _title = "HandyWinGet GUI";
         public string Title
         {
             get => _title;

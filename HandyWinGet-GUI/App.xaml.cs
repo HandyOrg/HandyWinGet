@@ -7,7 +7,6 @@ using HandyWinget_GUI.Views;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
-using Microsoft.Win32;
 using Prism.Ioc;
 using Prism.Regions;
 using System;
@@ -23,7 +22,7 @@ namespace HandyWinget_GUI
             AppCenter.Start("0153dc1d-eda3-4da2-98c9-ce29361d622d",
                    typeof(Analytics), typeof(Crashes));
 
-            GlobalDataHelper<AppConfig>.Init();
+            GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
             LocalizationManager.Instance.LocalizationProvider = new ResxProvider();
             LocalizationManager.Instance.CurrentCulture = new System.Globalization.CultureInfo(GlobalDataHelper<AppConfig>.Config.Lang);
         }
@@ -32,37 +31,19 @@ namespace HandyWinget_GUI
         {
             base.OnStartup(e);
             ConfigHelper.Instance.SetLang(GlobalDataHelper<AppConfig>.Config.Lang);
+        }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
             Container.Resolve<IRegionManager>().RegisterViewWithRegion("ContentRegion", typeof(Packages));
         }
 
-        private bool IsOSSupported()
-        {
-            string subKey = @"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion";
-            RegistryKey key = Registry.LocalMachine;
-            RegistryKey skey = key.OpenSubKey(subKey);
 
-            string name = skey.GetValue("ProductName").ToString();
-            if (name.Contains("Windows 10"))
-            {
-                int releaseId = Convert.ToInt32(Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", ""));
-                if (releaseId < 1709)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
         protected override System.Windows.Window CreateShell()
         {
             MainWindow shell = Container.Resolve<MainWindow>();
-            if (!IsOSSupported())
+            if (!Tools.IsOSSupported())
             {
                 HandyControl.Controls.MessageBox.Show(Lang.ResourceManager.GetString("OSNotSupport"));
                 Environment.Exit(0);

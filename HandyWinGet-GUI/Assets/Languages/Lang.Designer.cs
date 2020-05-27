@@ -349,6 +349,15 @@ namespace HandyWinget_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installed.
+        /// </summary>
+        public static string PkgInstalled {
+            get {
+                return ResourceManager.GetString("PkgInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Published At.
         /// </summary>
         public static string Published {

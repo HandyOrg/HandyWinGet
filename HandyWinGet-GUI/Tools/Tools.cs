@@ -94,5 +94,30 @@ namespace HandyWinget_GUI
                                .Where(x => x != null && x.Name != null && x.Version != null)
                                .Any(installedSoftwareName => installedSoftwareName != null && installedSoftwareName.Name.ToString().Contains(softwareName) && installedSoftwareName.Version.ToString().Contains(softwareVersion));
         }
+
+        public static bool IsOSSupported()
+        {
+            string subKey = @"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion";
+            RegistryKey key = Registry.LocalMachine;
+            RegistryKey skey = key.OpenSubKey(subKey);
+
+            string name = skey.GetValue("ProductName").ToString();
+            if (name.Contains("Windows 10"))
+            {
+                int releaseId = Convert.ToInt32(Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", ""));
+                if (releaseId < 1709)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
