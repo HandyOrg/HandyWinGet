@@ -160,7 +160,7 @@
     <value>General</value>
   </data>
   <data name="Hash" xml:space="preserve">
-    <value>Validated hash for</value>
+    <value>Hash (SHA256)</value>
   </data>
   <data name="Install" xml:space="preserve">
     <value>Install Selected</value>
@@ -257,5 +257,56 @@
   </data>
   <data name="PkgInstalled" xml:space="preserve">
     <value>Installed</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>App Name</value>
+  </data>
+  <data name="AppDetail" xml:space="preserve">
+    <value>Application Details</value>
+  </data>
+  <data name="Publisher" xml:space="preserve">
+    <value>Publisher</value>
+  </data>
+  <data name="PackageId" xml:space="preserve">
+    <value>Package Id</value>
+  </data>
+  <data name="PackageVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="AppMoniker" xml:space="preserve">
+    <value>AppMoniker [Optional]</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>any tags that would be useful to discover this tool</value>
+  </data>
+  <data name="Desc" xml:space="preserve">
+    <value>Description of the application</value>
+  </data>
+  <data name="License" xml:space="preserve">
+    <value>License</value>
+  </data>
+  <data name="Installer" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="HomePage" xml:space="preserve">
+    <value>HomePage</value>
+  </data>
+  <data name="LicenseURL" xml:space="preserve">
+    <value>License URL</value>
+  </data>
+  <data name="Architecture" xml:space="preserve">
+    <value>Architecture</value>
+  </data>
+  <data name="InstallerUrl" xml:space="preserve">
+    <value>URL to the installer</value>
+  </data>
+  <data name="GetHash" xml:space="preserve">
+    <value>Get Hash</value>
+  </data>
+  <data name="Finish" xml:space="preserve">
+    <value>Export Yaml File</value>
+  </data>
+  <data name="DefaultTag" xml:space="preserve">
+    <value>Tags: zip, c++</value>
   </data>
 </root>

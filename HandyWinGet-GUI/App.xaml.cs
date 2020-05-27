@@ -72,6 +72,7 @@ namespace HandyWinget_GUI
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<Packages>();
+            containerRegistry.RegisterForNavigation<CreatePackages>();
             containerRegistry.RegisterForNavigation<About>();
             containerRegistry.RegisterForNavigation<Settings>();
             containerRegistry.RegisterForNavigation<Updater>();

@@ -163,7 +163,7 @@
     <value>در حال دانلود {0}</value>
   </data>
   <data name="Hash" xml:space="preserve">
-    <value>هش معتبر برای</value>
+    <value>هش (SHA256)</value>
   </data>
   <data name="Installed" xml:space="preserve">
     <value>{0} نصب شد</value>
@@ -257,5 +257,56 @@
   </data>
   <data name="PkgInstalled" xml:space="preserve">
     <value>نصب شده</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>نام برنامه</value>
+  </data>
+  <data name="AppDetail" xml:space="preserve">
+    <value>جزئیات برنامه</value>
+  </data>
+  <data name="Publisher" xml:space="preserve">
+    <value>ناشر</value>
+  </data>
+  <data name="PackageId" xml:space="preserve">
+    <value>پکیج آیدی</value>
+  </data>
+  <data name="PackageVersion" xml:space="preserve">
+    <value>نسخه</value>
+  </data>
+  <data name="AppMoniker" xml:space="preserve">
+    <value>اسم اختصاری [اختیاری]</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>هرگونه برچسبی که برای دیده شدن برنامه شما مناسب باشد</value>
+  </data>
+  <data name="Desc" xml:space="preserve">
+    <value>توضیحات برنامه</value>
+  </data>
+  <data name="License" xml:space="preserve">
+    <value>لایسنس</value>
+  </data>
+  <data name="Installer" xml:space="preserve">
+    <value>نصاب</value>
+  </data>
+  <data name="HomePage" xml:space="preserve">
+    <value>صفحه اصلی</value>
+  </data>
+  <data name="LicenseURL" xml:space="preserve">
+    <value>آدرس لایسنس</value>
+  </data>
+  <data name="Architecture" xml:space="preserve">
+    <value>معماری</value>
+  </data>
+  <data name="InstallerUrl" xml:space="preserve">
+    <value>لینک دانلود</value>
+  </data>
+  <data name="GetHash" xml:space="preserve">
+    <value>دریافت هش</value>
+  </data>
+  <data name="Finish" xml:space="preserve">
+    <value>خروجی گرفتن فایل Yaml</value>
+  </data>
+  <data name="DefaultTag" xml:space="preserve">
+    <value>برچسب ها : زیپ، کد</value>
   </data>
 </root>

@@ -70,6 +70,42 @@ namespace HandyWinget_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application Details.
+        /// </summary>
+        public static string AppDetail {
+            get {
+                return ResourceManager.GetString("AppDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AppMoniker [Optional].
+        /// </summary>
+        public static string AppMoniker {
+            get {
+                return ResourceManager.GetString("AppMoniker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to App Name.
+        /// </summary>
+        public static string AppName {
+            get {
+                return ResourceManager.GetString("AppName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Architecture.
+        /// </summary>
+        public static string Architecture {
+            get {
+                return ResourceManager.GetString("Architecture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to change language?.
         /// </summary>
         public static string ChangeLanguage {
@@ -160,6 +196,24 @@ namespace HandyWinget_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tags: zip, c++.
+        /// </summary>
+        public static string DefaultTag {
+            get {
+                return ResourceManager.GetString("DefaultTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description of the application.
+        /// </summary>
+        public static string Desc {
+            get {
+                return ResourceManager.GetString("Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Programmer Mahdi Hosseini.
         /// </summary>
         public static string Developer {
@@ -205,6 +259,15 @@ namespace HandyWinget_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export Yaml File.
+        /// </summary>
+        public static string Finish {
+            get {
+                return ResourceManager.GetString("Finish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to General.
         /// </summary>
         public static string General {
@@ -214,11 +277,29 @@ namespace HandyWinget_GUI.Assets.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Validated hash for.
+        ///   Looks up a localized string similar to Get Hash.
+        /// </summary>
+        public static string GetHash {
+            get {
+                return ResourceManager.GetString("GetHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hash (SHA256).
         /// </summary>
         public static string Hash {
             get {
                 return ResourceManager.GetString("Hash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HomePage.
+        /// </summary>
+        public static string HomePage {
+            get {
+                return ResourceManager.GetString("HomePage", resourceCulture);
             }
         }
         
@@ -237,6 +318,24 @@ namespace HandyWinget_GUI.Assets.Languages {
         public static string Installed {
             get {
                 return ResourceManager.GetString("Installed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installer.
+        /// </summary>
+        public static string Installer {
+            get {
+                return ResourceManager.GetString("Installer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL to the installer.
+        /// </summary>
+        public static string InstallerUrl {
+            get {
+                return ResourceManager.GetString("InstallerUrl", resourceCulture);
             }
         }
         
@@ -282,6 +381,24 @@ namespace HandyWinget_GUI.Assets.Languages {
         public static string LatestVersion {
             get {
                 return ResourceManager.GetString("LatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to License.
+        /// </summary>
+        public static string License {
+            get {
+                return ResourceManager.GetString("License", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to License URL.
+        /// </summary>
+        public static string LicenseURL {
+            get {
+                return ResourceManager.GetString("LicenseURL", resourceCulture);
             }
         }
         
@@ -340,11 +457,29 @@ namespace HandyWinget_GUI.Assets.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package Id.
+        /// </summary>
+        public static string PackageId {
+            get {
+                return ResourceManager.GetString("PackageId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Packages.
         /// </summary>
         public static string Packages {
             get {
                 return ResourceManager.GetString("Packages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        public static string PackageVersion {
+            get {
+                return ResourceManager.GetString("PackageVersion", resourceCulture);
             }
         }
         
@@ -363,6 +498,15 @@ namespace HandyWinget_GUI.Assets.Languages {
         public static string Published {
             get {
                 return ResourceManager.GetString("Published", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publisher.
+        /// </summary>
+        public static string Publisher {
+            get {
+                return ResourceManager.GetString("Publisher", resourceCulture);
             }
         }
         
@@ -453,6 +597,15 @@ namespace HandyWinget_GUI.Assets.Languages {
         public static string Status {
             get {
                 return ResourceManager.GetString("Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to any tags that would be useful to discover this tool.
+        /// </summary>
+        public static string Tags {
+            get {
+                return ResourceManager.GetString("Tags", resourceCulture);
             }
         }
         

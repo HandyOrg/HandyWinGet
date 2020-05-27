@@ -2,14 +2,15 @@
  
 provides a GUI for installing apps through WinGet.
 
+- Install Packages
+- Recognize Installed Packages
+- Create Packages
 - .Net Core 3.1
 - Prism MVVM
 - Multi Language
 - Light/Dark Theme
 
-Todo:
-- [ ] Create Package
-
 Check out the Releases to download.
 
-![WinGet-GUI](ScreenShot/1.png)
+![HandyWinGet-GUI](ScreenShot/1.png)
+![HandyWinGet-GUI](ScreenShot/2.gif)
