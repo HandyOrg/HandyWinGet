@@ -2,6 +2,8 @@
 using HandyWinget_GUI.Assets.Languages;
 using Prism.Commands;
 using Prism.Mvvm;
+using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 
@@ -61,10 +63,20 @@ namespace HandyWinget_GUI.ViewModels
         #endregion
 
         public DelegateCommand CheckUpdateCommand { get; private set; }
+        public DelegateCommand DownloadCommand { get; private set; }
 
         public UpdaterViewModel()
         {
             CheckUpdateCommand = new DelegateCommand(CheckforUpdate);
+            DownloadCommand = new DelegateCommand(OnDownloadClick);
+        }
+
+        private void OnDownloadClick()
+        {
+            string exeLocation = Environment.CurrentDirectory + @"\HandyWinGet_GUI.exe";
+
+            Process.Start(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\HandyUpdater.exe", $"{CurrentVersion} {Version} {Environment.CurrentDirectory} {exeLocation} {DownloadUrl} ");
+            Environment.Exit(0);
         }
 
         private void CheckforUpdate()

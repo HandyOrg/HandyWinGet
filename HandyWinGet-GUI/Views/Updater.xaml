@@ -27,7 +27,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Visibility="{Binding IsUpdateExist}">
                         <Label Style="{DynamicResource LabelInfo}" Content="{hc:Localization DownloadLink}" Margin="5"/>
-                        <Button Margin="5" Content="{hc:Localization DownloadNewVer}" Command="hc:ControlCommands.OpenLink" CommandParameter="{Binding DownloadUrl}"/>
+                        <Button Margin="5" Content="{hc:Localization DownloadNewVer}" Command="{Binding DownloadCommand}"/>
                     </StackPanel>
                     <TextBox Text="{Binding ChangeLog}" IsReadOnly="True" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" TextWrapping="Wrap" Margin="10" Height="200" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
                 </StackPanel>
