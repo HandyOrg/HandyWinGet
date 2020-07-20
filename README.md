@@ -10,7 +10,10 @@ provides a GUI for installing apps through WinGet.
 - Multi Language
 - Light/Dark Theme
 
-Check out the Releases to download.
+## Installing and running HandyWinGet-GUI
+you can download setup from GitHub [Release](https://github.com/HandyOrg/HandyWinGet-GUI/releases) or download and install Via Winget
+To install HandyWinGet-GUI, run the following command from the command line / PowerShell:
+`WinGet install handywinget`
 
 ![HandyWinGet-GUI](ScreenShot/1.png)
 ![HandyWinGet-GUI](ScreenShot/2.gif)
