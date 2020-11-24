@@ -1,0 +1,18 @@
+﻿<Application x:Class="HandyWinGet.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:HandyWinGet" 
+             xmlns:ui="http://schemas.modernwpf.com/2019" 
+             xmlns:hc="https://handyorg.github.io/handycontrol">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemeResources />
+                <ui:XamlControlsResources />
+                <hc:Theme Name="hcTheme"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Geometry x:Key="RefreshGeometry">M 16 4 C 10.886719 4 6.617188 7.160156 4.875 11.625 L 6.71875 12.375 C 8.175781 8.640625 11.710938 6 16 6 C 19.242188 6 22.132813 7.589844 23.9375 10 L 20 10 L 20 12 L 27 12 L 27 5 L 25 5 L 25 8.09375 C 22.808594 5.582031 19.570313 4 16 4 Z M 25.28125 19.625 C 23.824219 23.359375 20.289063 26 16 26 C 12.722656 26 9.84375 24.386719 8.03125 22 L 12 22 L 12 20 L 5 20 L 5 27 L 7 27 L 7 23.90625 C 9.1875 26.386719 12.394531 28 16 28 C 21.113281 28 25.382813 24.839844 27.125 20.375 Z</Geometry>
+            <Geometry x:Key="InstalledGeometry">M 12 2.25 C 6.625 2.25 2.25 6.625 2.25 12 C 2.25 17.375 6.625 21.75 12 21.75 C 17.375 21.75 21.75 17.375 21.75 12 C 21.75 6.625 17.375 2.25 12 2.25 Z M 12 3.75 C 16.566406 3.75 20.25 7.4375 20.25 12 C 20.25 16.566406 16.566406 20.25 12 20.25 C 7.4375 20.25 3.75 16.566406 3.75 12 C 3.75 7.4375 7.4375 3.75 12 3.75 Z M 12 6.75 L 6 9.75 L 7.5 11.25 L 7.5 10.5 L 9.296875 11.496094 L 11.25 10.664063 L 9.75 9.851563 L 9.75 9 L 12 10.21875 L 14.976563 8.964844 L 14.976563 9.78125 L 12.789063 10.699219 L 14.414063 11.378906 L 16.5 10.5 L 16.5 11.246094 L 14.421875 12.167969 L 11.632813 13.46875 L 12.761719 14.988281 L 18.011719 12.738281 L 16.511719 11.238281 L 18 9.75 L 13.5 6.75 L 12.75 7.5 Z M 11.632813 13.46875 L 9.269531 12.304688 L 7.5 11.25 L 5.25 12.75 L 9.75 15 Z M 16.5 14.203125 L 12.589844 15.878906 L 12 15.15625 L 12 17.625 L 16.5 15.75 Z M 7.5 14.714844 L 7.5 15.75 L 11.25 18 L 11.25 14.714844 L 9.804688 15.867188 Z</Geometry>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
