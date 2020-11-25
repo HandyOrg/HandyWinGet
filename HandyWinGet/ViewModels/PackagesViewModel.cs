@@ -20,7 +20,9 @@ namespace HandyWinGet.ViewModels
 {
     public class PackagesViewModel : BindableBase
     {
+        public string _Id = string.Empty;
         public ICollectionView ItemsView => CollectionViewSource.GetDefaultView(DataList);
+        public ICollectionView ComboView => CollectionViewSource.GetDefaultView(DataListVersion);
         private readonly string path = Assembly.GetExecutingAssembly().Location.Replace(Path.GetFileName(Assembly.GetExecutingAssembly().Location), "") + @"pkgs";
 
         #region Command
@@ -35,8 +37,6 @@ namespace HandyWinGet.ViewModels
         #endregion
 
         #region Property
-        public ObservableCollection<VersionModel> _temp = new ObservableCollection<VersionModel>();
-
         private ObservableCollection<PackageModel> _DataList;
         public ObservableCollection<PackageModel> DataList
         {
@@ -93,8 +93,10 @@ namespace HandyWinGet.ViewModels
             DataList = new ObservableCollection<PackageModel>();
             DataListVersion = new ObservableCollection<VersionModel>();
             BindingOperations.EnableCollectionSynchronization(DataList, _lock);
+            BindingOperations.EnableCollectionSynchronization(DataListVersion, _lock);
 
             ItemsView.Filter = new Predicate<object>(o => Filter(o as PackageModel));
+            ComboView.Filter = new Predicate<object>(o => FilterCombo(o as VersionModel));
             GetPackages();
         }
 
@@ -169,7 +171,7 @@ namespace HandyWinGet.ViewModels
                         DataList.Add(packge);
                     }
 
-                    _temp.Add(new VersionModel { Id = id, Version = version });
+                    DataListVersion.Add(new VersionModel { Id = id, Version = version });
                 }
 
                 CleanRepo();
@@ -199,23 +201,21 @@ namespace HandyWinGet.ViewModels
                             || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
         }
 
+        private bool FilterCombo(VersionModel item)
+        {
+            return _Id == null || item.Id.Equals(_Id);
+        }
+
         void ItemChanged(SelectionChangedEventArgs e)
         {
             try
             {
                 if (e.OriginalSource is DataGrid)
                 {
-                    DataListVersion?.Clear();
-
                     if (e.AddedItems[0] is PackageModel item)
                     {
-                        var result = _temp.Where(w => w.Id.Equals(item.Id)).Select(x => new { x.Id, x.Version }).OrderByDescending(x => x.Version).ToList();
-
-                        foreach (var res in result)
-                        {
-                            DataListVersion.Add(new VersionModel { Id = res.Id, Version = res.Version });
-
-                        }
+                        _Id = item.Id;
+                        ComboView.Refresh();
                     }
                 }
             }
@@ -234,7 +234,6 @@ namespace HandyWinGet.ViewModels
                     LoadingStatus = "Refreshing Packages...";
                     DataList.Clear();
                     DataListVersion.Clear();
-                    _temp.Clear();
                     DataGot = false;
                     GetPackages(true);
                     break;

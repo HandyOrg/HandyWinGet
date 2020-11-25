@@ -3,8 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/" 
              xmlns:hc="https://handyorg.github.io/handycontrol"
-             xmlns:vw="clr-namespace:HandyWinGet.Views"
-             xmlns:vm="clr-namespace:HandyWinGet.ViewModels"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <hc:TransitioningContentControl>
         <hc:ToggleBlock IsChecked="{Binding DataGot}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
@@ -54,7 +52,7 @@
                             <Button Command="{Binding ButtonCmd}" CommandParameter="Refresh" hc:IconElement.Geometry="{DynamicResource RefreshGeometry}" hc:IconElement.Height="14" Style="{StaticResource ButtonDashed}" Width="170" Content="Refresh"/>
                         </StatusBarItem>
                         <StatusBarItem>
-                            <hc:SplitButton Style="{StaticResource SplitButtonPrimary}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" hc:IconElement.Height="14" Margin="10,0" Width="140" Content="Install" Command="{Binding ButtonCmd}" CommandParameter="Install" HorizontalAlignment="Stretch">
+                            <hc:SplitButton Style="{StaticResource SplitButtonPrimary}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" hc:IconElement.Height="14" Margin="5,0" Width="140" Content="Install" Command="{Binding ButtonCmd}" CommandParameter="Install" HorizontalAlignment="Stretch">
                                 <hc:SplitButton.DropDownContent>
                                     <StackPanel>
                                         <MenuItem Width="140" Foreground="{DynamicResource PrimaryTextBrush}" Header="Uninstall" Command="{Binding ButtonCmd}" CommandParameter="Uninstall">
