@@ -91,6 +91,7 @@ namespace HandyWinGet.ViewModels
         public PackagesViewModel()
         {
 
+            UpdatedDate = GlobalDataHelper<AppConfig>.Config.UpdatedDate.ToString();
             DataList = new ObservableCollection<PackageModel>();
             DataListVersion = new ObservableCollection<VersionModel>();
             BindingOperations.EnableCollectionSynchronization(DataList, _lock);
@@ -132,6 +133,9 @@ namespace HandyWinGet.ViewModels
             cloneOptions.RepositoryOperationStarting = RepositoryOperationStartingProgress;
 
             Repository.Clone("https://github.com/microsoft/winget-pkgs.git", path, cloneOptions);
+            UpdatedDate = DateTime.Now.ToString();
+            GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
+            GlobalDataHelper<AppConfig>.Save();
         }
 
         private void GetPackages(bool ForceUpdate = false)
@@ -179,8 +183,6 @@ namespace HandyWinGet.ViewModels
             }).ContinueWith(obj =>
             {
                 DataGot = true;
-                GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
-                UpdatedDate = DateTime.Now.ToString();
             });
         }
         class ItemEqualityComparer : IEqualityComparer<PackageModel>
