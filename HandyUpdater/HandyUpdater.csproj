@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HandyControls" Version="2.5.3" />
+    <PackageReference Include="HandyControls" Version="3.0.0-rc.2" />
   </ItemGroup>
 
 </Project>

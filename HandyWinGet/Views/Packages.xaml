@@ -4,7 +4,7 @@
              xmlns:prism="http://prismlibrary.com/" 
              xmlns:hc="https://handyorg.github.io/handycontrol"
              prism:ViewModelLocator.AutoWireViewModel="True">
-    <hc:TransitioningContentControl>
+    <hc:TransitioningContentControl TransitionMode="Fade">
         <hc:ToggleBlock IsChecked="{Binding DataGot}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
             <hc:ToggleBlock.UnCheckedContent>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">

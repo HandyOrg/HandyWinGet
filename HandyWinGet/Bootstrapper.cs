@@ -21,7 +21,9 @@ namespace HandyWinGet
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterForNavigation<CreatePackage>();
             containerRegistry.RegisterForNavigation<Packages>();
+            containerRegistry.RegisterForNavigation<Settings>();
         }
     }
 }

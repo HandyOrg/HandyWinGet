@@ -31,7 +31,7 @@
     <ui:NavigationView IsBackButtonVisible="Collapsed" IsTabStop="False" PaneTitle="HandyWinGet" IsSettingsVisible="True" PaneDisplayMode="{Binding PaneDisplayMode}">
         <ui:NavigationView.MenuItems>
             <ui:NavigationViewItem IsSelected="True" IsTabStop="False" Icon="home" Tag="Packages" Content="Packages"/>
-            <ui:NavigationViewItem Icon="add" Tag="CreatePackages" Content="Create New Package"/>
+            <ui:NavigationViewItem Icon="add" Tag="CreatePackage" Content="Create New Package"/>
         </ui:NavigationView.MenuItems>
 
         <ContentControl prism:RegionManager.RegionName="ContentRegion" />

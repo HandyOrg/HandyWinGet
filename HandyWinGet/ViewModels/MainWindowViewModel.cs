@@ -9,6 +9,7 @@ namespace HandyWinGet.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
+        internal static MainWindowViewModel Instance;
         IRegionManager region;
         private DelegateCommand<NavigationViewSelectionChangedEventArgs> _SwitchCommand;
         public DelegateCommand<NavigationViewSelectionChangedEventArgs> SwitchCommand =>
@@ -23,6 +24,7 @@ namespace HandyWinGet.ViewModels
 
         public MainWindowViewModel(IRegionManager regionManager)
         {
+            Instance = this;
             region = regionManager;
         }
 
