@@ -3,6 +3,9 @@ using HandyControl.Data;
 using HandyControl.Themes;
 using HandyControl.Tools;
 using HandyWinGet.Data;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using ModernWpf;
 using System;
 using System.IO;
@@ -25,6 +28,9 @@ namespace HandyWinGet
             }
             ProfileOptimization.SetProfileRoot(cachePath);
             ProfileOptimization.StartProfile("Profile");
+
+            AppCenter.Start("0153dc1d-eda3-4da2-98c9-ce29361d622d",
+                   typeof(Analytics), typeof(Crashes));
         }
 
         protected override void OnStartup(StartupEventArgs e)

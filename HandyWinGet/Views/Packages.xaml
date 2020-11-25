@@ -38,7 +38,7 @@
                                     <TextBlock Text="Latest Version" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridTemplateColumn Width="auto">
+                            <DataGridTemplateColumn Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <TextBlock Text="Available Versions" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTemplateColumn.Header>
