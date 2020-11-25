@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -155,7 +156,7 @@ namespace HandyWinGet.ViewModels
                 {
                     string result = Regex.Replace(item, @".*(?=manifests)", "", RegexOptions.IgnorePatternWhitespace).Replace(@"manifests\", "");
                     string version = result.Substring(result.LastIndexOf('\\') + 1).Replace(".yaml", "").Replace(".Yaml", "").Trim();
-                    string company = result.Substring(0, result.IndexOf('\\') - 1).Trim();
+                    string company = result.Substring(0, result.IndexOf('\\')).Trim();
 
                     int from = result.IndexOf(company) + company.Length + 2;
                     int to = result.LastIndexOf("\\");
@@ -198,7 +199,8 @@ namespace HandyWinGet.ViewModels
         private bool Filter(PackageModel item)
         {
             return SearchText == null
-                            || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
+                            || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1
+                            || item.Company.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
         }
 
         private bool FilterCombo(VersionModel item)

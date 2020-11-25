@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HandyWinGet"
         mc:Ignorable="d"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:prism="http://prismlibrary.com/"
@@ -15,8 +14,8 @@
         WindowStartupLocation="CenterScreen"
         Height="600"
         MinHeight="600"
-        Width="1050"
-        MinWidth="920">
+        Width="1100"
+        MinWidth="950">
     <hc:Window.NonClientAreaContent>
         <Grid Margin="20,0">
             <Grid.ColumnDefinitions>

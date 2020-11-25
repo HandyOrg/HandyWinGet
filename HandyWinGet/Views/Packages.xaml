@@ -23,10 +23,25 @@
 
                     <DataGrid hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="Column" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Company}" Header="Company"/>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Header="Name"/>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Header="Version"/>
-                            <DataGridTemplateColumn Header="Version" Width="auto">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Company}">
+                                <DataGridTextColumn.Header>
+                                    <TextBlock Text="Company" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}">
+                                <DataGridTextColumn.Header>
+                                    <TextBlock Text="Name" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}">
+                                <DataGridTextColumn.Header>
+                                    <TextBlock Text="Latest Version" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Width="auto">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock Text="Available Versions" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTemplateColumn.Header>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <hc:ComboBox DisplayMemberPath="Version" hc:InfoElement.Placeholder="Select Version (Current is Latest)" Width="220" ItemsSource="{Binding DataContext.DataListVersion, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
