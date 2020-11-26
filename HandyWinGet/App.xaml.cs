@@ -28,9 +28,6 @@ namespace HandyWinGet
             }
             ProfileOptimization.SetProfileRoot(cachePath);
             ProfileOptimization.StartProfile("Profile");
-
-            AppCenter.Start("0153dc1d-eda3-4da2-98c9-ce29361d622d",
-                   typeof(Analytics), typeof(Crashes));
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -43,6 +40,9 @@ namespace HandyWinGet
             }
             var boot = new Bootstrapper();
             boot.Run();
+
+            AppCenter.Start("0153dc1d-eda3-4da2-98c9-ce29361d622d",
+                   typeof(Analytics), typeof(Crashes));
         }
         public void UpdateSkin(SkinType skin)
         {

@@ -17,7 +17,7 @@ namespace HandyWinGet
             base.OnInitialized();
             if (!IsOSSupported())
             {
-                HandyControl.Controls.MessageBox.Error("your Windows Is Not Supported Please Update to Windows 10 1709 (build 16299) or later");
+                HandyControl.Controls.MessageBox.Error("Your Windows Is Not Supported Please Update to Windows 10 1709 (build 16299) or later");
                 Environment.Exit(0);
             }
 

@@ -26,6 +26,7 @@
 
             <StackPanel Margin="10,10,50,20" Grid.Column="1">
                 <TextBlock HorizontalAlignment="Left" Text="HandywinGet-GUI" Style="{StaticResource TextBlockTitleBold}"/>
+                <TextBlock Margin="0,5" Width="200" Text="powerful app for installing apps through WinGet and Creating winget package." TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14"/>
 
                 <TextBlock Margin="0,5,0,0" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14">
                     <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet-GUI" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
