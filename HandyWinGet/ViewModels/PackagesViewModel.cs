@@ -169,7 +169,7 @@ namespace HandyWinGet.ViewModels
                     string version = result.Substring(result.LastIndexOf('\\') + 1).Replace(".yaml", "").Replace(".Yaml", "").Trim();
                     string company = result.Substring(0, result.IndexOf('\\')).Trim();
 
-                    int from = result.IndexOf(company) + company.Length + 2;
+                    int from = result.IndexOf(company) + company.Length + 1;
                     int to = result.LastIndexOf("\\");
                     string name = result.Substring(from, to - from).Trim();
 
@@ -219,22 +219,24 @@ namespace HandyWinGet.ViewModels
 
         void ItemChanged(SelectionChangedEventArgs e)
         {
-            if (e.OriginalSource is DataGrid)
+            if (e.OriginalSource is DataGrid dg)
             {
-                if (e.AddedItems[0] is PackageModel item)
+                var dgItem = (PackageModel)dg.SelectedItem;
+
+                if (dgItem != null)
                 {
-                    _Id = item.Id;
+                    _Id = dgItem.Id;
                     ComboView.Refresh();
-                    SelectedPackage = new VersionModel { Id = item.Id, Version = item.Version };
+                    SelectedPackage = new VersionModel { Id = dgItem.Id, Version = dgItem.Version };
                 }
             }
 
             if (e.OriginalSource is HandyControl.Controls.ComboBox cmb)
             {
-                var typeItem = (VersionModel)cmb.SelectedItem;
-                if (typeItem != null)
+                var cmbItem = (VersionModel)cmb.SelectedItem;
+                if (cmbItem != null)
                 {
-                    SelectedPackage = new VersionModel { Id = typeItem.Id, Version = typeItem.Version };
+                    SelectedPackage = new VersionModel { Id = cmbItem.Id, Version = cmbItem.Version };
                 }
             }
         }
@@ -309,65 +311,70 @@ namespace HandyWinGet.ViewModels
 
         public void Install()
         {
-            DataGot = false;
-            LoadingStatus = $"Installing {SelectedPackage.Id}";
-
-            Process proc = new Process
+            if (SelectedPackage.Id !=null)
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "winget",
-                    Arguments = $"install {SelectedPackage.Id} {($"-v {SelectedPackage.Version}")}",
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true
-                },
-                EnableRaisingEvents = true
-            };
+                DataGot = false;
+                LoadingStatus = $"Installing {SelectedPackage.Id}";
 
-            proc.OutputDataReceived += (o, args) =>
+                Process proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "winget",
+                        Arguments = $"install {SelectedPackage.Id} {($"-v {SelectedPackage.Version}")}",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true
+                    },
+                    EnableRaisingEvents = true
+                };
+
+                proc.OutputDataReceived += (o, args) =>
+                {
+                    string line = args.Data ?? "";
+
+                    if (line.Contains("Download"))
+                    {
+                        LoadingStatus = "Downloading Package...";
+                    }
+
+                    if (line.Contains("hash"))
+                    {
+                        LoadingStatus = $"Validated hash for {SelectedPackage.Id}";
+                    }
+
+                    if (line.Contains("Installing"))
+                    {
+                        LoadingStatus = $"Installing {SelectedPackage.Id}";
+                    }
+
+                    if (line.Contains("Failed"))
+                    {
+                        LoadingStatus = $"Installation of {SelectedPackage.Id} failed";
+                    }
+                };
+
+                proc.Exited += (o, args) =>
+                {
+                    Application.Current.Dispatcher.Invoke(async () =>
+                    {
+                        bool installFailed = (o as Process).ExitCode != 0;
+                        LoadingStatus = installFailed
+                            ? $"Installation of {SelectedPackage.Id} failed"
+                            : $"Installed {SelectedPackage.Id}";
+
+                        await Task.Delay(2000);
+                        DataGot = true;
+                    });
+                };
+
+                proc.Start();
+                proc.BeginOutputReadLine();
+            }
+            else
             {
-                string line = args.Data ?? "";
-
-                if (line.Contains("Download"))
-                {
-                    LoadingStatus = "Downloading Package...";
-                }
-
-                if (line.Contains("hash"))
-                {
-                    LoadingStatus = $"Validated hash for {SelectedPackage.Id}";
-                }
-
-                if (line.Contains("Installing"))
-                {
-                    LoadingStatus = $"Installing {SelectedPackage.Id}";
-                }
-
-                if (line.Contains("Failed"))
-                {
-                    LoadingStatus = $"Installation of {SelectedPackage.Id} failed";
-                }
-            };
-
-            proc.Exited += (o, args) =>
-            {
-                Application.Current.Dispatcher.Invoke(async () =>
-                {
-                    bool installFailed = (o as Process).ExitCode != 0;
-                    LoadingStatus = installFailed
-                        ? $"Installation of {SelectedPackage.Id} failed"
-                        : $"Installed {SelectedPackage.Id}";
-
-                    await Task.Delay(2000);
-                    DataGot = true;
-                });
-            };
-
-            proc.Start();
-            proc.BeginOutputReadLine();
-
+                Growl.InfoGlobal("Please select an application!");
+            }
         }
-
     }
 }

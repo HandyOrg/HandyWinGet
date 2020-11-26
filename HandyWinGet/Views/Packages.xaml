@@ -74,7 +74,7 @@
                                 <hc:SplitButton Margin=".5,0,0,0" hc:BorderElement.CornerRadius="0,6,6,0" Style="{StaticResource SplitButtonPrimary}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" hc:IconElement.Height="14" Width="170" Content="Install" Command="{Binding ButtonCmd}" CommandParameter="Install" HorizontalAlignment="Stretch">
                                     <hc:SplitButton.DropDownContent>
                                         <StackPanel>
-                                            <MenuItem Width="140" Foreground="{DynamicResource PrimaryTextBrush}" Header="Uninstall" Command="{Binding ButtonCmd}" CommandParameter="Uninstall">
+                                            <MenuItem Width="180" Foreground="{DynamicResource PrimaryTextBrush}" IsEnabled="False" Header="Uninstall (Coming Soon)" Command="{Binding ButtonCmd}" CommandParameter="Uninstall">
                                                 <MenuItem.Icon>
                                                     <Path Data="{DynamicResource DeleteGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
                                                 </MenuItem.Icon>
