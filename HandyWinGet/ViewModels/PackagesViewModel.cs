@@ -140,7 +140,7 @@ namespace HandyWinGet.ViewModels
         #region Cloning Progress
         public bool RepositoryTransferProgress(TransferProgress progress)
         {
-            LoadingStatus = $"{progress.ReceivedObjects} of {progress.TotalObjects}";
+            LoadingStatus = $"Downloading {progress.ReceivedObjects} objects from {progress.TotalObjects}";
             return true;
         }
 
