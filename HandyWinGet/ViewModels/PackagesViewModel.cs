@@ -91,12 +91,10 @@ namespace HandyWinGet.ViewModels
         }
         #endregion
 
-
         private static object _lock = new object();
 
         public PackagesViewModel()
         {
-
             UpdatedDate = GlobalDataHelper<AppConfig>.Config.UpdatedDate.ToString();
             DataList = new ObservableCollection<PackageModel>();
             DataListVersion = new ObservableCollection<VersionModel>();
@@ -127,7 +125,6 @@ namespace HandyWinGet.ViewModels
         private void RepositoryOnCheckoutProgress(string path, int completedSteps, int totalSteps)
         {
             LoadingStatus = "Checkout Repository...";
-
         }
 
         #endregion
@@ -194,6 +191,7 @@ namespace HandyWinGet.ViewModels
                 DataGot = true;
             });
         }
+
         class ItemEqualityComparer : IEqualityComparer<PackageModel>
         {
             public bool Equals(PackageModel x, PackageModel y)
@@ -207,6 +205,7 @@ namespace HandyWinGet.ViewModels
                 return obj.Name.GetHashCode();
             }
         }
+
         private bool Filter(PackageModel item)
         {
             return SearchText == null
@@ -253,24 +252,17 @@ namespace HandyWinGet.ViewModels
                         case PackageInstallMode.Wingetcli:
                             if (((App)System.Windows.Application.Current).IsWingetInstalled())
                             {
-                                InstallWingetModel();
+                                InstallWingetMode();
                             }
                             else
                             {
                                 MessageBox.Error("Winget-cli is not installed, please download and install latest version.", "Install Winget");
-                                ProcessStartInfo ps = new ProcessStartInfo("https://github.com/microsoft/winget-cli/releases")
-                                {
-                                    UseShellExecute = true,
-                                    Verb = "open"
-                                };
-                                Process.Start(ps);
+                                StartProcess("https://github.com/microsoft/winget-cli/releases");
                             }
 
                             break;
                         case PackageInstallMode.Internal:
-                            InstallInternalModel();
-                            break;
-                        default:
+                            InstallInternalMode();
                             break;
                     }
                     break;
@@ -286,6 +278,7 @@ namespace HandyWinGet.ViewModels
             }
         }
 
+        #region Clean Repo
         public IEnumerable<string> GetAllDirectories(string rootDirectory)
         {
             foreach (string directory in System.IO.Directory.GetDirectories(
@@ -334,13 +327,14 @@ namespace HandyWinGet.ViewModels
                 System.IO.Directory.Delete(d);
             }
         }
+        #endregion
 
-        public void InstallWingetModel()
+        public void InstallWingetMode()
         {
             if (SelectedPackage.Id != null)
             {
                 DataGot = false;
-                LoadingStatus = $"Installing {SelectedPackage.Id}";
+                LoadingStatus = $"Preparing to download {SelectedPackage.Id}";
 
                 Process proc = new Process
                 {
@@ -403,7 +397,7 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        public async void InstallInternalModel()
+        public async void InstallInternalMode()
         {
             try
             {
@@ -416,12 +410,12 @@ namespace HandyWinGet.ViewModels
                     }
                     else
                     {
-                        LoadingStatus = $"Downlaoding {SelectedPackage.Id}";
+                        LoadingStatus = $"Preparing to download {SelectedPackage.Id}";
                         DataGot = false;
 
                         string url = RemoveComment(SelectedPackage.Url);
 
-                        _tempLocation = $"{location} {SelectedPackage.Id} {GetExtension(url)}";
+                        _tempLocation = $"{location} {SelectedPackage.Id} {GetExtension(url)}".Trim();
                         if (!File.Exists(_tempLocation))
                         {
                             var downloader = new DownloadService();
@@ -431,8 +425,8 @@ namespace HandyWinGet.ViewModels
                         }
                         else
                         {
-                            Process.Start(_tempLocation);
                             DataGot = true;
+                            StartProcess(_tempLocation);
                         }
                     }
                 }
@@ -442,6 +436,28 @@ namespace HandyWinGet.ViewModels
                 Growl.ErrorGlobal(ex.Message);
             }
         }
+
+        public void StartProcess(string path)
+        {
+            try
+            {
+                ProcessStartInfo ps = new ProcessStartInfo(path)
+                {
+                    UseShellExecute = true,
+                    Verb = "open"
+                };
+                Process.Start(ps);
+            }
+            catch (Win32Exception ex)
+            {
+                Growl.ErrorGlobal(ex.Message);
+            }
+        }
+
+        #region Downloader
+
+        public string _tempLocation = string.Empty;
+        private readonly string location = Path.GetTempPath() + @"\";
 
         public void DownloadWithIDM(string link)
         {
@@ -461,11 +477,6 @@ namespace HandyWinGet.ViewModels
                 Growl.ErrorGlobal("Internet Download Manager (IDM) is not installed on your system, please download and install it first");
             }
         }
-
-        #region Downloader
-
-        public string _tempLocation = string.Empty;
-        private readonly string location = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\";
 
         public string GetExtension(string url)
         {
@@ -526,7 +537,7 @@ namespace HandyWinGet.ViewModels
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             DataGot = true;
-            Process.Start(_tempLocation);
+            StartProcess(_tempLocation);
         }
 
         private void OnDownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
