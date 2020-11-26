@@ -89,6 +89,34 @@ namespace HandyWinGet.ViewModels
             get { return _UpdatedDate; }
             set { SetProperty(ref _UpdatedDate, value); }
         }
+
+        private int _Progress = 0;
+        public int Progress
+        {
+            get { return _Progress; }
+            set { SetProperty(ref _Progress, value); }
+        }
+
+        private bool _IsVisibleProgressButton;
+        public bool IsVisibleProgressButton
+        {
+            get { return _IsVisibleProgressButton; }
+            set { SetProperty(ref _IsVisibleProgressButton, value); }
+        }
+
+        private bool _IsCheckedProgressButton = true;
+        public bool IsCheckedProgressButton
+        {
+            get { return _IsCheckedProgressButton; }
+            set
+            {
+                SetProperty(ref _IsCheckedProgressButton, value);
+                if (!value)
+                {
+                    downloader.CancelAsync();
+                }
+            }
+        }
         #endregion
 
         private static object _lock = new object();
@@ -410,6 +438,7 @@ namespace HandyWinGet.ViewModels
                     }
                     else
                     {
+                        IsVisibleProgressButton = true;
                         LoadingStatus = $"Preparing to download {SelectedPackage.Id}";
                         DataGot = false;
 
@@ -418,13 +447,14 @@ namespace HandyWinGet.ViewModels
                         _tempLocation = $"{location} {SelectedPackage.Id} {GetExtension(url)}".Trim();
                         if (!File.Exists(_tempLocation))
                         {
-                            var downloader = new DownloadService();
+                            downloader = new DownloadService();
                             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
                             downloader.DownloadFileCompleted += OnDownloadFileCompleted;
                             await downloader.DownloadFileAsync(url, _tempLocation);
                         }
                         else
                         {
+                            IsVisibleProgressButton = false;
                             DataGot = true;
                             StartProcess(_tempLocation);
                         }
@@ -455,7 +485,7 @@ namespace HandyWinGet.ViewModels
         }
 
         #region Downloader
-
+        public DownloadService downloader;
         public string _tempLocation = string.Empty;
         private readonly string location = Path.GetTempPath() + @"\";
 
@@ -536,6 +566,9 @@ namespace HandyWinGet.ViewModels
 
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            Progress = 0;
+            IsVisibleProgressButton = false;
+            IsCheckedProgressButton = true;
             DataGot = true;
             StartProcess(_tempLocation);
         }
@@ -545,7 +578,9 @@ namespace HandyWinGet.ViewModels
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
-            LoadingStatus = $"Downloading {SelectedPackage.Id}-{SelectedPackage.Version}   {Math.Truncate(percentage)}%";
+            var truncate = Math.Truncate(percentage);
+            Progress = (int)truncate;
+            LoadingStatus = $"Downloading {SelectedPackage.Id}-{SelectedPackage.Version}   {truncate}%";
         }
         #endregion
     }

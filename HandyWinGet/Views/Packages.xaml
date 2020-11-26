@@ -10,6 +10,18 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <hc:LoadingCircle IsRunning="{Binding DataGot, Converter={StaticResource Boolean2BooleanReConverter}}"/>
                     <TextBlock HorizontalAlignment="Center" Margin="0,10" Text="{Binding LoadingStatus}"/>
+                    <hc:ProgressButton Progress="{Binding Progress}" Visibility="{Binding IsVisibleProgressButton, Converter={StaticResource Boolean2VisibilityConverter}}" Margin="5,0" Width="200" IsChecked="{Binding IsCheckedProgressButton}">
+                        <hc:ProgressButton.Style>
+                            <Style TargetType="hc:ProgressButton" BasedOn="{StaticResource ProgressButtonPrimary}">
+                                <Setter Property="Content" Value="Download Canceled"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="Cancel Download"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </hc:ProgressButton.Style>
+                    </hc:ProgressButton>
                 </StackPanel>
             </hc:ToggleBlock.UnCheckedContent>
             <hc:ToggleBlock.CheckedContent>
