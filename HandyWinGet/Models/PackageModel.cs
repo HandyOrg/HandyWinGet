@@ -6,6 +6,7 @@
         public string Name { get; set; }
         public string Company { get; set; }
         public string Version { get; set; }
+        public string Url { get; set; }
         public bool IsInstalled { get; set; }
     }
 }

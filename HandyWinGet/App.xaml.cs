@@ -8,6 +8,8 @@ using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using ModernWpf;
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime;
 using System.Windows;
@@ -44,6 +46,7 @@ namespace HandyWinGet
             AppCenter.Start("0153dc1d-eda3-4da2-98c9-ce29361d622d",
                    typeof(Analytics), typeof(Crashes));
         }
+
         public void UpdateSkin(SkinType skin)
         {
             SharedResourceDictionary.SharedDictionaries.Clear();
@@ -60,6 +63,31 @@ namespace HandyWinGet
             }
 
             Current.MainWindow?.OnApplyTemplate();
+        }
+
+        public bool IsWingetInstalled()
+        {
+            try
+            {
+                Process proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "winget",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true
+                    },
+                    EnableRaisingEvents = true
+                };
+                proc.Start();
+                return true;
+            }
+            catch (Win32Exception)
+            {
+
+                return false;
+            }
         }
     }
 }

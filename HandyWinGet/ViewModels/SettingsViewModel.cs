@@ -20,6 +20,10 @@ namespace HandyWinGet.ViewModels
         public DelegateCommand<SelectionChangedEventArgs> PaneDisplayModeChangedCommand =>
             _PaneDisplayModeChangedCommand ?? (_PaneDisplayModeChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(PaneDisplayModeChanged));
 
+        private DelegateCommand<SelectionChangedEventArgs> _InstallModeChangedCommand;
+        public DelegateCommand<SelectionChangedEventArgs> InstallModeChangedCommand =>
+            _InstallModeChangedCommand ?? (_InstallModeChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(InstallModeChanged));
+
         private string _version;
         public string Version
         {
@@ -34,10 +38,48 @@ namespace HandyWinGet.ViewModels
             set { SetProperty(ref _PaneIndex, value); }
         }
 
+        private int _InstallModeIndex;
+        public int InstallModeIndex
+        {
+            get { return _InstallModeIndex; }
+            set { SetProperty(ref _InstallModeIndex, value); }
+        }
+
+        private bool _IsIDM;
+        public bool IsIDM
+        {
+            get { return _IsIDM; }
+            set
+            {
+                SetProperty(ref _IsIDM, value);
+                GlobalDataHelper<AppConfig>.Config.IsIDM = value;
+                GlobalDataHelper<AppConfig>.Save();
+                GlobalDataHelper<AppConfig>.Init();
+            }
+        }
+
+        private bool _IsVisibleIDM;
+        public bool IsVisibleIDM
+        {
+            get { return _IsVisibleIDM; }
+            set { SetProperty(ref _IsVisibleIDM, value); }
+        }
+
         public SettingsViewModel()
         {
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             PaneIndex = (int)GlobalDataHelper<AppConfig>.Config.PaneDisplayMode;
+            InstallModeIndex = (int)GlobalDataHelper<AppConfig>.Config.PackageInstallMode;
+            if (InstallModeIndex == (int)PackageInstallMode.Internal)
+            {
+                IsVisibleIDM = true;
+            }
+            else
+            {
+                IsVisibleIDM = false;
+            }
+
+            IsIDM = GlobalDataHelper<AppConfig>.Config.IsIDM;
         }
 
         void PaneDisplayModeChanged(SelectionChangedEventArgs e)
@@ -54,6 +96,33 @@ namespace HandyWinGet.ViewModels
                     GlobalDataHelper<AppConfig>.Save();
                     GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
                     MainWindowViewModel.Instance.PaneDisplayMode = item;
+                }
+            }
+        }
+
+        void InstallModeChanged(SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0)
+            {
+                return;
+            }
+            if (e.AddedItems[0] is PackageInstallMode item)
+            {
+                if (!item.Equals(GlobalDataHelper<AppConfig>.Config.PackageInstallMode))
+                {
+                    GlobalDataHelper<AppConfig>.Config.PackageInstallMode = item;
+
+                    if (item.Equals(PackageInstallMode.Internal))
+                    {
+                        IsVisibleIDM = true;
+                    }
+                    else
+                    {
+                        IsVisibleIDM = false;
+                    }
+
+                    GlobalDataHelper<AppConfig>.Save();
+                    GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using HandyControl.Controls;
+﻿using Downloader;
+using HandyControl.Controls;
 using HandyWinGet.Data;
 using HandyWinGet.Models;
 using LibGit2Sharp;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace HandyWinGet.ViewModels
 {
@@ -174,16 +176,16 @@ namespace HandyWinGet.ViewModels
                     string name = result.Substring(from, to - from).Trim();
 
                     string id = File.ReadAllLines(item).Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
+                    string url = File.ReadAllLines(item).Where(l => l.Contains("Url:", StringComparison.InvariantCultureIgnoreCase) && !l.Contains("LicenseUrl")).FirstOrDefault().Replace("Url:", "").Trim();
 
                     bool isInstalled = false;
-                    var packge = new PackageModel { Company = company, Name = name, IsInstalled = isInstalled, Version = version, Id = id };
+                    var packge = new PackageModel { Company = company, Name = name, IsInstalled = isInstalled, Version = version, Id = id, Url = url };
 
                     if (!DataList.Contains(packge, new ItemEqualityComparer()))
                     {
                         DataList.Add(packge);
                     }
-
-                    DataListVersion.Add(new VersionModel { Id = id, Version = version });
+                    DataListVersion.Add(new VersionModel { Id = id, Version = version, Url = url });
                 }
 
                 CleanRepo();
@@ -227,7 +229,7 @@ namespace HandyWinGet.ViewModels
                 {
                     _Id = dgItem.Id;
                     ComboView.Refresh();
-                    SelectedPackage = new VersionModel { Id = dgItem.Id, Version = dgItem.Version };
+                    SelectedPackage = new VersionModel { Id = dgItem.Id, Version = dgItem.Version, Url = dgItem.Url };
                 }
             }
 
@@ -236,7 +238,7 @@ namespace HandyWinGet.ViewModels
                 var cmbItem = (VersionModel)cmb.SelectedItem;
                 if (cmbItem != null)
                 {
-                    SelectedPackage = new VersionModel { Id = cmbItem.Id, Version = cmbItem.Version };
+                    SelectedPackage = new VersionModel { Id = cmbItem.Id, Version = cmbItem.Version, Url = cmbItem.Url };
                 }
             }
         }
@@ -246,7 +248,31 @@ namespace HandyWinGet.ViewModels
             switch (param)
             {
                 case "Install":
-                    Install();
+                    switch (GlobalDataHelper<AppConfig>.Config.PackageInstallMode)
+                    {
+                        case PackageInstallMode.Wingetcli:
+                            if (((App)System.Windows.Application.Current).IsWingetInstalled())
+                            {
+                                InstallWingetModel();
+                            }
+                            else
+                            {
+                                MessageBox.Error("Winget-cli is not installed, please download and install latest version.", "Install Winget");
+                                ProcessStartInfo ps = new ProcessStartInfo("https://github.com/microsoft/winget-cli/releases")
+                                {
+                                    UseShellExecute = true,
+                                    Verb = "open"
+                                };
+                                Process.Start(ps);
+                            }
+
+                            break;
+                        case PackageInstallMode.Internal:
+                            InstallInternalModel();
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 case "Uninstall":
                     break;
@@ -309,9 +335,9 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        public void Install()
+        public void InstallWingetModel()
         {
-            if (SelectedPackage.Id !=null)
+            if (SelectedPackage.Id != null)
             {
                 DataGot = false;
                 LoadingStatus = $"Installing {SelectedPackage.Id}";
@@ -376,5 +402,140 @@ namespace HandyWinGet.ViewModels
                 Growl.InfoGlobal("Please select an application!");
             }
         }
+
+        public async void InstallInternalModel()
+        {
+            try
+            {
+                if (SelectedPackage.Id != null)
+                {
+                    if (GlobalDataHelper<AppConfig>.Config.IsIDM)
+                    {
+                        string url = RemoveComment(SelectedPackage.Url);
+                        DownloadWithIDM(url);
+                    }
+                    else
+                    {
+                        LoadingStatus = $"Downlaoding {SelectedPackage.Id}";
+                        DataGot = false;
+
+                        string url = RemoveComment(SelectedPackage.Url);
+
+                        _tempLocation = $"{location} {SelectedPackage.Id} {GetExtension(url)}";
+                        if (!File.Exists(_tempLocation))
+                        {
+                            var downloader = new DownloadService();
+                            downloader.DownloadProgressChanged += OnDownloadProgressChanged;
+                            downloader.DownloadFileCompleted += OnDownloadFileCompleted;
+                            await downloader.DownloadFileAsync(url, _tempLocation);
+                        }
+                        else
+                        {
+                            Process.Start(_tempLocation);
+                            DataGot = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Growl.ErrorGlobal(ex.Message);
+            }
+        }
+
+        public void DownloadWithIDM(string link)
+        {
+            string command = $"/C /d \"{link}\"";
+            string IDManX64Location = @"C:\Program Files (x86)\Internet Download Manager\IDMan.exe";
+            string IDManX86Location = @"C:\Program Files\Internet Download Manager\IDMan.exe";
+            if (File.Exists(IDManX64Location))
+            {
+                System.Diagnostics.Process.Start(IDManX64Location, command);
+            }
+            else if (File.Exists(IDManX86Location))
+            {
+                System.Diagnostics.Process.Start(IDManX86Location, command);
+            }
+            else
+            {
+                Growl.ErrorGlobal("Internet Download Manager (IDM) is not installed on your system, please download and install it first");
+            }
+        }
+
+        #region Downloader
+
+        public string _tempLocation = string.Empty;
+        private readonly string location = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\";
+
+        public string GetExtension(string url)
+        {
+            var ext = Path.GetExtension(url);
+            if (string.IsNullOrEmpty(ext))
+            {
+                string pointChar = ".";
+                string slashChar = "/";
+
+                int pointIndex = url.LastIndexOf(pointChar);
+                int slashIndex = url.LastIndexOf(slashChar);
+
+                if (pointIndex >= 0)
+                {
+                    if (slashIndex >= 0)
+                    {
+                        int pFrom = pointIndex + pointChar.Length;
+                        int pTo = slashIndex;
+                        return $".{url.Substring(pFrom, pTo - pFrom)}";
+                    }
+                    else
+                    {
+                        return url.Substring(pointIndex + pointChar.Length);
+
+                    }
+
+                    return string.Empty;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            else if (ext.Contains("?"))
+            {
+                int qTo = ext.IndexOf("?");
+                return ext.Substring(0, qTo - 0);
+            }
+            else
+            {
+                return ext;
+            }
+        }
+
+        public string RemoveComment(string url)
+        {
+            int index = url.IndexOf("#");
+            if (index >= 0)
+            {
+                return url.Substring(0, index).Trim();
+            }
+            else
+            {
+                return url.Trim();
+            }
+        }
+
+        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            DataGot = true;
+            Process.Start(_tempLocation);
+        }
+
+        private void OnDownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
+        {
+            double bytesIn = double.Parse(e.BytesReceived.ToString());
+            double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
+            double percentage = bytesIn / totalBytes * 100;
+            LoadingStatus = $"Downloading {SelectedPackage.Id}-{SelectedPackage.Version}   {Math.Truncate(percentage)}%";
+        }
+        #endregion
     }
 }

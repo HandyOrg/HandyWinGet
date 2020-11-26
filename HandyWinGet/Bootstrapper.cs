@@ -4,8 +4,6 @@ using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Regions;
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 
 namespace HandyWinGet
@@ -18,18 +16,6 @@ namespace HandyWinGet
             if (!IsOSSupported())
             {
                 HandyControl.Controls.MessageBox.Error("Your Windows Is Not Supported Please Update to Windows 10 1709 (build 16299) or later");
-                Environment.Exit(0);
-            }
-
-            if (!IsWingetInstalled())
-            {
-                HandyControl.Controls.MessageBox.Error("Winget-cli Is Not Installed, Please Install it first", "Install Winget");
-                ProcessStartInfo ps = new ProcessStartInfo("https://github.com/microsoft/winget-cli/releases")
-                {
-                    UseShellExecute = true,
-                    Verb = "open"
-                };
-                Process.Start(ps);
                 Environment.Exit(0);
             }
 
@@ -50,31 +36,6 @@ namespace HandyWinGet
             containerRegistry.RegisterForNavigation<CreatePackage>();
             containerRegistry.RegisterForNavigation<Packages>();
             containerRegistry.RegisterForNavigation<Settings>();
-        }
-
-        public bool IsWingetInstalled()
-        {
-            try
-            {
-                Process proc = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "winget",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true
-                    },
-                    EnableRaisingEvents = true
-                };
-                proc.Start();
-                return true;
-            }
-            catch (Win32Exception)
-            {
-
-                return false;
-            }
         }
 
         public bool IsOSSupported()

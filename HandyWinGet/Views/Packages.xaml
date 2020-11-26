@@ -9,7 +9,7 @@
             <hc:ToggleBlock.UnCheckedContent>
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <hc:LoadingCircle IsRunning="{Binding DataGot, Converter={StaticResource Boolean2BooleanReConverter}}"/>
-                    <TextBlock Margin="0,10" Text="{Binding LoadingStatus}"/>
+                    <TextBlock HorizontalAlignment="Center" Margin="0,10" Text="{Binding LoadingStatus}"/>
                 </StackPanel>
             </hc:ToggleBlock.UnCheckedContent>
             <hc:ToggleBlock.CheckedContent>

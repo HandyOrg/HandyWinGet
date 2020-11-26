@@ -4,6 +4,7 @@
              xmlns:prism="http://prismlibrary.com/"          
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:em="clr-namespace:HandyWinGet.Data"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <hc:TransitioningContentControl TransitionMode="Fade">
         <Grid Background="{DynamicResource RegionBrush}">
@@ -21,6 +22,15 @@
                             </hc:EventTrigger>
                         </hc:Interaction.Triggers>
                     </hc:ComboBox>
+                    <hc:ComboBox SelectedIndex="{Binding InstallModeIndex}" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:PackageInstallMode}}}" Width="330" HorizontalAlignment="Left" IsEditable="False" hc:TitleElement.Title="Package Install Mode" Margin="0,10,60,10" hc:InfoElement.Placeholder="Package Install Mode">
+                        <hc:Interaction.Triggers>
+                            <hc:EventTrigger EventName="SelectionChanged">
+                                <hc:EventToCommand Command="{Binding InstallModeChangedCommand}" PassEventArgsToCommand="True"/>
+                            </hc:EventTrigger>
+                        </hc:Interaction.Triggers>
+                    </hc:ComboBox>
+
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Download with Internet Download Manager (IDM)" IsChecked="{Binding IsIDM}" Visibility="{Binding IsVisibleIDM, Converter={StaticResource Boolean2VisibilityConverter}}"/>
                 </StackPanel>
             </hc:ScrollViewer>
 

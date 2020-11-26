@@ -1,4 +1,5 @@
-﻿using HandyControl.Controls;
+﻿using Downloader;
+using HandyControl.Controls;
 using HandyControl.Tools;
 using Microsoft.Win32;
 using Prism.Commands;
@@ -7,7 +8,6 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -243,7 +243,15 @@ namespace HandyWinGet.ViewModels
 
         #region Downloader
         private readonly string location = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\";
-        private void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+
+        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            Progress = 0;
+            Hash = CryptographyHelper.GenerateSHA256ForFile(location + Path.GetFileName(URL));
+            IsEnabled = true;
+        }
+
+        private void OnDownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
         {
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
@@ -251,22 +259,15 @@ namespace HandyWinGet.ViewModels
             Progress = int.Parse(Math.Truncate(percentage).ToString());
         }
 
-        private void Completed(object sender, AsyncCompletedEventArgs e)
-        {
-            Progress = 0;
-            Hash = CryptographyHelper.GenerateSHA256ForFile(location + Path.GetFileName(URL));
-            IsEnabled = true;
-        }
-
-        private readonly WebClient client = new WebClient();
-        private void OnDownloadClick()
+        private async void OnDownloadClick()
         {
             try
             {
                 Progress = 0;
-                client.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-                client.DownloadFileAsync(new Uri(URL), location + Path.GetFileName(URL));
+                var downloader = new DownloadService();
+                downloader.DownloadProgressChanged += OnDownloadProgressChanged;
+                downloader.DownloadFileCompleted += OnDownloadFileCompleted;
+                await downloader.DownloadFileAsync(URL, location + Path.GetFileName(URL));
             }
             catch (NotSupportedException) { }
             catch (ArgumentException) { }
