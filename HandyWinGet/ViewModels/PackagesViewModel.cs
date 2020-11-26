@@ -9,11 +9,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -22,6 +24,8 @@ namespace HandyWinGet.ViewModels
     public class PackagesViewModel : BindableBase
     {
         public string _Id = string.Empty;
+        private VersionModel SelectedPackage = new VersionModel();
+
         public ICollectionView ItemsView => CollectionViewSource.GetDefaultView(DataList);
         public ICollectionView ComboView => CollectionViewSource.GetDefaultView(DataListVersion);
         private readonly string path = Assembly.GetExecutingAssembly().Location.Replace(Path.GetFileName(Assembly.GetExecutingAssembly().Location), "") + @"pkgs";
@@ -96,6 +100,9 @@ namespace HandyWinGet.ViewModels
             DataListVersion = new ObservableCollection<VersionModel>();
             BindingOperations.EnableCollectionSynchronization(DataList, _lock);
             BindingOperations.EnableCollectionSynchronization(DataListVersion, _lock);
+
+            ItemsView.SortDescriptions.Add(new SortDescription("Company", ListSortDirection.Ascending));
+            ItemsView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
             ItemsView.Filter = new Predicate<object>(o => Filter(o as PackageModel));
             ComboView.Filter = new Predicate<object>(o => FilterCombo(o as VersionModel));
@@ -212,18 +219,24 @@ namespace HandyWinGet.ViewModels
 
         void ItemChanged(SelectionChangedEventArgs e)
         {
-            try
+            if (e.OriginalSource is DataGrid)
             {
-                if (e.OriginalSource is DataGrid)
+                if (e.AddedItems[0] is PackageModel item)
                 {
-                    if (e.AddedItems[0] is PackageModel item)
-                    {
-                        _Id = item.Id;
-                        ComboView.Refresh();
-                    }
+                    _Id = item.Id;
+                    ComboView.Refresh();
+                    SelectedPackage = new VersionModel { Id = item.Id, Version = item.Version };
                 }
             }
-            catch (IndexOutOfRangeException) { }
+
+            if (e.OriginalSource is HandyControl.Controls.ComboBox cmb)
+            {
+                var typeItem = (VersionModel)cmb.SelectedItem;
+                if (typeItem != null)
+                {
+                    SelectedPackage = new VersionModel { Id = typeItem.Id, Version = typeItem.Version };
+                }
+            }
         }
 
         void OnButtonAction(string param)
@@ -231,6 +244,7 @@ namespace HandyWinGet.ViewModels
             switch (param)
             {
                 case "Install":
+                    Install();
                     break;
                 case "Uninstall":
                     break;
@@ -291,6 +305,68 @@ namespace HandyWinGet.ViewModels
                 }
                 System.IO.Directory.Delete(d);
             }
+        }
+
+        public void Install()
+        {
+            DataGot = false;
+            LoadingStatus = $"Installing {SelectedPackage.Id}";
+
+            Process proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "winget",
+                    Arguments = $"install {SelectedPackage.Id} {($"-v {SelectedPackage.Version}")}",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true
+                },
+                EnableRaisingEvents = true
+            };
+
+            proc.OutputDataReceived += (o, args) =>
+            {
+                string line = args.Data ?? "";
+
+                if (line.Contains("Download"))
+                {
+                    LoadingStatus = "Downloading Package...";
+                }
+
+                if (line.Contains("hash"))
+                {
+                    LoadingStatus = $"Validated hash for {SelectedPackage.Id}";
+                }
+
+                if (line.Contains("Installing"))
+                {
+                    LoadingStatus = $"Installing {SelectedPackage.Id}";
+                }
+
+                if (line.Contains("Failed"))
+                {
+                    LoadingStatus = $"Installation of {SelectedPackage.Id} failed";
+                }
+            };
+
+            proc.Exited += (o, args) =>
+            {
+                Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    bool installFailed = (o as Process).ExitCode != 0;
+                    LoadingStatus = installFailed
+                        ? $"Installation of {SelectedPackage.Id} failed"
+                        : $"Installed {SelectedPackage.Id}";
+
+                    await Task.Delay(2000);
+                    DataGot = true;
+                });
+            };
+
+            proc.Start();
+            proc.BeginOutputReadLine();
+
         }
 
     }

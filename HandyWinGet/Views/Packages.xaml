@@ -23,27 +23,27 @@
 
                     <DataGrid hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="Column" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Company}" Width="auto">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Company}" Width="auto" MinWidth="190">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Company" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Width="auto">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Width="auto" MinWidth="190">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Name" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto">
+                            <DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto" MinWidth="150">
                                 <DataGridCheckBoxColumn.Header>
                                     <TextBlock Text="Installation status" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridCheckBoxColumn.Header>
                             </DataGridCheckBoxColumn>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Width="auto">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Width="auto" MinWidth="120">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Latest Version" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridTemplateColumn Width="*">
+                            <DataGridTemplateColumn MinWidth="250" Width="*">
                                 <DataGridTemplateColumn.Header>
                                     <TextBlock Text="Available Versions" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTemplateColumn.Header>
