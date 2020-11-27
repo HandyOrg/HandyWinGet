@@ -8,6 +8,10 @@
     <FileVersion>2.0.0.0</FileVersion>
     <Version>2.0.0</Version>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <DebugType>embedded</DebugType>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +20,7 @@
     <PackageReference Include="ModernWpfUI" Version="0.9.3-preview.201004.0" />
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
 
-    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0096" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.0.0" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.0.0" />
   </ItemGroup>

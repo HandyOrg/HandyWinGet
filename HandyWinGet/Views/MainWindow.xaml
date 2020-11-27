@@ -8,7 +8,7 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="MainWindow"
+        Title="HandyWinGet"
         Background="{DynamicResource SecondaryRegionBrush}"
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen"
