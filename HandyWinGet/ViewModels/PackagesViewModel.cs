@@ -444,7 +444,7 @@ namespace HandyWinGet.ViewModels
 
                         string url = RemoveComment(SelectedPackage.Url);
 
-                        _tempLocation = $"{location} {SelectedPackage.Id} {GetExtension(url)}".Trim();
+                        _tempLocation = $"{location}{SelectedPackage.Id}-{SelectedPackage.Version}{GetExtension(url)}".Trim();
                         if (!File.Exists(_tempLocation))
                         {
                             downloader = new DownloadService();
@@ -480,7 +480,11 @@ namespace HandyWinGet.ViewModels
             }
             catch (Win32Exception ex)
             {
-                Growl.ErrorGlobal(ex.Message);
+                if (!ex.Message.Contains("The system cannot find the file specified."))
+                {
+                    Growl.ErrorGlobal(ex.Message);
+
+                }
             }
         }
 
