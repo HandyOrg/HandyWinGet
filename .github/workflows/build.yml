@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@master
       
       - name: Setup Nuget.exe
-        uses: nuget/setup-nuget@master
+        uses: nuget/setup-nuget@main
       
       - name: Restore Nuget packages
         run: nuget restore HandyWinGet-GUI.sln
@@ -21,5 +21,5 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@master
   
-      - name: Build Core_31
+      - name: Build Core_50
         run: dotnet build HandyWinGet-GUI/HandyWinGet-GUI.csproj --configuration Release
