@@ -31,6 +31,7 @@
                     </hc:ComboBox>
 
                     <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Download with Internet Download Manager (IDM)" IsChecked="{Binding IsIDM}" Visibility="{Binding IsVisibleIDM, Converter={StaticResource Boolean2VisibilityConverter}}"/>
+                    <ToggleButton Margin="10" IsEnabled="False" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Content="Check if the application is already installed (Soon)"/>
                 </StackPanel>
             </hc:ScrollViewer>
 

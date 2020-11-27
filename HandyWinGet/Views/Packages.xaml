@@ -45,11 +45,11 @@
                                     <TextBlock Text="Name" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto" MinWidth="150">
+                            <!--<DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto" MinWidth="150">
                                 <DataGridCheckBoxColumn.Header>
                                     <TextBlock Text="Installation status" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridCheckBoxColumn.Header>
-                            </DataGridCheckBoxColumn>
+                            </DataGridCheckBoxColumn>-->
                             <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Width="auto" MinWidth="120">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Latest Version" Style="{StaticResource TextBlockSubTitle}"/>
