@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyWinGet.Data;
+using Microsoft.Win32;
 using ModernWpf.Controls;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -118,7 +119,15 @@ namespace HandyWinGet.ViewModels
                     }
                     else
                     {
-                        IsVisibleIDM = false;
+                        if (!IsOSSupported())
+                        {
+                            HandyControl.Controls.MessageBox.Error("Your Windows Is Not Supported, Winget-cli requires Windows 10 version 1709 (build 16299) Please Update to Windows 10 1709 (build 16299) or later", "OS is not Supported");
+                            InstallModeIndex = 1;
+                        }
+                        else
+                        {
+                            IsVisibleIDM = false;
+                        }
                     }
 
                     GlobalDataHelper<AppConfig>.Save();
@@ -159,5 +168,31 @@ namespace HandyWinGet.ViewModels
                 Growl.ErrorGlobal(ex.Message);
             }
         }
+
+        public bool IsOSSupported()
+        {
+            string subKey = @"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion";
+            RegistryKey key = Registry.LocalMachine;
+            RegistryKey skey = key.OpenSubKey(subKey);
+
+            string name = skey.GetValue("ProductName").ToString();
+            if (name.Contains("Windows 10"))
+            {
+                int releaseId = Convert.ToInt32(Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", ""));
+                if (releaseId < 1709)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }
