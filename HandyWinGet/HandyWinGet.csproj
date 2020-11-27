@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows10.0.18362.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <Version>2.0.0</Version>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Downloader" Version="1.9.7" />
+    <PackageReference Include="HandyControls" Version="3.0.0-rc.2" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.3-preview.201004.0" />
+    <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
+
+    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="HandyUpdater.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="HandyUpdater.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="HandyUpdater.runtimeconfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UnRAR.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

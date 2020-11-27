@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="HandyWinGet.Views.Packages"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/" 
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <hc:TransitioningContentControl TransitionMode="Fade">
+        <hc:ToggleBlock IsChecked="{Binding DataGot}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <hc:ToggleBlock.UnCheckedContent>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <hc:LoadingCircle IsRunning="{Binding DataGot, Converter={StaticResource Boolean2BooleanReConverter}}"/>
+                    <TextBlock HorizontalAlignment="Center" Margin="0,10" Text="{Binding LoadingStatus}"/>
+                    <hc:ProgressButton IsEnabled="{Binding IsCheckedProgressButton}" Progress="{Binding Progress}" Visibility="{Binding IsVisibleProgressButton, Converter={StaticResource Boolean2VisibilityConverter}}" Margin="5,0" Width="200" IsChecked="{Binding IsCheckedProgressButton}">
+                        <hc:ProgressButton.Style>
+                            <Style TargetType="hc:ProgressButton" BasedOn="{StaticResource ProgressButtonPrimary}">
+                                <Setter Property="Content" Value="Download Canceled"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content" Value="Cancel Download"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </hc:ProgressButton.Style>
+                    </hc:ProgressButton>
+                </StackPanel>
+            </hc:ToggleBlock.UnCheckedContent>
+            <hc:ToggleBlock.CheckedContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="5,10" hc:InfoElement.Placeholder="Search Application or Company..." IsRealTime="True" ShowClearButton="True" Style="{StaticResource SearchBarPlus}"/>
+
+                    <DataGrid hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="Column" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Company}" Width="auto" MinWidth="190">
+                                <DataGridTextColumn.Header>
+                                    <TextBlock Text="Company" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Width="auto" MinWidth="190">
+                                <DataGridTextColumn.Header>
+                                    <TextBlock Text="Name" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <!--<DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto" MinWidth="150">
+                                <DataGridCheckBoxColumn.Header>
+                                    <TextBlock Text="Installation status" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridCheckBoxColumn.Header>
+                            </DataGridCheckBoxColumn>-->
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Width="auto" MinWidth="120">
+                                <DataGridTextColumn.Header>
+                                    <TextBlock Text="Latest Version" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn MinWidth="250" Width="*">
+                                <DataGridTemplateColumn.Header>
+                                    <TextBlock Text="Available Versions" Style="{StaticResource TextBlockSubTitle}"/>
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <hc:ComboBox DisplayMemberPath="Version" hc:InfoElement.Placeholder="Select Version (Current is Latest)" Width="220" ItemsSource="{Binding DataContext.DataListVersion, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                        <hc:Interaction.Triggers>
+                            <hc:EventTrigger EventName="SelectionChanged">
+                                <hc:EventToCommand Command="{Binding ItemChangedCmd}" PassEventArgsToCommand="True"/>
+                            </hc:EventTrigger>
+                        </hc:Interaction.Triggers>
+                    </DataGrid>
+
+                    <StatusBar Grid.Row="2">
+                        <StatusBarItem>
+                            <hc:Shield Subject="Available Packages:" Status="{Binding DataList.Count}" Margin="0,0,10,0"/>
+                        </StatusBarItem>
+                        <StatusBarItem>
+                            <hc:Shield Subject="Updated Date:" Status="{Binding UpdatedDate}" Margin="0,0,10,0"/>
+                        </StatusBarItem>
+                        <StatusBarItem>
+                            <StackPanel Orientation="Horizontal">
+                                <Button hc:BorderElement.CornerRadius="6,0,0,6" Command="{Binding ButtonCmd}" CommandParameter="Refresh" hc:IconElement.Geometry="{DynamicResource RefreshGeometry}" hc:IconElement.Height="14" Style="{StaticResource ButtonPrimary}" Width="170" Content="Refresh"/>
+                                <hc:SplitButton Margin=".5,0,0,0" hc:BorderElement.CornerRadius="0,6,6,0" Style="{StaticResource SplitButtonPrimary}" hc:IconElement.Geometry="{DynamicResource DownloadGeometry}" hc:IconElement.Height="14" Width="170" Content="Install" Command="{Binding ButtonCmd}" CommandParameter="Install" HorizontalAlignment="Stretch">
+                                    <hc:SplitButton.DropDownContent>
+                                        <StackPanel>
+                                            <MenuItem Width="180" Foreground="{DynamicResource PrimaryTextBrush}" IsEnabled="False" Header="Uninstall (Coming Soon)" Command="{Binding ButtonCmd}" CommandParameter="Uninstall">
+                                                <MenuItem.Icon>
+                                                    <Path Data="{DynamicResource DeleteGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </StackPanel>
+                                    </hc:SplitButton.DropDownContent>
+                                </hc:SplitButton>
+                            </StackPanel>
+                        </StatusBarItem>
+                    </StatusBar>
+                </Grid>
+
+            </hc:ToggleBlock.CheckedContent>
+        </hc:ToggleBlock>
+
+    </hc:TransitioningContentControl>
+</UserControl>
