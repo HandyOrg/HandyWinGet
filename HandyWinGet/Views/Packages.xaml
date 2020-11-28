@@ -33,7 +33,7 @@
                     </Grid.RowDefinitions>
                     <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="5,10" hc:InfoElement.Placeholder="Search Application or Company..." IsRealTime="True" ShowClearButton="True" Style="{StaticResource SearchBarPlus}"/>
 
-                    <DataGrid x:Name="dg" hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="Column" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
+                    <DataGrid x:Name="dg" hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="All" SelectionMode="Single" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
                         <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
                                 <StackPanel>
