@@ -200,11 +200,16 @@ namespace HandyWinGet.ViewModels
                     int to = result.LastIndexOf("\\");
                     string name = result.Substring(from, to - from).Trim();
 
-                    string id = File.ReadAllLines(item).Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
-                    string url = File.ReadAllLines(item).Where(l => l.Contains("Url:", StringComparison.InvariantCultureIgnoreCase) && !l.Contains("LicenseUrl")).FirstOrDefault().Replace("Url:", "").Trim();
+                    var content = File.ReadAllLines(item);
+                    string id = content.Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
+                    string url = content.Where(l => l.Contains("Url:", StringComparison.InvariantCultureIgnoreCase) && !l.Contains("LicenseUrl")).FirstOrDefault().Replace("Url:", "").Trim();
+                    string desc = content.Where(l => l.Contains("Description:"))?.FirstOrDefault()?.Replace("Description:", "")?.Trim();
+                    string license = content.Where(l => l.Contains("LicenseUrl:"))?.FirstOrDefault()?.Replace("LicenseUrl:", "")?.Trim();
+                    string homePage = content.Where(l => l.Contains("Homepage:"))?.FirstOrDefault()?.Replace("Homepage:", "")?.Trim();
+                    string arch = content.Where(l => l.Contains("Arch:"))?.FirstOrDefault()?.Replace("Arch:", "")?.Replace("#","")?.Trim();
 
                     bool isInstalled = false;
-                    var packge = new PackageModel { Company = company, Name = name, IsInstalled = isInstalled, Version = version, Id = id, Url = url };
+                    var packge = new PackageModel { Company = company, Name = name, IsInstalled = isInstalled, Version = version, Id = id, Url = url, Description = desc, LicenseUrl = license, Homepage = homePage, Arch = id + " " + arch};
 
                     if (!DataList.Contains(packge, new ItemEqualityComparer()))
                     {

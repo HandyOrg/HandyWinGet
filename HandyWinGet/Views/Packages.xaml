@@ -33,11 +33,42 @@
                     </Grid.RowDefinitions>
                     <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="5,10" hc:InfoElement.Placeholder="Search Application or Company..." IsRealTime="True" ShowClearButton="True" Style="{StaticResource SearchBarPlus}"/>
 
-                    <DataGrid hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="Column" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
+                    <DataGrid x:Name="dg" hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="Column" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
+                        <DataGrid.RowDetailsTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock TextAlignment="Justify" Margin="10" HorizontalAlignment="Left" Width="850" Text="{Binding Description}" TextWrapping="Wrap">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockDefaultBold}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="Text" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Margin="10,0">           
+                                            <Hyperlink TextDecorations="{x:Null}" Command="hc:ControlCommands.OpenLink" CommandParameter="{Binding Homepage}">
+                                                HomePage
+                                            </Hyperlink>
+                                        </TextBlock>
+                                        <TextBlock>           
+                                            <Hyperlink TextDecorations="{x:Null}" Command="hc:ControlCommands.OpenLink" CommandParameter="{Binding LicenseUrl}">
+                                                License
+                                            </Hyperlink>
+                                        </TextBlock>
+                                        <TextBlock Margin="10,0" Text="{Binding Arch}" Style="{StaticResource TextBlockDefault}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGrid.RowDetailsTemplate>
                         <DataGrid.Columns>
                             <DataGridTextColumn IsReadOnly="True" Binding="{Binding Company}" Width="auto" MinWidth="190">
                                 <DataGridTextColumn.Header>
-                                    <TextBlock Text="Company" Style="{StaticResource TextBlockSubTitle}"/>
+                                    <TextBlock Text="Publisher" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
                             <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Width="auto" MinWidth="190">
