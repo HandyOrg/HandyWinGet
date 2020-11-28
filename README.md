@@ -1,4 +1,4 @@
-# HandyWinGet-GUI
+# HandyWinGet
  
 provides a GUI for installing apps through WinGet.
 
@@ -19,26 +19,17 @@ provides a GUI for installing apps through WinGet.
 - New Navigation Menu
 - Prism MVVM
 
-## Version 2 Release Date: Unknown, [beta version available](https://github.com/HandyOrg/HandyWinGet-GUI/releases)
+## Version 2 [beta version available](https://github.com/HandyOrg/HandyWinGet-GUI/releases)
 
 
-`Version 1:`
-- Install Packages
-- Recognize Installed Packages
-- Create Packages
-- .Net Core 3.1
-- Prism MVVM
-- Multi Language
-- Light/Dark Theme
-
-## Installing and running HandyWinGet-GUI
-you can download setup from GitHub [Release](https://github.com/HandyOrg/HandyWinGet-GUI/releases) or download and install Via Winget
-To install HandyWinGet-GUI, run the following command from the command line / PowerShell:
+## Installing and running HandyWinGet
+you can download setup from GitHub [Release](https://github.com/HandyOrg/HandyWinGet/releases) or download and install Via Winget
+To install HandyWinGet, run the following command from the command line / PowerShell:
 `WinGet install handywinget`
 
-![HandyWinGet-GUI](ScreenShot/1.png)
-![HandyWinGet-GUI](ScreenShot/2.png)
-![HandyWinGet-GUI](ScreenShot/3.png)
-![HandyWinGet-GUI](ScreenShot/4.png)
-![HandyWinGet-GUI](ScreenShot/5.png)
+![HandyWinGet](ScreenShot/1.png)
+![HandyWinGet](ScreenShot/2.png)
+![HandyWinGet](ScreenShot/3.png)
+![HandyWinGet](ScreenShot/4.png)
+![HandyWinGet](ScreenShot/5.png)
 

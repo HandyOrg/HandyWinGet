@@ -13,9 +13,15 @@
                 <hc:TextBox Text="{Binding PackageId, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,10,10" hc:InfoElement.Placeholder="Publisher.Appname: Microsoft.Excel" hc:TitleElement.Title="Package Id" hc:InfoElement.Necessary="True"/>
                 <hc:TextBox Text="{Binding Version, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,10,10" hc:InfoElement.Placeholder="1.0 OR 1.0.0.0" hc:TitleElement.Title="Package Version" hc:InfoElement.Necessary="True"/>
                 <hc:TextBox Text="{Binding AppMoniker, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,10,10" hc:InfoElement.Placeholder="msexcel" hc:TitleElement.Title="Alternate Name"/>
-                <hc:TagPanel Name="TagPanel" Orientation="Horizontal" Margin="10" ShowAddTextBox="True">
-                    <hc:Tag Focusable="False" IsEnabled="False" ShowCloseButton="False" Content="Tags (Keywords):"/>
-                </hc:TagPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Width="150" Command="{Binding AddTagCmd}" Margin="10,0,0,0" Content="Add Tag"/>
+                    <hc:TextBox Margin="10,0" Grid.Column="1" Text="{Binding TagName}" hc:InfoElement.Placeholder="Tag"/>
+                </Grid>
+                <hc:TagContainer Name="TagContainer" Margin="10" ItemsSource="{Binding TagDataList}"/>
                 <hc:TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Top" Margin="10,0,10,10" Height="100" TextWrapping="Wrap" hc:TitleElement.Title="Description"/>
 
                 <TextBlock Margin="10" HorizontalAlignment="Left" Text="License" Style="{StaticResource TextBlockTitleBold}"/>
@@ -40,8 +46,8 @@
                 </StackPanel>
                 <ProgressBar Margin="10" Value="{Binding Progress}" Style="{StaticResource ProgressBarFlat}"/>
                 <StackPanel Orientation="Horizontal">
-                    <Button hc:BorderElement.CornerRadius="4,0,0,4" Command="{Binding CreatePackageCmd}" CommandParameter="{Binding ElementName=TagPanel, Path=Children}" Margin="10,10,0,10" Width="150" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Right" Content="Create Package"/>
-                    <Button hc:BorderElement.CornerRadius="0,4,4,0" Command="{Binding CopyToClipboardCmd}" CommandParameter="{Binding ElementName=TagPanel, Path=Children}" Margin=".5,10,10,10" Width="150" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Right" Content="Copy to clipboard"/>
+                    <Button hc:BorderElement.CornerRadius="4,0,0,4" Command="{Binding CreatePackageCmd}" Margin="10,10,0,10" Width="150" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Right" Content="Create Package"/>
+                    <Button hc:BorderElement.CornerRadius="0,4,4,0" Command="{Binding CopyToClipboardCmd}" Margin=".5,10,10,10" Width="150" Style="{StaticResource ButtonPrimary}" HorizontalAlignment="Right" Content="Copy to clipboard"/>
                 </StackPanel>
             </StackPanel>
         </hc:ScrollViewer>

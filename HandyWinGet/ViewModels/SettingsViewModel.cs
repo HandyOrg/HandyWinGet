@@ -140,7 +140,7 @@ namespace HandyWinGet.ViewModels
         {
             try
             {
-                UpdateHelper.GithubReleaseModel ver = UpdateHelper.CheckForUpdateGithubRelease("HandyOrg", "HandyWinGet-GUI");
+                UpdateHelper.GithubReleaseModel ver = UpdateHelper.CheckForUpdateGithubRelease("HandyOrg", "HandyWinGet");
 
                 if (ver.IsExistNewVersion)
                 {
@@ -151,7 +151,7 @@ namespace HandyWinGet.ViewModels
                             return true;
                         }
 
-                        string exeLocation = Environment.CurrentDirectory + @"\HandyWinGet_GUI.exe";
+                        string exeLocation = Environment.CurrentDirectory + @"\HandyWinGet.exe";
 
                         Process.Start(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\HandyUpdater.exe", $"{Version} {ver.TagName.Replace("v", "")} {Environment.CurrentDirectory} {exeLocation} {ver.Asset[0].browser_download_url} ");
                         Environment.Exit(0);

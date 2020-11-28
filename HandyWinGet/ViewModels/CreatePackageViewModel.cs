@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -21,17 +22,28 @@ namespace HandyWinGet.ViewModels
         public DelegateCommand GetHashCmd =>
             _GetHashCmd ?? (_GetHashCmd = new DelegateCommand(GetHash));
 
-        private DelegateCommand<object> _CreatePackageCmd;
-        public DelegateCommand<object> CreatePackageCmd =>
-            _CreatePackageCmd ?? (_CreatePackageCmd = new DelegateCommand<object>(CreatePackage));
+        private DelegateCommand _CreatePackageCmd;
+        public DelegateCommand CreatePackageCmd =>
+            _CreatePackageCmd ?? (_CreatePackageCmd = new DelegateCommand(CreatePackage));
 
-        private DelegateCommand<object> _CopyToClipboardCmd;
-        public DelegateCommand<object> CopyToClipboardCmd =>
-            _CopyToClipboardCmd ?? (_CopyToClipboardCmd = new DelegateCommand<object>(CopyToClipboard));
+        private DelegateCommand _CopyToClipboardCmd;
+        public DelegateCommand CopyToClipboardCmd =>
+            _CopyToClipboardCmd ?? (_CopyToClipboardCmd = new DelegateCommand(CopyToClipboard));
+
+        private DelegateCommand _AddTagCmd;
+        public DelegateCommand AddTagCmd =>
+            _AddTagCmd ?? (_AddTagCmd = new DelegateCommand(AddTag));
 
         #endregion
 
         #region Property
+        private string _tagName;
+        public string TagName
+        {
+            get => _tagName;
+            set => SetProperty(ref _tagName, value);
+        }
+
         private bool _IsEnabled = true;
         public bool IsEnabled
         {
@@ -130,34 +142,26 @@ namespace HandyWinGet.ViewModels
             set { SetProperty(ref _SelectedArchitecture, value); }
         }
 
+        private ObservableCollection<Tag> _TagDataList = new ObservableCollection<Tag>();
+        public ObservableCollection<Tag> TagDataList
+        {
+            get { return _TagDataList; }
+            set { SetProperty(ref _TagDataList, value); }
+        }
         #endregion
         public CreatePackageViewModel()
         {
 
         }
 
-        public void GenerateScript(GenerateMode mode, object param)
+        public void GenerateScript(GenerateMode mode)
         {
             if (!string.IsNullOrEmpty(AppName) && !string.IsNullOrEmpty(Publisher)
                 && !string.IsNullOrEmpty(PackageId) && !string.IsNullOrEmpty(Version)
                 && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(URL) && URL.IsUrl())
             {
-                string tags = string.Empty;
-                if (param is UIElementCollection data)
-                {
-                    foreach (object item in data)
-                    {
-                        Tag correctItem = item as Tag;
-                        if (correctItem != null && !correctItem.Content.ToString().Equals("Tags (Keywords):"))
-                        {
-                            tags += correctItem.Content.ToString().Trim() + ", ";
-                        }
-                    }
-                }
-                if (tags != null && tags.Trim().Count() > 0)
-                {
-                    tags = tags.Remove(tags.TrimEnd().Count() - 1, 1);
-                }
+
+                var tags = String.Join(",", TagDataList.Select(p => p.Content));
 
                 string ext = Path.GetExtension(URL)?.Replace(".", "").Trim();
                 if (ext != null && ext.ToLower().Equals("msixbundle"))
@@ -176,13 +180,13 @@ namespace HandyWinGet.ViewModels
                 builder.AppendLine($"Description: {Description}");
                 builder.AppendLine($"Homepage: {HomePage}");
                 builder.AppendLine($"Installers:");
-                builder.AppendLine($"  - Arch: {SelectedArchitecture.Content}");
+                builder.AppendLine($"  - Arch: {SelectedArchitecture?.Content}");
                 builder.AppendLine($"    Url: {URL}");
                 builder.AppendLine($"    Sha256: {Hash}");
                 builder.AppendLine($"    InstallerType: {ext}");
                 if (ext != null && ext.ToLower().Equals("exe"))
                 {
-                    builder.AppendLine(Environment.NewLine);
+                    builder.AppendLine();
                     builder.AppendLine("    Switches:");
                     builder.AppendLine("      Silent: /S");
                     builder.AppendLine("      SilentWithProgress: /S");
@@ -193,6 +197,7 @@ namespace HandyWinGet.ViewModels
                     case GenerateMode.CopyToClipboard:
                         Clipboard.SetText(builder.ToString());
                         Growl.SuccessGlobal("Script Copied to clipboard.");
+                        ClearInputs();
                         break;
                     case GenerateMode.SaveToFile:
                         SaveFileDialog dialog = new SaveFileDialog();
@@ -203,6 +208,7 @@ namespace HandyWinGet.ViewModels
                         if (dialog.ShowDialog() == true)
                         {
                             File.WriteAllText(dialog.FileName, builder.ToString());
+                            ClearInputs();
                         }
                         break;
                 }
@@ -213,14 +219,14 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        void CreatePackage(object param)
+        void CreatePackage()
         {
-            GenerateScript(GenerateMode.SaveToFile, param);
+            GenerateScript(GenerateMode.SaveToFile);
         }
 
-        void CopyToClipboard(object param)
+        void CopyToClipboard()
         {
-            GenerateScript(GenerateMode.CopyToClipboard, param);
+            GenerateScript(GenerateMode.CopyToClipboard);
         }
 
         public enum GenerateMode
@@ -239,6 +245,41 @@ namespace HandyWinGet.ViewModels
             {
                 Growl.ErrorGlobal("Url field is Empty or Invalid");
             }
+        }
+
+        void AddTag()
+        {
+            if (string.IsNullOrEmpty(TagName))
+            {
+                Growl.Warning("Please Enter Content");
+                return;
+            }
+
+            TagDataList.Add(new Tag
+            {
+                Content = TagName,
+                ShowCloseButton = true
+            });
+            TagName = string.Empty;
+        }
+
+        public void ClearInputs()
+        {
+            AppName = string.Empty;
+            Publisher = string.Empty;
+            PackageId = string.Empty;
+            Version = string.Empty;
+            AppMoniker = string.Empty;
+            TagName = string.Empty;
+            Description = string.Empty;
+            HomePage = string.Empty;
+            License = string.Empty;
+            LicenseUrl = string.Empty;
+            SelectedArchitecture.Content = string.Empty;
+            URL = string.Empty;
+            Hash = string.Empty;
+            Progress = 0;
+            TagDataList.Clear();
         }
 
         #region Downloader

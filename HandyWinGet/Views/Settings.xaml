@@ -36,21 +36,21 @@
             </hc:ScrollViewer>
 
             <StackPanel Margin="10,10,50,20" Grid.Column="1">
-                <TextBlock HorizontalAlignment="Left" Text="HandywinGet-GUI" Style="{StaticResource TextBlockTitleBold}"/>
+                <TextBlock HorizontalAlignment="Left" Text="HandywinGet" Style="{StaticResource TextBlockTitleBold}"/>
                 <TextBlock Margin="0,5" Width="200" Text="powerful app for installing apps through WinGet and Creating winget package." TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14"/>
 
                 <TextBlock Margin="0,5,0,0" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14">
-                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet-GUI" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
+                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
                         <TextBlock Text="Github Repository"/>
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock Margin="0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14">
-                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet-GUI/issues" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
+                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet/issues" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
                         <TextBlock Text="Report a bug"/>
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14">
-                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet-GUI/issues" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
+                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet/issues" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
                         <TextBlock Text="Request a feature"/>
                     </Hyperlink>
                 </TextBlock>
