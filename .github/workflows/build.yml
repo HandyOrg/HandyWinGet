@@ -16,7 +16,7 @@ jobs:
         uses: nuget/setup-nuget@main
       
       - name: Restore Nuget packages
-        run: nuget restore HandyWinGet-GUI.sln
+        run: nuget restore HandyWinGet.sln
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@master
