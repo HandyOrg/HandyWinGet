@@ -33,7 +33,7 @@
                     </Grid.RowDefinitions>
                     <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="5,10" hc:InfoElement.Placeholder="Search Application or Company..." IsRealTime="True" ShowClearButton="True" Style="{StaticResource SearchBarPlus}"/>
 
-                    <DataGrid x:Name="dg" hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="All" SelectionMode="Single" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
+                    <DataGrid hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="All" SelectionMode="Single" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
                         <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -50,37 +50,49 @@
                                         </TextBlock.Style>
                                     </TextBlock>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Margin="10,0">           
+                                        <TextBlock Margin="10">           
                                             <Hyperlink TextDecorations="{x:Null}" Command="hc:ControlCommands.OpenLink" CommandParameter="{Binding Homepage}">
                                                 HomePage
                                             </Hyperlink>
                                         </TextBlock>
-                                        <TextBlock>           
+                                        <TextBlock Margin="0,10">           
                                             <Hyperlink TextDecorations="{x:Null}" Command="hc:ControlCommands.OpenLink" CommandParameter="{Binding LicenseUrl}">
                                                 License
                                             </Hyperlink>
                                         </TextBlock>
                                         <TextBlock Margin="10,0" Text="{Binding Arch}" Style="{StaticResource TextBlockDefault}"/>
+                                        <Label Content="{Binding InstalledVersion}">
+                                            <Label.Style>
+                                                <Style TargetType="Label" BasedOn="{StaticResource LabelDefault}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="Content" Value="">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
                                     </StackPanel>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGrid.RowDetailsTemplate>
                         <DataGrid.Columns>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Company}" Width="auto" MinWidth="190">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Publisher}" MinWidth="190">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Publisher" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Width="auto" MinWidth="190">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" MinWidth="190">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Name" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <!--<DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto" MinWidth="150">
+                            <DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto" MinWidth="150">
                                 <DataGridCheckBoxColumn.Header>
-                                    <TextBlock Text="Installation status" Style="{StaticResource TextBlockSubTitle}"/>
+                                    <TextBlock Text="Installed" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridCheckBoxColumn.Header>
-                            </DataGridCheckBoxColumn>-->
+                            </DataGridCheckBoxColumn>
                             <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Width="auto" MinWidth="120">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Latest Version" Style="{StaticResource TextBlockSubTitle}"/>

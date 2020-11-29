@@ -3,6 +3,7 @@ using HandyControl.Controls;
 using HandyWinGet.Data;
 using HandyWinGet.Models;
 using LibGit2Sharp;
+using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
@@ -14,7 +15,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,8 +25,16 @@ namespace HandyWinGet.ViewModels
 {
     public class PackagesViewModel : BindableBase
     {
+        private static object _lock = new object();
+
         public string _Id = string.Empty;
         private VersionModel SelectedPackage = new VersionModel();
+
+        List<InstalledAppModel> InstalledApps = new List<InstalledAppModel>();
+        List<string> keys = new List<string>() {
+            @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+            @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+        };
 
         public ICollectionView ItemsView => CollectionViewSource.GetDefaultView(DataList);
         public ICollectionView ComboView => CollectionViewSource.GetDefaultView(DataListVersion);
@@ -119,8 +127,6 @@ namespace HandyWinGet.ViewModels
         }
         #endregion
 
-        private static object _lock = new object();
-
         public PackagesViewModel()
         {
             UpdatedDate = GlobalDataHelper<AppConfig>.Config.UpdatedDate.ToString();
@@ -128,9 +134,6 @@ namespace HandyWinGet.ViewModels
             DataListVersion = new ObservableCollection<VersionModel>();
             BindingOperations.EnableCollectionSynchronization(DataList, _lock);
             BindingOperations.EnableCollectionSynchronization(DataListVersion, _lock);
-
-            ItemsView.SortDescriptions.Add(new SortDescription("Company", ListSortDirection.Ascending));
-            ItemsView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
             ItemsView.Filter = new Predicate<object>(o => Filter(o as PackageModel));
             ComboView.Filter = new Predicate<object>(o => FilterCombo(o as VersionModel));
@@ -189,27 +192,35 @@ namespace HandyWinGet.ViewModels
                 LoadingStatus = "Extracting packages...";
 
                 var pkgs = GetAllDirectories(path + @"\manifests").OrderByDescending(x => x).ToList();
+                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64), keys, InstalledApps);
+                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64), keys, InstalledApps);
 
+                InstalledApps = InstalledApps.Distinct().ToList();
                 foreach (string item in pkgs)
                 {
-                    string result = Regex.Replace(item, @".*(?=manifests)", "", RegexOptions.IgnorePatternWhitespace).Replace(@"manifests\", "");
-                    string version = result.Substring(result.LastIndexOf('\\') + 1).Replace(".yaml", "").Replace(".Yaml", "").Trim();
-                    string company = result.Substring(0, result.IndexOf('\\')).Trim();
-
-                    int from = result.IndexOf(company) + company.Length + 1;
-                    int to = result.LastIndexOf("\\");
-                    string name = result.Substring(from, to - from).Trim();
-
                     var content = File.ReadAllLines(item);
+                    string version = content.Where(l => l.Trim().StartsWith("Version:"))?.FirstOrDefault()?.Replace("Version:", "");
+                    string name = content.Where(l => l.Contains("Name:"))?.FirstOrDefault()?.Replace("Name:", "")?.Trim();
+                    string publisher = content.Where(l => l.Contains("Publisher:"))?.FirstOrDefault()?.Replace("Publisher:", "")?.Trim();
                     string id = content.Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
                     string url = content.Where(l => l.Contains("Url:", StringComparison.InvariantCultureIgnoreCase) && !l.Contains("LicenseUrl")).FirstOrDefault().Replace("Url:", "").Trim();
                     string desc = content.Where(l => l.Contains("Description:"))?.FirstOrDefault()?.Replace("Description:", "")?.Trim();
                     string license = content.Where(l => l.Contains("LicenseUrl:"))?.FirstOrDefault()?.Replace("LicenseUrl:", "")?.Trim();
                     string homePage = content.Where(l => l.Contains("Homepage:"))?.FirstOrDefault()?.Replace("Homepage:", "")?.Trim();
-                    string arch = content.Where(l => l.Contains("Arch:"))?.FirstOrDefault()?.Replace("Arch:", "")?.Replace("#","")?.Trim();
+                    string arch = content.Where(l => l.Contains("Arch:"))?.FirstOrDefault()?.Replace("Arch:", "")?.Replace("#", "")?.Trim();
+                    string installedVersion = string.Empty;
 
                     bool isInstalled = false;
-                    var packge = new PackageModel { Company = company, Name = name, IsInstalled = isInstalled, Version = version, Id = id, Url = url, Description = desc, LicenseUrl = license, Homepage = homePage, Arch = id + " " + arch};
+                    foreach (var itemApp in InstalledApps)
+                    {
+                        if (itemApp.DisplayName.Contains(name))
+                        {
+                            installedVersion = $"Installed Version: {itemApp.Version}";
+                            isInstalled = true;
+                        }
+                    }
+
+                    var packge = new PackageModel { Publisher = publisher, Name = name, IsInstalled = isInstalled, Version = version, Id = id, Url = url, Description = desc, LicenseUrl = license, Homepage = homePage, Arch = id + " " + arch, InstalledVersion = installedVersion };
 
                     if (!DataList.Contains(packge, new ItemEqualityComparer()))
                     {
@@ -225,25 +236,11 @@ namespace HandyWinGet.ViewModels
             });
         }
 
-        class ItemEqualityComparer : IEqualityComparer<PackageModel>
-        {
-            public bool Equals(PackageModel x, PackageModel y)
-            {
-                // Two items are equal if their keys are equal.
-                return x.Name == y.Name;
-            }
-
-            public int GetHashCode(PackageModel obj)
-            {
-                return obj.Name.GetHashCode();
-            }
-        }
-
         private bool Filter(PackageModel item)
         {
             return SearchText == null
                             || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1
-                            || item.Company.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
+                            || item.Publisher.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
         }
 
         private bool FilterCombo(VersionModel item)
@@ -305,6 +302,7 @@ namespace HandyWinGet.ViewModels
                     LoadingStatus = "Refreshing Packages...";
                     DataList.Clear();
                     DataListVersion.Clear();
+                    InstalledApps.Clear();
                     DataGot = false;
                     GetPackages(true);
                     break;
@@ -493,6 +491,42 @@ namespace HandyWinGet.ViewModels
             }
         }
 
+        private void FindInstalledApps(RegistryKey regKey, List<string> keys, List<InstalledAppModel> installed)
+        {
+            foreach (string key in keys)
+            {
+                using (RegistryKey rk = regKey.OpenSubKey(key))
+                {
+                    if (rk == null)
+                    {
+                        continue;
+                    }
+                    foreach (string skName in rk.GetSubKeyNames())
+                    {
+                        using (RegistryKey sk = rk.OpenSubKey(skName))
+                        {
+                            if (sk.GetValue("DisplayName") != null)
+                            {
+                                try
+                                {
+                                    installed.Add(new InstalledAppModel
+                                    {
+                                        DisplayName = (string)sk.GetValue("DisplayName"),
+                                        Version = (string)sk.GetValue("DisplayVersion"),
+                                        Publisher = (string)sk.GetValue("Publisher"),
+                                        UnninstallCommand = (string)sk.GetValue("UninstallString")
+                                    });
+                                }
+                                catch (Exception)
+                                { }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
         #region Downloader
         public DownloadService downloader;
         public string _tempLocation = string.Empty;
@@ -592,5 +626,19 @@ namespace HandyWinGet.ViewModels
             LoadingStatus = $"Downloading {SelectedPackage.Id}-{SelectedPackage.Version}   {truncate}%";
         }
         #endregion
+
+        class ItemEqualityComparer : IEqualityComparer<PackageModel>
+        {
+            public bool Equals(PackageModel x, PackageModel y)
+            {
+                // Two items are equal if their keys are equal.
+                return x?.Name == y?.Name;
+            }
+
+            public int GetHashCode(PackageModel obj)
+            {
+                return obj.Name.GetHashCode();
+            }
+        }
     }
 }
