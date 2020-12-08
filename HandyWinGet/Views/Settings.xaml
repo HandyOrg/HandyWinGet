@@ -32,6 +32,9 @@
 
                     <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Download with Internet Download Manager (IDM)" IsChecked="{Binding IsIDM}" Visibility="{Binding IsVisibleIDM, Converter={StaticResource Boolean2VisibilityConverter}}"/>
                     <ToggleButton Margin="10" IsEnabled="False" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Content="Check if the application is already installed (Soon)"/>
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Grouping packages by publisher" IsChecked="{Binding IsGroup}"/>
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Show extra package details (by clicking on the row)" IsChecked="{Binding IsExtraDetail}"/>
+
                 </StackPanel>
             </hc:ScrollViewer>
 

@@ -25,13 +25,14 @@ namespace HandyWinGet.ViewModels
 {
     public class PackagesViewModel : BindableBase
     {
-        private static object _lock = new object();
+        internal static PackagesViewModel Instance;
+        private static readonly object _lock = new object();
 
         public string _Id = string.Empty;
         private VersionModel SelectedPackage = new VersionModel();
 
         List<InstalledAppModel> InstalledApps = new List<InstalledAppModel>();
-        List<string> keys = new List<string>() {
+        readonly List<string> keys = new List<string>() {
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
             @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
         };
@@ -55,22 +56,22 @@ namespace HandyWinGet.ViewModels
         private ObservableCollection<PackageModel> _DataList;
         public ObservableCollection<PackageModel> DataList
         {
-            get { return _DataList; }
-            set { SetProperty(ref _DataList, value); }
+            get => _DataList;
+            set => SetProperty(ref _DataList, value);
         }
 
         private ObservableCollection<VersionModel> _DataListVersion;
         public ObservableCollection<VersionModel> DataListVersion
         {
-            get { return _DataListVersion; }
-            set { SetProperty(ref _DataListVersion, value); }
+            get => _DataListVersion;
+            set => SetProperty(ref _DataListVersion, value);
         }
 
         private bool _DataGot;
         public bool DataGot
         {
-            get { return _DataGot; }
-            set { SetProperty(ref _DataGot, value); }
+            get => _DataGot;
+            set => SetProperty(ref _DataGot, value);
         }
 
         private string _searchText;
@@ -87,35 +88,35 @@ namespace HandyWinGet.ViewModels
         private string _LoadingStatus;
         public string LoadingStatus
         {
-            get { return _LoadingStatus; }
-            set { SetProperty(ref _LoadingStatus, value); }
+            get => _LoadingStatus;
+            set => SetProperty(ref _LoadingStatus, value);
         }
 
         private string _UpdatedDate;
         public string UpdatedDate
         {
-            get { return _UpdatedDate; }
-            set { SetProperty(ref _UpdatedDate, value); }
+            get => _UpdatedDate;
+            set => SetProperty(ref _UpdatedDate, value);
         }
 
         private int _Progress = 0;
         public int Progress
         {
-            get { return _Progress; }
-            set { SetProperty(ref _Progress, value); }
+            get => _Progress;
+            set => SetProperty(ref _Progress, value);
         }
 
         private bool _IsVisibleProgressButton;
         public bool IsVisibleProgressButton
         {
-            get { return _IsVisibleProgressButton; }
-            set { SetProperty(ref _IsVisibleProgressButton, value); }
+            get => _IsVisibleProgressButton;
+            set => SetProperty(ref _IsVisibleProgressButton, value);
         }
 
         private bool _IsCheckedProgressButton = true;
         public bool IsCheckedProgressButton
         {
-            get { return _IsCheckedProgressButton; }
+            get => _IsCheckedProgressButton;
             set
             {
                 SetProperty(ref _IsCheckedProgressButton, value);
@@ -125,19 +126,43 @@ namespace HandyWinGet.ViewModels
                 }
             }
         }
+
+        private DataGridRowDetailsVisibilityMode _RowDetailsVisibilityMode;
+        public DataGridRowDetailsVisibilityMode RowDetailsVisibilityMode
+        {
+            get => GlobalDataHelper<AppConfig>.Config.IsExtraDetail
+                    ? DataGridRowDetailsVisibilityMode.VisibleWhenSelected
+                    : DataGridRowDetailsVisibilityMode.Collapsed;
+            set => SetProperty(ref _RowDetailsVisibilityMode, value);
+        }
+
         #endregion
 
         public PackagesViewModel()
         {
+            Instance = this;
             UpdatedDate = GlobalDataHelper<AppConfig>.Config.UpdatedDate.ToString();
             DataList = new ObservableCollection<PackageModel>();
             DataListVersion = new ObservableCollection<VersionModel>();
             BindingOperations.EnableCollectionSynchronization(DataList, _lock);
             BindingOperations.EnableCollectionSynchronization(DataListVersion, _lock);
-
+            SetDataGridGrouping();
             ItemsView.Filter = new Predicate<object>(o => Filter(o as PackageModel));
             ComboView.Filter = new Predicate<object>(o => FilterCombo(o as VersionModel));
             GetPackages();
+        }
+
+        public void SetDataGridGrouping()
+        {
+
+            if (GlobalDataHelper<AppConfig>.Config.IsGroup)
+            {
+                ItemsView.GroupDescriptions.Add(new PropertyGroupDescription("Publisher"));
+            }
+            else
+            {
+                ItemsView.GroupDescriptions.Clear();
+            }
         }
 
         #region Cloning Progress
@@ -434,9 +459,10 @@ namespace HandyWinGet.ViewModels
             {
                 if (SelectedPackage.Id != null)
                 {
+                    string url = RemoveComment(SelectedPackage.Url);
+
                     if (GlobalDataHelper<AppConfig>.Config.IsIDM)
                     {
-                        string url = RemoveComment(SelectedPackage.Url);
                         DownloadWithIDM(url);
                     }
                     else
@@ -444,8 +470,6 @@ namespace HandyWinGet.ViewModels
                         IsVisibleProgressButton = true;
                         LoadingStatus = $"Preparing to download {SelectedPackage.Id}";
                         DataGot = false;
-
-                        string url = RemoveComment(SelectedPackage.Url);
 
                         _tempLocation = $"{location}{SelectedPackage.Id}-{SelectedPackage.Version}{GetExtension(url)}".Trim();
                         if (!File.Exists(_tempLocation))
@@ -575,8 +599,6 @@ namespace HandyWinGet.ViewModels
                         return url.Substring(pointIndex + pointChar.Length);
 
                     }
-
-                    return string.Empty;
                 }
                 else
                 {

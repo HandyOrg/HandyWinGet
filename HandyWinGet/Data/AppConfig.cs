@@ -10,6 +10,8 @@ namespace HandyWinGet.Data
         public DateTime UpdatedDate { get; set; } = DateTime.Now;
         public bool IsCheckedCompanyName { get; set; } = true;
         public bool IsIDM { get; set; } = false;
+        public bool IsGroup { get; set; } = false;
+        public bool IsExtraDetail { get; set; } = false;
         public NavigationViewPaneDisplayMode PaneDisplayMode { get; set; } = NavigationViewPaneDisplayMode.Left;
         public PackageInstallMode PackageInstallMode { get; set; } = PackageInstallMode.Wingetcli;
         public SkinType Skin { get; set; } = SkinType.Default;

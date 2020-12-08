@@ -138,15 +138,15 @@ namespace HandyWinGet.ViewModels
         private ComboBoxItem _SelectedArchitecture;
         public ComboBoxItem SelectedArchitecture
         {
-            get { return _SelectedArchitecture; }
-            set { SetProperty(ref _SelectedArchitecture, value); }
+            get => _SelectedArchitecture;
+            set => SetProperty(ref _SelectedArchitecture, value);
         }
 
         private ObservableCollection<Tag> _TagDataList = new ObservableCollection<Tag>();
         public ObservableCollection<Tag> TagDataList
         {
-            get { return _TagDataList; }
-            set { SetProperty(ref _TagDataList, value); }
+            get => _TagDataList;
+            set => SetProperty(ref _TagDataList, value);
         }
         #endregion
         public CreatePackageViewModel()
@@ -161,7 +161,7 @@ namespace HandyWinGet.ViewModels
                 && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(URL) && URL.IsUrl())
             {
 
-                var tags = String.Join(",", TagDataList.Select(p => p.Content));
+                var tags = string.Join(",", TagDataList.Select(p => p.Content));
 
                 string ext = Path.GetExtension(URL)?.Replace(".", "").Trim();
                 if (ext != null && ext.ToLower().Equals("msixbundle"))

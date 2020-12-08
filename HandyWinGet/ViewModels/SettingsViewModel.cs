@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyWinGet.Data;
+using HandyWinGet.Views;
 using Microsoft.Win32;
 using ModernWpf.Controls;
 using Prism.Commands;
@@ -35,21 +36,21 @@ namespace HandyWinGet.ViewModels
         private int _PaneIndex;
         public int PaneIndex
         {
-            get { return _PaneIndex; }
-            set { SetProperty(ref _PaneIndex, value); }
+            get => _PaneIndex;
+            set => SetProperty(ref _PaneIndex, value);
         }
 
         private int _InstallModeIndex;
         public int InstallModeIndex
         {
-            get { return _InstallModeIndex; }
-            set { SetProperty(ref _InstallModeIndex, value); }
+            get => _InstallModeIndex;
+            set => SetProperty(ref _InstallModeIndex, value);
         }
 
         private bool _IsIDM;
         public bool IsIDM
         {
-            get { return _IsIDM; }
+            get => _IsIDM;
             set
             {
                 SetProperty(ref _IsIDM, value);
@@ -62,8 +63,39 @@ namespace HandyWinGet.ViewModels
         private bool _IsVisibleIDM;
         public bool IsVisibleIDM
         {
-            get { return _IsVisibleIDM; }
-            set { SetProperty(ref _IsVisibleIDM, value); }
+            get => _IsVisibleIDM;
+            set => SetProperty(ref _IsVisibleIDM, value);
+        }
+
+        private bool _IsGroup;
+        public bool IsGroup
+        {
+            get => _IsGroup;
+            set
+            {
+                SetProperty(ref _IsGroup, value);
+                GlobalDataHelper<AppConfig>.Config.IsGroup = value;
+                GlobalDataHelper<AppConfig>.Save();
+                GlobalDataHelper<AppConfig>.Init();
+                PackagesViewModel.Instance.SetDataGridGrouping();
+                Packages.Instance.SetPublisherVisibility();
+            }
+        }
+
+        private bool _IsExtraDetail;
+        public bool IsExtraDetail
+        {
+            get => _IsExtraDetail;
+            set
+            {
+                SetProperty(ref _IsExtraDetail, value);
+                GlobalDataHelper<AppConfig>.Config.IsExtraDetail = value;
+                GlobalDataHelper<AppConfig>.Save();
+                GlobalDataHelper<AppConfig>.Init();
+                PackagesViewModel.Instance.RowDetailsVisibilityMode = value
+                    ? DataGridRowDetailsVisibilityMode.VisibleWhenSelected
+                    : DataGridRowDetailsVisibilityMode.Collapsed;
+            }
         }
 
         public SettingsViewModel()
@@ -71,16 +103,11 @@ namespace HandyWinGet.ViewModels
             Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             PaneIndex = (int)GlobalDataHelper<AppConfig>.Config.PaneDisplayMode;
             InstallModeIndex = (int)GlobalDataHelper<AppConfig>.Config.PackageInstallMode;
-            if (InstallModeIndex == (int)PackageInstallMode.Internal)
-            {
-                IsVisibleIDM = true;
-            }
-            else
-            {
-                IsVisibleIDM = false;
-            }
+            IsVisibleIDM = InstallModeIndex == (int)PackageInstallMode.Internal;
 
             IsIDM = GlobalDataHelper<AppConfig>.Config.IsIDM;
+            IsGroup = GlobalDataHelper<AppConfig>.Config.IsGroup;
+            IsExtraDetail = GlobalDataHelper<AppConfig>.Config.IsExtraDetail;
         }
 
         void PaneDisplayModeChanged(SelectionChangedEventArgs e)

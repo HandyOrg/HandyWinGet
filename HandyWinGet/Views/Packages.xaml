@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/" 
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             Name="self"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <hc:TransitioningContentControl TransitionMode="Fade">
         <hc:ToggleBlock IsChecked="{Binding DataGot}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
@@ -33,7 +34,7 @@
                     </Grid.RowDefinitions>
                     <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="5,10" hc:InfoElement.Placeholder="Search Application or Company..." IsRealTime="True" ShowClearButton="True" Style="{StaticResource SearchBarPlus}"/>
 
-                    <DataGrid hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="All" SelectionMode="Single" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
+                    <DataGrid x:Name="dg" RowDetailsVisibilityMode="{Binding RowDetailsVisibilityMode}" VirtualizingPanel.IsVirtualizingWhenGrouping="True" hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="All" SelectionMode="Single" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding DataList}">
                         <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -77,23 +78,25 @@
                                 </StackPanel>
                             </DataTemplate>
                         </DataGrid.RowDetailsTemplate>
+
                         <DataGrid.Columns>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Publisher}" MinWidth="190">
+                            <DataGridTextColumn
+                                IsReadOnly="True" Binding="{Binding Publisher}" Width=".5*">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Publisher" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" MinWidth="190">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Width=".5*">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Name" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
                             </DataGridTextColumn>
-                            <DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width="auto" MinWidth="150">
+                            <DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width=".3*">
                                 <DataGridCheckBoxColumn.Header>
                                     <TextBlock Text="Installed" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridCheckBoxColumn.Header>
                             </DataGridCheckBoxColumn>
-                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Width="auto" MinWidth="120">
+                            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Version}" Width=".5*">
                                 <DataGridTextColumn.Header>
                                     <TextBlock Text="Latest Version" Style="{StaticResource TextBlockSubTitle}"/>
                                 </DataGridTextColumn.Header>
@@ -109,6 +112,24 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
+                       
+                        <DataGrid.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.ContainerStyle>
+                                    <Style TargetType="{x:Type GroupItem}" >
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                    <Expander Margin="0,10,0,0" IsExpanded="True" Header="{Binding Name}">
+                                                        <ItemsPresenter Margin="0,5,0,0"/>
+                                                    </Expander>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </GroupStyle.ContainerStyle>
+                            </GroupStyle>
+                        </DataGrid.GroupStyle>
                         <hc:Interaction.Triggers>
                             <hc:EventTrigger EventName="SelectionChanged">
                                 <hc:EventToCommand Command="{Binding ItemChangedCmd}" PassEventArgsToCommand="True"/>

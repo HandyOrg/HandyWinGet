@@ -23,9 +23,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Downloader" Version="1.9.7" />
+    <PackageReference Include="Downloader" Version="2.0.0" />
     <PackageReference Include="HandyControls" Version="3.0.0" />
-    <PackageReference Include="ModernWpfUI" Version="0.9.3-preview.201004.0" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.3-preview.201204.0" />
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
 
     <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0096" />

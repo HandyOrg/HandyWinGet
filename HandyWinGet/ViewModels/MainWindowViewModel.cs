@@ -10,7 +10,7 @@ namespace HandyWinGet.ViewModels
     public class MainWindowViewModel : BindableBase
     {
         internal static MainWindowViewModel Instance;
-        IRegionManager region;
+        readonly IRegionManager region;
         private DelegateCommand<NavigationViewSelectionChangedEventArgs> _SwitchCommand;
         public DelegateCommand<NavigationViewSelectionChangedEventArgs> SwitchCommand =>
             _SwitchCommand ?? (_SwitchCommand = new DelegateCommand<NavigationViewSelectionChangedEventArgs>(Switch));
@@ -18,8 +18,8 @@ namespace HandyWinGet.ViewModels
         private NavigationViewPaneDisplayMode _paneDisplayMode;
         public NavigationViewPaneDisplayMode PaneDisplayMode
         {
-            get { return GlobalDataHelper<AppConfig>.Config.PaneDisplayMode; }
-            set { SetProperty(ref _paneDisplayMode, value); }
+            get => GlobalDataHelper<AppConfig>.Config.PaneDisplayMode;
+            set => SetProperty(ref _paneDisplayMode, value);
         }
 
         public MainWindowViewModel(IRegionManager regionManager)
