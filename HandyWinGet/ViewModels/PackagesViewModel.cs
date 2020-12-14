@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using YamlDotNet.Serialization;
 using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace HandyWinGet.ViewModels
@@ -223,35 +224,39 @@ namespace HandyWinGet.ViewModels
                 InstalledApps = InstalledApps.Distinct().ToList();
                 foreach (string item in pkgs)
                 {
-                    var content = File.ReadAllLines(item);
-                    string version = content.Where(l => l.Trim().StartsWith("Version:"))?.FirstOrDefault()?.Replace("Version:", "");
-                    string name = content.Where(l => l.Contains("Name:"))?.FirstOrDefault()?.Replace("Name:", "")?.Trim();
-                    string publisher = content.Where(l => l.Contains("Publisher:"))?.FirstOrDefault()?.Replace("Publisher:", "")?.Trim();
-                    string id = content.Where(l => l.Contains("Id:")).FirstOrDefault().Replace("Id:", "").Trim();
-                    string url = content.Where(l => l.Contains("Url:", StringComparison.InvariantCultureIgnoreCase) && !l.Contains("LicenseUrl")).FirstOrDefault().Replace("Url:", "").Trim();
-                    string desc = content.Where(l => l.Contains("Description:"))?.FirstOrDefault()?.Replace("Description:", "")?.Trim();
-                    string license = content.Where(l => l.Contains("LicenseUrl:"))?.FirstOrDefault()?.Replace("LicenseUrl:", "")?.Trim();
-                    string homePage = content.Where(l => l.Contains("Homepage:"))?.FirstOrDefault()?.Replace("Homepage:", "")?.Trim();
-                    string arch = content.Where(l => l.Contains("Arch:"))?.FirstOrDefault()?.Replace("Arch:", "")?.Replace("#", "")?.Trim();
+                    var file = File.ReadAllText(item);
+                    var input = new StringReader(file);
+
+                    var deserializer = new DeserializerBuilder().Build();
+                    var yamlObject = deserializer.Deserialize(input);
+                    var serializer = new SerializerBuilder()
+                        .JsonCompatible()
+                        .Build();
+
+                    var json = serializer.Serialize(yamlObject);
+                    var yaml = System.Text.Json.JsonSerializer.Deserialize<YamlModel>(json);
+
                     string installedVersion = string.Empty;
 
                     bool isInstalled = false;
                     foreach (var itemApp in InstalledApps)
                     {
-                        if (itemApp.DisplayName.Contains(name))
+                        if (itemApp.DisplayName.Contains(yaml.Name))
                         {
                             installedVersion = $"Installed Version: {itemApp.Version}";
                             isInstalled = true;
                         }
                     }
 
-                    var packge = new PackageModel { Publisher = publisher, Name = name, IsInstalled = isInstalled, Version = version, Id = id, Url = url, Description = desc, LicenseUrl = license, Homepage = homePage, Arch = id + " " + arch, InstalledVersion = installedVersion };
+                    var packge = new PackageModel { Publisher = yaml.Publisher, Name = yaml.Name, IsInstalled = isInstalled, 
+                        Version = yaml.Version, Id = yaml.Id, Url = yaml.Installers[0].Url, Description = yaml.Description, LicenseUrl = yaml.LicenseUrl,
+                        Homepage = yaml.Homepage, Arch = yaml.Id + " " + yaml.Installers[0].Arch, InstalledVersion = installedVersion };
 
                     if (!DataList.Contains(packge, new ItemEqualityComparer()))
                     {
                         DataList.Add(packge);
                     }
-                    DataListVersion.Add(new VersionModel { Id = id, Version = version, Url = url });
+                    DataListVersion.Add(new VersionModel { Id = yaml.Id, Version = yaml.Version, Url = yaml.Installers[0].Url });
                 }
 
                 CleanRepo();

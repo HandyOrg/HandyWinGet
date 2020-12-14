@@ -1,6 +1,7 @@
 ﻿using Downloader;
 using HandyControl.Controls;
 using HandyControl.Tools;
+using HandyWinGet.Models;
 using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using YamlDotNet.Serialization;
 
 namespace HandyWinGet.ViewModels
 {
@@ -168,34 +170,37 @@ namespace HandyWinGet.ViewModels
                 {
                     ext = "Msix";
                 }
-                StringBuilder builder = new StringBuilder();
-                builder.AppendLine($"Id: {PackageId}");
-                builder.AppendLine($"Version: {Version}");
-                builder.AppendLine($"Name: {AppName}");
-                builder.AppendLine($"Publisher: {Publisher}");
-                builder.AppendLine($"License: {License}");
-                builder.AppendLine($"LicenseUrl: {LicenseUrl}");
-                builder.AppendLine($"AppMoniker: {AppMoniker}");
-                builder.AppendLine($"Tags: {tags}");
-                builder.AppendLine($"Description: {Description}");
-                builder.AppendLine($"Homepage: {HomePage}");
-                builder.AppendLine($"Installers:");
-                builder.AppendLine($"  - Arch: {SelectedArchitecture?.Content}");
-                builder.AppendLine($"    Url: {URL}");
-                builder.AppendLine($"    Sha256: {Hash}");
-                builder.AppendLine($"    InstallerType: {ext}");
-                if (ext != null && ext.ToLower().Equals("exe"))
-                {
-                    builder.AppendLine();
-                    builder.AppendLine("    Switches:");
-                    builder.AppendLine("      Silent: /S");
-                    builder.AppendLine("      SilentWithProgress: /S");
-                }
 
+                var builder = new YamlModel
+                {
+                    Id = PackageId,
+                    Version = Version,
+                    Name = AppName,
+                    Publisher = Publisher,
+                    License = License,
+                    LicenseUrl = LicenseUrl,
+                    AppMoniker = AppMoniker,
+                    Tags = tags,
+                    Description = Description,
+                    Homepage = HomePage,
+                    Installers = new System.Collections.Generic.List<Installer> {
+                        new Installer {
+                            Arch = SelectedArchitecture?.Content.ToString(),
+                            Url = URL,
+                            Sha256 = Hash
+                        } },
+                    InstallerType = ext,
+                    Switches = ext != null && ext.ToLower().Equals("exe") ? new Switches { 
+                        Silent = "/S", SilentWithProgress = "/S" 
+                    } : new Switches()
+                };
+
+                var serializer = new SerializerBuilder().Build();
+                var yaml = serializer.Serialize(builder);
                 switch (mode)
                 {
                     case GenerateMode.CopyToClipboard:
-                        Clipboard.SetText(builder.ToString());
+                        Clipboard.SetText(yaml);
                         Growl.SuccessGlobal("Script Copied to clipboard.");
                         ClearInputs();
                         break;
@@ -207,7 +212,7 @@ namespace HandyWinGet.ViewModels
                         dialog.Filter = "Yaml File (*.yaml)|*.yaml";
                         if (dialog.ShowDialog() == true)
                         {
-                            File.WriteAllText(dialog.FileName, builder.ToString());
+                            File.WriteAllText(dialog.FileName, yaml);
                             ClearInputs();
                         }
                         break;
@@ -275,7 +280,6 @@ namespace HandyWinGet.ViewModels
             HomePage = string.Empty;
             License = string.Empty;
             LicenseUrl = string.Empty;
-            SelectedArchitecture.Content = string.Empty;
             URL = string.Empty;
             Hash = string.Empty;
             Progress = 0;

@@ -31,6 +31,7 @@
     <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0096" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.0.0" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.0.0" />
+    <PackageReference Include="YamlDotNet" Version="9.1.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="HandyUpdater.dll">
