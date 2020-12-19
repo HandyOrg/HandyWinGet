@@ -1,50 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
-    <Version>2.0.0</Version>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <DebugType>embedded</DebugType>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
-    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net5.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<AssemblyVersion>2.0.0.0</AssemblyVersion>
+		<FileVersion>2.0.0.0</FileVersion>
+		<Version>2.0.0</Version>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<DebugType>embedded</DebugType>
+		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
-    </Page>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Downloader" Version="2.0.1" />
-    <PackageReference Include="HandyControls" Version="3.0.0" />
-    <PackageReference Include="ModernWpfUis" Version="1.0.0" />
-    <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
+	<ItemGroup>
+		<Page Include="Properties\DesignTimeResources.xaml"
+		      Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+			<ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+		</Page>
+	</ItemGroup>
 
-    <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0096" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.0.0" />
-    <PackageReference Include="YamlDotNet" Version="9.1.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="HandyUpdater.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="HandyUpdater.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="HandyUpdater.runtimeconfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="UnRAR.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Downloader" Version="2.0.1" />
+		<PackageReference Include="HandyControls" Version="3.0.0" />
+		<PackageReference Include="ModernWpfUis" Version="1.0.0" />
+		<PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
+
+		<PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0096" />
+		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.0.0" />
+		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.0.0" />
+		<PackageReference Include="YamlDotNet" Version="9.1.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="HandyUpdater.dll">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="HandyUpdater.exe">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="HandyUpdater.runtimeconfig.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="UnRAR.exe">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

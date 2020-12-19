@@ -1,8 +1,8 @@
-﻿using HandyWinGet.Views;
+﻿using System.Windows;
+using HandyWinGet.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Regions;
-using System.Windows;
 
 namespace HandyWinGet
 {
@@ -24,6 +24,7 @@ namespace HandyWinGet
             containerRegistry.RegisterForNavigation<CreatePackage>();
             containerRegistry.RegisterForNavigation<Packages>();
             containerRegistry.RegisterForNavigation<Settings>();
+            containerRegistry.RegisterForNavigation<PackageManager>();
         }
     }
 }

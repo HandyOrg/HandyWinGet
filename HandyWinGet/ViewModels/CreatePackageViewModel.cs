@@ -1,23 +1,160 @@
-﻿using Downloader;
-using HandyControl.Controls;
-using HandyControl.Tools;
-using HandyWinGet.Models;
-using Microsoft.Win32;
-using Prism.Commands;
-using Prism.Mvvm;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Downloader;
+using HandyControl.Controls;
+using HandyControl.Tools;
+using HandyWinGet.Models;
+using Microsoft.Win32;
+using Prism.Commands;
+using Prism.Mvvm;
 using YamlDotNet.Serialization;
 
 namespace HandyWinGet.ViewModels
 {
     public class CreatePackageViewModel : BindableBase
     {
+        public enum GenerateMode
+        {
+            CopyToClipboard,
+            SaveToFile
+        }
+
+        public void GenerateScript(GenerateMode mode)
+        {
+            if (!string.IsNullOrEmpty(AppName) && !string.IsNullOrEmpty(Publisher)
+                                               && !string.IsNullOrEmpty(PackageId) && !string.IsNullOrEmpty(Version)
+                                               && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(URL) &&
+                                               URL.IsUrl())
+            {
+                var tags = string.Join(",", TagDataList.Select(p => p.Content));
+
+                var ext = Path.GetExtension(URL)?.Replace(".", "").Trim();
+                if (ext != null && ext.ToLower().Equals("msixbundle")) ext = "Msix";
+
+                var builder = new YamlModel
+                {
+                    Id = PackageId,
+                    Version = Version,
+                    Name = AppName,
+                    Publisher = Publisher,
+                    License = License,
+                    LicenseUrl = LicenseUrl,
+                    AppMoniker = AppMoniker,
+                    Tags = tags,
+                    Description = Description,
+                    Homepage = HomePage,
+                    Installers = new List<Installer>
+                    {
+                        new()
+                        {
+                            Arch = SelectedArchitecture?.Content.ToString(),
+                            Url = URL,
+                            Sha256 = Hash
+                        }
+                    },
+                    InstallerType = ext,
+                    Switches = ext != null && ext.ToLower().Equals("exe")
+                        ? new Switches
+                        {
+                            Silent = "/S",
+                            SilentWithProgress = "/S"
+                        }
+                        : new Switches()
+                };
+
+                var serializer = new SerializerBuilder().Build();
+                var yaml = serializer.Serialize(builder);
+                switch (mode)
+                {
+                    case GenerateMode.CopyToClipboard:
+                        Clipboard.SetText(yaml);
+                        Growl.SuccessGlobal("Script Copied to clipboard.");
+                        ClearInputs();
+                        break;
+                    case GenerateMode.SaveToFile:
+                        var dialog = new SaveFileDialog();
+                        dialog.Title = "Save Package";
+                        dialog.FileName = $"{Version}.yaml";
+                        dialog.DefaultExt = "yaml";
+                        dialog.Filter = "Yaml File (*.yaml)|*.yaml";
+                        if (dialog.ShowDialog() == true)
+                        {
+                            File.WriteAllText(dialog.FileName, yaml);
+                            ClearInputs();
+                        }
+
+                        break;
+                }
+            }
+            else
+            {
+                Growl.ErrorGlobal("Required fields must be filled");
+            }
+        }
+
+        private void CreatePackage()
+        {
+            GenerateScript(GenerateMode.SaveToFile);
+        }
+
+        private void CopyToClipboard()
+        {
+            GenerateScript(GenerateMode.CopyToClipboard);
+        }
+
+        private void GetHash()
+        {
+            if (!string.IsNullOrEmpty(URL) && URL.IsUrl())
+            {
+                IsEnabled = false;
+                OnDownloadClick();
+            }
+            else
+            {
+                Growl.ErrorGlobal("Url field is Empty or Invalid");
+            }
+        }
+
+        private void AddTag()
+        {
+            if (string.IsNullOrEmpty(TagName))
+            {
+                Growl.Warning("Please Enter Content");
+                return;
+            }
+
+            TagDataList.Add(new Tag
+            {
+                Content = TagName,
+                ShowCloseButton = true
+            });
+            TagName = string.Empty;
+        }
+
+        public void ClearInputs()
+        {
+            AppName = string.Empty;
+            Publisher = string.Empty;
+            PackageId = string.Empty;
+            Version = string.Empty;
+            AppMoniker = string.Empty;
+            TagName = string.Empty;
+            Description = string.Empty;
+            HomePage = string.Empty;
+            License = string.Empty;
+            LicenseUrl = string.Empty;
+            URL = string.Empty;
+            Hash = string.Empty;
+            Progress = 0;
+            TagDataList.Clear();
+        }
+
         #region Commands
 
         private DelegateCommand _GetHashCmd;
@@ -164,7 +301,7 @@ namespace HandyWinGet.ViewModels
             set => SetProperty(ref _SelectedArchitecture, value);
         }
 
-        private ObservableCollection<Tag> _TagDataList = new ObservableCollection<Tag>();
+        private ObservableCollection<Tag> _TagDataList = new();
 
         public ObservableCollection<Tag> TagDataList
         {
@@ -173,149 +310,6 @@ namespace HandyWinGet.ViewModels
         }
 
         #endregion
-
-        public CreatePackageViewModel()
-        {
-        }
-
-        public void GenerateScript(GenerateMode mode)
-        {
-            if (!string.IsNullOrEmpty(AppName) && !string.IsNullOrEmpty(Publisher)
-                                               && !string.IsNullOrEmpty(PackageId) && !string.IsNullOrEmpty(Version)
-                                               && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(URL) &&
-                                               URL.IsUrl())
-            {
-                var tags = string.Join(",", TagDataList.Select(p => p.Content));
-
-                string ext = Path.GetExtension(URL)?.Replace(".", "").Trim();
-                if (ext != null && ext.ToLower().Equals("msixbundle"))
-                {
-                    ext = "Msix";
-                }
-
-                var builder = new YamlModel
-                {
-                    Id = PackageId,
-                    Version = Version,
-                    Name = AppName,
-                    Publisher = Publisher,
-                    License = License,
-                    LicenseUrl = LicenseUrl,
-                    AppMoniker = AppMoniker,
-                    Tags = tags,
-                    Description = Description,
-                    Homepage = HomePage,
-                    Installers = new System.Collections.Generic.List<Installer>
-                    {
-                        new Installer
-                        {
-                            Arch = SelectedArchitecture?.Content.ToString(),
-                            Url = URL,
-                            Sha256 = Hash
-                        }
-                    },
-                    InstallerType = ext,
-                    Switches = ext != null && ext.ToLower().Equals("exe")
-                        ? new Switches
-                        {
-                            Silent = "/S",
-                            SilentWithProgress = "/S"
-                        }
-                        : new Switches()
-                };
-
-                var serializer = new SerializerBuilder().Build();
-                var yaml = serializer.Serialize(builder);
-                switch (mode)
-                {
-                    case GenerateMode.CopyToClipboard:
-                        Clipboard.SetText(yaml);
-                        Growl.SuccessGlobal("Script Copied to clipboard.");
-                        ClearInputs();
-                        break;
-                    case GenerateMode.SaveToFile:
-                        SaveFileDialog dialog = new SaveFileDialog();
-                        dialog.Title = "Save Package";
-                        dialog.FileName = $"{Version}.yaml";
-                        dialog.DefaultExt = "yaml";
-                        dialog.Filter = "Yaml File (*.yaml)|*.yaml";
-                        if (dialog.ShowDialog() == true)
-                        {
-                            File.WriteAllText(dialog.FileName, yaml);
-                            ClearInputs();
-                        }
-
-                        break;
-                }
-            }
-            else
-            {
-                Growl.ErrorGlobal("Required fields must be filled");
-            }
-        }
-
-        void CreatePackage()
-        {
-            GenerateScript(GenerateMode.SaveToFile);
-        }
-
-        void CopyToClipboard()
-        {
-            GenerateScript(GenerateMode.CopyToClipboard);
-        }
-
-        public enum GenerateMode
-        {
-            CopyToClipboard,
-            SaveToFile
-        }
-
-        void GetHash()
-        {
-            if (!string.IsNullOrEmpty(URL) && URL.IsUrl())
-            {
-                IsEnabled = false;
-                OnDownloadClick();
-            }
-            else
-            {
-                Growl.ErrorGlobal("Url field is Empty or Invalid");
-            }
-        }
-
-        void AddTag()
-        {
-            if (string.IsNullOrEmpty(TagName))
-            {
-                Growl.Warning("Please Enter Content");
-                return;
-            }
-
-            TagDataList.Add(new Tag
-            {
-                Content = TagName,
-                ShowCloseButton = true
-            });
-            TagName = string.Empty;
-        }
-
-        public void ClearInputs()
-        {
-            AppName = string.Empty;
-            Publisher = string.Empty;
-            PackageId = string.Empty;
-            Version = string.Empty;
-            AppMoniker = string.Empty;
-            TagName = string.Empty;
-            Description = string.Empty;
-            HomePage = string.Empty;
-            License = string.Empty;
-            LicenseUrl = string.Empty;
-            URL = string.Empty;
-            Hash = string.Empty;
-            Progress = 0;
-            TagDataList.Clear();
-        }
 
         #region Downloader
 
@@ -328,11 +322,11 @@ namespace HandyWinGet.ViewModels
             IsEnabled = true;
         }
 
-        private void OnDownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
+        private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            double bytesIn = double.Parse(e.BytesReceived.ToString());
-            double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
-            double percentage = bytesIn / totalBytes * 100;
+            var bytesIn = double.Parse(e.BytesReceived.ToString());
+            var totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
+            var percentage = bytesIn / totalBytes * 100;
             Progress = int.Parse(Math.Truncate(percentage).ToString());
         }
 

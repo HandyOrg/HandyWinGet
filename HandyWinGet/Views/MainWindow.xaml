@@ -24,15 +24,19 @@
             <StackPanel Height="29">
                 <ToggleButton x:Name="tg" BorderThickness="0" Content="Toggle Theme" Click="ToggleSkins_OnClick" />
             </StackPanel>
-
         </Grid>
     </hc:Window.NonClientAreaContent>
 
     <ui:NavigationView IsBackButtonVisible="Collapsed" IsTabStop="False" PaneTitle="HandyWinGet"
                        IsSettingsVisible="True" PaneDisplayMode="{Binding PaneDisplayMode}">
         <ui:NavigationView.MenuItems>
-            <ui:NavigationViewItem IsSelected="True" IsTabStop="False" Icon="home" Tag="Packages" Content="Packages" />
+            <ui:NavigationViewItem IsSelected="True" IsTabStop="False" Tag="Packages" Content="Packages">
+                <ui:NavigationViewItem.Icon>
+                    <ui:FontIcon Glyph="&#xE7B8;" />
+                </ui:NavigationViewItem.Icon>
+            </ui:NavigationViewItem>
             <ui:NavigationViewItem IsTabStop="False" Icon="add" Tag="CreatePackage" Content="Create New Package" />
+            <ui:NavigationViewItem IsTabStop="False" Icon="Manage" Tag="PackageManager" Content="Package Manager" />
         </ui:NavigationView.MenuItems>
 
         <ContentControl prism:RegionManager.RegionName="ContentRegion" />

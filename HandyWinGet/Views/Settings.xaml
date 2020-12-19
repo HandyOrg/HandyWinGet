@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="HandyWinGet.Views.Settings"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/"          
+             xmlns:prism="http://prismlibrary.com/"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:em="clr-namespace:HandyWinGet.Data"
@@ -9,66 +9,99 @@
     <hc:TransitioningContentControl TransitionMode="Fade">
         <Grid Background="{DynamicResource RegionBrush}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <hc:ScrollViewer>
                 <StackPanel Margin="10,10">
-                    <TextBlock HorizontalAlignment="Left" Text="General" Style="{StaticResource TextBlockTitleBold}"/>
-                    <hc:ComboBox SelectedIndex="{Binding PaneIndex}" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type ui:NavigationViewPaneDisplayMode}}}" Width="330" HorizontalAlignment="Left" IsEditable="False" hc:TitleElement.Title="Pane Display Mode" Margin="0,10,60,10" hc:InfoElement.Placeholder="Pane Display Mode">
+                    <TextBlock HorizontalAlignment="Left" Text="General" Style="{StaticResource TextBlockTitleBold}" />
+                    <hc:ComboBox SelectedIndex="{Binding PaneIndex}"
+                                 ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type ui:NavigationViewPaneDisplayMode}}}"
+                                 Width="330" HorizontalAlignment="Left" IsEditable="False"
+                                 hc:TitleElement.Title="Pane Display Mode" Margin="0,10,60,10"
+                                 hc:InfoElement.Placeholder="Pane Display Mode">
                         <hc:Interaction.Triggers>
                             <hc:EventTrigger EventName="SelectionChanged">
-                                <hc:EventToCommand Command="{Binding PaneDisplayModeChangedCommand}" PassEventArgsToCommand="True"/>
+                                <hc:EventToCommand Command="{Binding PaneDisplayModeChangedCommand}"
+                                                   PassEventArgsToCommand="True" />
                             </hc:EventTrigger>
                         </hc:Interaction.Triggers>
                     </hc:ComboBox>
-                    <hc:ComboBox SelectedIndex="{Binding IdentifyPackageModeIndex}" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:IdentifyPackageMode}}}" Width="330" HorizontalAlignment="Left" IsEditable="False" hc:TitleElement.Title="Show Installed Package" Margin="0,10,60,10">
+                    <hc:ComboBox SelectedIndex="{Binding IdentifyPackageModeIndex}"
+                                 ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:IdentifyPackageMode}}}"
+                                 Width="330" HorizontalAlignment="Left" IsEditable="False"
+                                 hc:TitleElement.Title="Show Installed Package" Margin="0,10,60,10">
                         <hc:Interaction.Triggers>
                             <hc:EventTrigger EventName="SelectionChanged">
-                                <hc:EventToCommand Command="{Binding IdentifyPackageModeChangedCommand}" PassEventArgsToCommand="True"/>
+                                <hc:EventToCommand Command="{Binding IdentifyPackageModeChangedCommand}"
+                                                   PassEventArgsToCommand="True" />
                             </hc:EventTrigger>
                         </hc:Interaction.Triggers>
                     </hc:ComboBox>
-                    <hc:ComboBox SelectedIndex="{Binding InstallModeIndex}" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:InstallMode}}}" Width="330" HorizontalAlignment="Left" IsEditable="False" hc:TitleElement.Title="Package Install Mode" Margin="0,10,60,10" hc:InfoElement.Placeholder="Package Install Mode">
+                    <hc:ComboBox SelectedIndex="{Binding InstallModeIndex}"
+                                 ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:InstallMode}}}"
+                                 Width="330" HorizontalAlignment="Left" IsEditable="False"
+                                 hc:TitleElement.Title="Package Install Mode" Margin="0,10,60,10"
+                                 hc:InfoElement.Placeholder="Package Install Mode">
                         <hc:Interaction.Triggers>
                             <hc:EventTrigger EventName="SelectionChanged">
-                                <hc:EventToCommand Command="{Binding InstallModeChangedCommand}" PassEventArgsToCommand="True"/>
+                                <hc:EventToCommand Command="{Binding InstallModeChangedCommand}"
+                                                   PassEventArgsToCommand="True" />
                             </hc:EventTrigger>
                         </hc:Interaction.Triggers>
                     </hc:ComboBox>
 
-                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Download with Internet Download Manager (IDM)" IsChecked="{Binding IsIDMEnabled}" Visibility="{Binding IsVisibleIDM, Converter={StaticResource Boolean2VisibilityConverter}}"/>
-                    <ToggleButton Margin="10" IsEnabled="False" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Content="Check if the application is already installed (Soon)"/>
-                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Grouping packages by publisher" IsChecked="{Binding IsShowingGroup}"/>
-                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Show extra package details (by clicking on the row)" IsChecked="{Binding IsShowingExtraDetail}"/>
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0"
+                                  Content="Download with Internet Download Manager (IDM)"
+                                  IsChecked="{Binding IsIDMEnabled}"
+                                  Visibility="{Binding IsVisibleIDM, Converter={StaticResource Boolean2VisibilityConverter}}" />
+                    <ToggleButton Margin="10" IsEnabled="False" Style="{StaticResource ToggleButtonSwitch}"
+                                  HorizontalAlignment="Left"
+                                  Content="Check if the application is already installed (Soon)" />
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0"
+                                  Content="Grouping packages by publisher" IsChecked="{Binding IsShowingGroup}" />
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10"
+                                  Content="Show extra package details (by clicking on the row)"
+                                  IsChecked="{Binding IsShowingExtraDetail}" />
 
                 </StackPanel>
             </hc:ScrollViewer>
 
             <StackPanel Margin="10,10,50,20" Grid.Column="1">
-                <TextBlock HorizontalAlignment="Left" Text="HandywinGet" Style="{StaticResource TextBlockTitleBold}"/>
-                <TextBlock Margin="0,5" Width="200" Text="powerful app for installing apps through WinGet and Creating winget package." TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14"/>
+                <TextBlock HorizontalAlignment="Left" Text="HandywinGet" Style="{StaticResource TextBlockTitleBold}" />
+                <TextBlock Margin="0,5" Width="200"
+                           Text="powerful app for installing apps through WinGet and Creating winget package."
+                           TextWrapping="Wrap" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}"
+                           FontSize="14" />
 
-                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14">
-                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
-                        <TextBlock Text="Github Repository"/>
+                <TextBlock Margin="0,5,0,0" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}"
+                           FontSize="14">
+                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet"
+                               Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
+                        <TextBlock Text="Github Repository" />
                     </Hyperlink>
                 </TextBlock>
-                <TextBlock Margin="0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14">
-                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet/issues" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
-                        <TextBlock Text="Report a bug"/>
+                <TextBlock Margin="0,10" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}"
+                           FontSize="14">
+                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet/issues"
+                               Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
+                        <TextBlock Text="Report a bug" />
                     </Hyperlink>
                 </TextBlock>
                 <TextBlock HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14">
-                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet/issues" Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
-                        <TextBlock Text="Request a feature"/>
+                    <Hyperlink CommandParameter="https://github.com/HandyOrg/HandywinGet/issues"
+                               Command="hc:ControlCommands.OpenLink" TextDecorations="{x:Null}">
+                        <TextBlock Text="Request a feature" />
                     </Hyperlink>
                 </TextBlock>
 
-                <TextBlock Margin="0,10" HorizontalAlignment="Left" Text="Update" Style="{StaticResource TextBlockTitleBold}"/>
+                <TextBlock Margin="0,10" HorizontalAlignment="Left" Text="Update"
+                           Style="{StaticResource TextBlockTitleBold}" />
 
-                <TextBlock Text="{Binding Version, StringFormat= 'Current Version \{0\}'}" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14"/>
-                <Button HorizontalAlignment="Left" Margin="0,10" Content="Check For Update" FontSize="14" Style="{DynamicResource ButtonPrimary}" Command="{Binding CheckUpdateCommand}"/>
+                <TextBlock Text="{Binding Version, StringFormat= 'Current Version \{0\}'}" HorizontalAlignment="Left"
+                           Style="{StaticResource TextBlockSubTitle}" FontSize="14" />
+                <Button HorizontalAlignment="Left" Margin="0,10" Content="Check For Update" FontSize="14"
+                        Style="{DynamicResource ButtonPrimary}" Command="{Binding CheckUpdateCommand}" />
             </StackPanel>
         </Grid>
     </hc:TransitioningContentControl>
