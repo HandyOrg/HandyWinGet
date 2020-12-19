@@ -1,11 +1,12 @@
-﻿using HandyControl.Controls;
-using HandyWinGet.Data;
+﻿using System.Windows;
 using System.Windows.Controls;
+using HandyControl.Controls;
+using HandyWinGet.Data;
 
 namespace HandyWinGet.Views
 {
     /// <summary>
-    /// Interaction logic for Packages
+    ///     Interaction logic for Packages
     /// </summary>
     public partial class Packages : UserControl
     {
@@ -21,8 +22,8 @@ namespace HandyWinGet.Views
         public void SetPublisherVisibility()
         {
             dg.Columns[0].Visibility = GlobalDataHelper<AppConfig>.Config.IsShowingGroup
-                ? System.Windows.Visibility.Collapsed
-                : System.Windows.Visibility.Visible;
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         }
     }
 }
