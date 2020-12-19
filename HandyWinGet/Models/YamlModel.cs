@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace HandyWinGet.Models
 {
@@ -23,6 +19,7 @@ namespace HandyWinGet.Models
         public Switches Switches { get; set; }
         public List<Installer> Installers { get; set; }
     }
+
     public class Switches
     {
         public string Custom { get; set; }
@@ -36,5 +33,4 @@ namespace HandyWinGet.Models
         public string Url { get; set; }
         public string Sha256 { get; set; }
     }
-
 }

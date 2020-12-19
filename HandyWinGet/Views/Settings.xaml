@@ -22,7 +22,14 @@
                             </hc:EventTrigger>
                         </hc:Interaction.Triggers>
                     </hc:ComboBox>
-                    <hc:ComboBox SelectedIndex="{Binding InstallModeIndex}" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:PackageInstallMode}}}" Width="330" HorizontalAlignment="Left" IsEditable="False" hc:TitleElement.Title="Package Install Mode" Margin="0,10,60,10" hc:InfoElement.Placeholder="Package Install Mode">
+                    <hc:ComboBox SelectedIndex="{Binding IdentifyPackageModeIndex}" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:IdentifyPackageMode}}}" Width="330" HorizontalAlignment="Left" IsEditable="False" hc:TitleElement.Title="Show Installed Package" Margin="0,10,60,10">
+                        <hc:Interaction.Triggers>
+                            <hc:EventTrigger EventName="SelectionChanged">
+                                <hc:EventToCommand Command="{Binding IdentifyPackageModeChangedCommand}" PassEventArgsToCommand="True"/>
+                            </hc:EventTrigger>
+                        </hc:Interaction.Triggers>
+                    </hc:ComboBox>
+                    <hc:ComboBox SelectedIndex="{Binding InstallModeIndex}" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type em:InstallMode}}}" Width="330" HorizontalAlignment="Left" IsEditable="False" hc:TitleElement.Title="Package Install Mode" Margin="0,10,60,10" hc:InfoElement.Placeholder="Package Install Mode">
                         <hc:Interaction.Triggers>
                             <hc:EventTrigger EventName="SelectionChanged">
                                 <hc:EventToCommand Command="{Binding InstallModeChangedCommand}" PassEventArgsToCommand="True"/>
@@ -30,10 +37,10 @@
                         </hc:Interaction.Triggers>
                     </hc:ComboBox>
 
-                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Download with Internet Download Manager (IDM)" IsChecked="{Binding IsIDM}" Visibility="{Binding IsVisibleIDM, Converter={StaticResource Boolean2VisibilityConverter}}"/>
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Download with Internet Download Manager (IDM)" IsChecked="{Binding IsIDMEnabled}" Visibility="{Binding IsVisibleIDM, Converter={StaticResource Boolean2VisibilityConverter}}"/>
                     <ToggleButton Margin="10" IsEnabled="False" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Content="Check if the application is already installed (Soon)"/>
-                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Grouping packages by publisher" IsChecked="{Binding IsGroup}"/>
-                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Show extra package details (by clicking on the row)" IsChecked="{Binding IsExtraDetail}"/>
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Grouping packages by publisher" IsChecked="{Binding IsShowingGroup}"/>
+                    <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Show extra package details (by clicking on the row)" IsChecked="{Binding IsShowingExtraDetail}"/>
 
                 </StackPanel>
             </hc:ScrollViewer>

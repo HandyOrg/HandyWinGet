@@ -16,15 +16,19 @@ namespace HandyWinGet.ViewModels
     {
         private DelegateCommand _CheckUpdateCommand;
         public DelegateCommand CheckUpdateCommand =>
-            _CheckUpdateCommand ?? (_CheckUpdateCommand = new DelegateCommand(CheckUpdate));
+            _CheckUpdateCommand ?? (_CheckUpdateCommand = new DelegateCommand(OnCheckUpdate));
 
         private DelegateCommand<SelectionChangedEventArgs> _PaneDisplayModeChangedCommand;
         public DelegateCommand<SelectionChangedEventArgs> PaneDisplayModeChangedCommand =>
-            _PaneDisplayModeChangedCommand ?? (_PaneDisplayModeChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(PaneDisplayModeChanged));
+            _PaneDisplayModeChangedCommand ?? (_PaneDisplayModeChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(OnPaneDisplayModeChanged));
 
         private DelegateCommand<SelectionChangedEventArgs> _InstallModeChangedCommand;
         public DelegateCommand<SelectionChangedEventArgs> InstallModeChangedCommand =>
-            _InstallModeChangedCommand ?? (_InstallModeChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(InstallModeChanged));
+            _InstallModeChangedCommand ?? (_InstallModeChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(OnInstallModeChanged));
+
+        private DelegateCommand<SelectionChangedEventArgs> _IdentifyPackageModeChangedCommand;
+        public DelegateCommand<SelectionChangedEventArgs> IdentifyPackageModeChangedCommand =>
+            _IdentifyPackageModeChangedCommand ?? (_IdentifyPackageModeChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(OnIdentifyPackageModeChanged));
 
         private string _version;
         public string Version
@@ -47,14 +51,21 @@ namespace HandyWinGet.ViewModels
             set => SetProperty(ref _InstallModeIndex, value);
         }
 
-        private bool _IsIDM;
-        public bool IsIDM
+        private int _IdentifyPackageModeIndex;
+        public int IdentifyPackageModeIndex
         {
-            get => _IsIDM;
+            get => _IdentifyPackageModeIndex;
+            set => SetProperty(ref _IdentifyPackageModeIndex, value);
+        }
+
+        private bool _isIdmEnabled;
+        public bool IsIDMEnabled
+        {
+            get => _isIdmEnabled;
             set
             {
-                SetProperty(ref _IsIDM, value);
-                GlobalDataHelper<AppConfig>.Config.IsIDM = value;
+                SetProperty(ref _isIdmEnabled, value);
+                GlobalDataHelper<AppConfig>.Config.IsIDMEnabled = value;
                 GlobalDataHelper<AppConfig>.Save();
                 GlobalDataHelper<AppConfig>.Init();
             }
@@ -67,14 +78,14 @@ namespace HandyWinGet.ViewModels
             set => SetProperty(ref _IsVisibleIDM, value);
         }
 
-        private bool _IsGroup;
-        public bool IsGroup
+        private bool _isShowingGroup;
+        public bool IsShowingGroup
         {
-            get => _IsGroup;
+            get => _isShowingGroup;
             set
             {
-                SetProperty(ref _IsGroup, value);
-                GlobalDataHelper<AppConfig>.Config.IsGroup = value;
+                SetProperty(ref _isShowingGroup, value);
+                GlobalDataHelper<AppConfig>.Config.IsShowingGroup = value;
                 GlobalDataHelper<AppConfig>.Save();
                 GlobalDataHelper<AppConfig>.Init();
                 PackagesViewModel.Instance.SetDataGridGrouping();
@@ -82,14 +93,14 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        private bool _IsExtraDetail;
-        public bool IsExtraDetail
+        private bool _isShowingExtraDetail;
+        public bool IsShowingExtraDetail
         {
-            get => _IsExtraDetail;
+            get => _isShowingExtraDetail;
             set
             {
-                SetProperty(ref _IsExtraDetail, value);
-                GlobalDataHelper<AppConfig>.Config.IsExtraDetail = value;
+                SetProperty(ref _isShowingExtraDetail, value);
+                GlobalDataHelper<AppConfig>.Config.IsShowingExtraDetail = value;
                 GlobalDataHelper<AppConfig>.Save();
                 GlobalDataHelper<AppConfig>.Init();
                 PackagesViewModel.Instance.RowDetailsVisibilityMode = value
@@ -100,17 +111,18 @@ namespace HandyWinGet.ViewModels
 
         public SettingsViewModel()
         {
-            Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
             PaneIndex = (int)GlobalDataHelper<AppConfig>.Config.PaneDisplayMode;
-            InstallModeIndex = (int)GlobalDataHelper<AppConfig>.Config.PackageInstallMode;
-            IsVisibleIDM = InstallModeIndex == (int)PackageInstallMode.Internal;
+            InstallModeIndex = (int)GlobalDataHelper<AppConfig>.Config.InstallMode;
+            IsVisibleIDM = InstallModeIndex == (int)InstallMode.Internal;
+            IdentifyPackageModeIndex = (int)GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode;
 
-            IsIDM = GlobalDataHelper<AppConfig>.Config.IsIDM;
-            IsGroup = GlobalDataHelper<AppConfig>.Config.IsGroup;
-            IsExtraDetail = GlobalDataHelper<AppConfig>.Config.IsExtraDetail;
+            IsIDMEnabled = GlobalDataHelper<AppConfig>.Config.IsIDMEnabled;
+            IsShowingGroup = GlobalDataHelper<AppConfig>.Config.IsShowingGroup;
+            IsShowingExtraDetail = GlobalDataHelper<AppConfig>.Config.IsShowingExtraDetail;
         }
 
-        void PaneDisplayModeChanged(SelectionChangedEventArgs e)
+        void OnPaneDisplayModeChanged(SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0)
             {
@@ -128,25 +140,25 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        void InstallModeChanged(SelectionChangedEventArgs e)
+        void OnInstallModeChanged(SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0)
             {
                 return;
             }
-            if (e.AddedItems[0] is PackageInstallMode item)
+            if (e.AddedItems[0] is InstallMode item)
             {
-                if (!item.Equals(GlobalDataHelper<AppConfig>.Config.PackageInstallMode))
+                if (!item.Equals(GlobalDataHelper<AppConfig>.Config.InstallMode))
                 {
-                    GlobalDataHelper<AppConfig>.Config.PackageInstallMode = item;
+                    GlobalDataHelper<AppConfig>.Config.InstallMode = item;
 
-                    if (item.Equals(PackageInstallMode.Internal))
+                    if (item.Equals(InstallMode.Internal))
                     {
                         IsVisibleIDM = true;
                     }
                     else
                     {
-                        if (!IsOSSupported())
+                        if (!IsOsSupported())
                         {
                             HandyControl.Controls.MessageBox.Error("Your Windows Is Not Supported, Winget-cli requires Windows 10 version 1709 (build 16299) Please Update to Windows 10 1709 (build 16299) or later", "OS is not Supported");
                             InstallModeIndex = 1;
@@ -163,7 +175,33 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        void CheckUpdate()
+        void OnIdentifyPackageModeChanged(SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0)
+            {
+                return;
+            }
+            if (e.AddedItems[0] is IdentifyPackageMode item)
+            {
+                if (!item.Equals(GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode))
+                {
+                    GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode = item;
+
+                    if (item.Equals(IdentifyPackageMode.Wingetcli))
+                    {
+                        if (!IsOsSupported())
+                        {
+                            HandyControl.Controls.MessageBox.Error("Your Windows Is Not Supported, Winget-cli requires Windows 10 version 1709 (build 16299) Please Update to Windows 10 1709 (build 16299) or later", "OS is not Supported");
+                            IdentifyPackageModeIndex = 0;
+                        }
+                    }
+
+                    GlobalDataHelper<AppConfig>.Save();
+                    GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
+                }
+            }
+        }
+        void OnCheckUpdate()
         {
             try
             {
@@ -180,7 +218,7 @@ namespace HandyWinGet.ViewModels
 
                         string exeLocation = Environment.CurrentDirectory + @"\HandyWinGet.exe";
 
-                        Process.Start(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\HandyUpdater.exe", $"{Version} {ver.TagName.Replace("v", "")} {Environment.CurrentDirectory} {exeLocation} {ver.Asset[0].browser_download_url} ");
+                        Process.Start(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) + @"\HandyUpdater.exe", $"{Version} {ver.TagName.Replace("v", "")} {Environment.CurrentDirectory} {exeLocation} {ver.Asset[0].browser_download_url} ");
                         Environment.Exit(0);
                         return true;
                     });
@@ -196,24 +234,17 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        public bool IsOSSupported()
+        public bool IsOsSupported()
         {
             string subKey = @"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion";
             RegistryKey key = Registry.LocalMachine;
             RegistryKey skey = key.OpenSubKey(subKey);
 
-            string name = skey.GetValue("ProductName").ToString();
-            if (name.Contains("Windows 10"))
+            string name = skey?.GetValue("ProductName")?.ToString();
+            if (name != null && name.Contains("Windows 10"))
             {
                 int releaseId = Convert.ToInt32(Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", ""));
-                if (releaseId < 1709)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+                return releaseId >= 1709;
             }
             else
             {

@@ -42,7 +42,7 @@ namespace HandyWinGet.Views
 
             GlobalDataHelper<AppConfig>.Config.Skin = tag;
             GlobalDataHelper<AppConfig>.Save();
-            ((App)System.Windows.Application.Current).UpdateSkin(tag);
+            ((App) System.Windows.Application.Current).UpdateSkin(tag);
         }
     }
 }

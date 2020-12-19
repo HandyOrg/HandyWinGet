@@ -28,6 +28,7 @@ namespace HandyWinGet
             {
                 Directory.CreateDirectory(cachePath);
             }
+
             ProfileOptimization.SetProfileRoot(cachePath);
             ProfileOptimization.StartProfile("Profile");
         }
@@ -40,26 +41,26 @@ namespace HandyWinGet
             {
                 UpdateSkin(GlobalDataHelper<AppConfig>.Config.Skin);
             }
+
             var boot = new Bootstrapper();
             boot.Run();
 
             AppCenter.Start("0153dc1d-eda3-4da2-98c9-ce29361d622d",
-                   typeof(Analytics), typeof(Crashes));
+                typeof(Analytics), typeof(Crashes));
         }
 
         public void UpdateSkin(SkinType skin)
         {
             SharedResourceDictionary.SharedDictionaries.Clear();
             ResourceHelper.GetTheme("hcTheme", Resources).Skin = skin;
-            ThemeManager tm = ThemeManager.Current;
 
             if (skin == SkinType.Dark)
             {
-                tm.ApplicationTheme = ApplicationTheme.Dark;
+                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             }
             else
             {
-                tm.ApplicationTheme = ApplicationTheme.Light;
+                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
             }
 
             Current.MainWindow?.OnApplyTemplate();
@@ -85,7 +86,6 @@ namespace HandyWinGet
             }
             catch (Win32Exception)
             {
-
                 return false;
             }
         }

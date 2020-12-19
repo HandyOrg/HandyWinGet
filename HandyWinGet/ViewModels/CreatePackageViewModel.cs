@@ -10,7 +10,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using YamlDotNet.Serialization;
@@ -20,26 +19,33 @@ namespace HandyWinGet.ViewModels
     public class CreatePackageViewModel : BindableBase
     {
         #region Commands
+
         private DelegateCommand _GetHashCmd;
+
         public DelegateCommand GetHashCmd =>
             _GetHashCmd ?? (_GetHashCmd = new DelegateCommand(GetHash));
 
         private DelegateCommand _CreatePackageCmd;
+
         public DelegateCommand CreatePackageCmd =>
             _CreatePackageCmd ?? (_CreatePackageCmd = new DelegateCommand(CreatePackage));
 
         private DelegateCommand _CopyToClipboardCmd;
+
         public DelegateCommand CopyToClipboardCmd =>
             _CopyToClipboardCmd ?? (_CopyToClipboardCmd = new DelegateCommand(CopyToClipboard));
 
         private DelegateCommand _AddTagCmd;
+
         public DelegateCommand AddTagCmd =>
             _AddTagCmd ?? (_AddTagCmd = new DelegateCommand(AddTag));
 
         #endregion
 
         #region Property
+
         private string _tagName;
+
         public string TagName
         {
             get => _tagName;
@@ -47,6 +53,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private bool _IsEnabled = true;
+
         public bool IsEnabled
         {
             get => _IsEnabled;
@@ -54,6 +61,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private int _Progress;
+
         public int Progress
         {
             get => _Progress;
@@ -61,6 +69,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _AppName;
+
         public string AppName
         {
             get => _AppName;
@@ -68,6 +77,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _Publisher;
+
         public string Publisher
         {
             get => _Publisher;
@@ -75,6 +85,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _PackageId;
+
         public string PackageId
         {
             get => _PackageId;
@@ -82,6 +93,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _Version;
+
         public string Version
         {
             get => _Version;
@@ -89,6 +101,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _AppMoniker;
+
         public string AppMoniker
         {
             get => _AppMoniker;
@@ -96,6 +109,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _Description;
+
         public string Description
         {
             get => _Description;
@@ -103,6 +117,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _HomePage;
+
         public string HomePage
         {
             get => _HomePage;
@@ -110,6 +125,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _License;
+
         public string License
         {
             get => _License;
@@ -117,6 +133,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _LicenseUrl;
+
         public string LicenseUrl
         {
             get => _LicenseUrl;
@@ -124,6 +141,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _URL;
+
         public string URL
         {
             get => _URL;
@@ -131,6 +149,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _Hash;
+
         public string Hash
         {
             get => _Hash;
@@ -138,6 +157,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private ComboBoxItem _SelectedArchitecture;
+
         public ComboBoxItem SelectedArchitecture
         {
             get => _SelectedArchitecture;
@@ -145,24 +165,26 @@ namespace HandyWinGet.ViewModels
         }
 
         private ObservableCollection<Tag> _TagDataList = new ObservableCollection<Tag>();
+
         public ObservableCollection<Tag> TagDataList
         {
             get => _TagDataList;
             set => SetProperty(ref _TagDataList, value);
         }
+
         #endregion
+
         public CreatePackageViewModel()
         {
-
         }
 
         public void GenerateScript(GenerateMode mode)
         {
             if (!string.IsNullOrEmpty(AppName) && !string.IsNullOrEmpty(Publisher)
-                && !string.IsNullOrEmpty(PackageId) && !string.IsNullOrEmpty(Version)
-                && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(URL) && URL.IsUrl())
+                                               && !string.IsNullOrEmpty(PackageId) && !string.IsNullOrEmpty(Version)
+                                               && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(URL) &&
+                                               URL.IsUrl())
             {
-
                 var tags = string.Join(",", TagDataList.Select(p => p.Content));
 
                 string ext = Path.GetExtension(URL)?.Replace(".", "").Trim();
@@ -183,16 +205,23 @@ namespace HandyWinGet.ViewModels
                     Tags = tags,
                     Description = Description,
                     Homepage = HomePage,
-                    Installers = new System.Collections.Generic.List<Installer> {
-                        new Installer {
+                    Installers = new System.Collections.Generic.List<Installer>
+                    {
+                        new Installer
+                        {
                             Arch = SelectedArchitecture?.Content.ToString(),
                             Url = URL,
                             Sha256 = Hash
-                        } },
+                        }
+                    },
                     InstallerType = ext,
-                    Switches = ext != null && ext.ToLower().Equals("exe") ? new Switches { 
-                        Silent = "/S", SilentWithProgress = "/S" 
-                    } : new Switches()
+                    Switches = ext != null && ext.ToLower().Equals("exe")
+                        ? new Switches
+                        {
+                            Silent = "/S",
+                            SilentWithProgress = "/S"
+                        }
+                        : new Switches()
                 };
 
                 var serializer = new SerializerBuilder().Build();
@@ -215,6 +244,7 @@ namespace HandyWinGet.ViewModels
                             File.WriteAllText(dialog.FileName, yaml);
                             ClearInputs();
                         }
+
                         break;
                 }
             }
@@ -239,6 +269,7 @@ namespace HandyWinGet.ViewModels
             CopyToClipboard,
             SaveToFile
         }
+
         void GetHash()
         {
             if (!string.IsNullOrEmpty(URL) && URL.IsUrl())
@@ -287,6 +318,7 @@ namespace HandyWinGet.ViewModels
         }
 
         #region Downloader
+
         private readonly string location = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\";
 
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
@@ -314,9 +346,14 @@ namespace HandyWinGet.ViewModels
                 downloader.DownloadFileCompleted += OnDownloadFileCompleted;
                 await downloader.DownloadFileAsync(URL, location + Path.GetFileName(URL));
             }
-            catch (NotSupportedException) { }
-            catch (ArgumentException) { }
+            catch (NotSupportedException)
+            {
+            }
+            catch (ArgumentException)
+            {
+            }
         }
+
         #endregion
     }
 }

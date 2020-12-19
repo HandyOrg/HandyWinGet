@@ -12,8 +12,8 @@ namespace HandyWinGet
         {
             base.InitializeShell(shell);
             Container.Resolve<IRegionManager>().RequestNavigate("ContentRegion", "Packages");
-
         }
+
         protected override DependencyObject CreateShell()
         {
             return Container.Resolve<MainWindow>();

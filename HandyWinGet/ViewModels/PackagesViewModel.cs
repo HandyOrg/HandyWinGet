@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -33,28 +32,37 @@ namespace HandyWinGet.ViewModels
         private VersionModel SelectedPackage = new VersionModel();
 
         List<InstalledAppModel> InstalledApps = new List<InstalledAppModel>();
-        readonly List<string> keys = new List<string>() {
+
+        readonly List<string> keys = new List<string>()
+        {
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
             @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
         };
 
         public ICollectionView ItemsView => CollectionViewSource.GetDefaultView(DataList);
         public ICollectionView ComboView => CollectionViewSource.GetDefaultView(DataListVersion);
-        private readonly string path = Assembly.GetExecutingAssembly().Location.Replace(Path.GetFileName(Assembly.GetExecutingAssembly().Location), "") + @"pkgs";
+
+        private readonly string path = Assembly.GetExecutingAssembly().Location
+            .Replace(Path.GetFileName(Assembly.GetExecutingAssembly().Location), "") + @"pkgs";
 
         #region Command
+
         private DelegateCommand<string> _ButtonCmd;
+
         public DelegateCommand<string> ButtonCmd =>
             _ButtonCmd ?? (_ButtonCmd = new DelegateCommand<string>(OnButtonAction));
 
         private DelegateCommand<SelectionChangedEventArgs> _ItemChangedCmd;
+
         public DelegateCommand<SelectionChangedEventArgs> ItemChangedCmd =>
             _ItemChangedCmd ?? (_ItemChangedCmd = new DelegateCommand<SelectionChangedEventArgs>(ItemChanged));
 
         #endregion
 
         #region Property
+
         private ObservableCollection<PackageModel> _DataList;
+
         public ObservableCollection<PackageModel> DataList
         {
             get => _DataList;
@@ -62,6 +70,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private ObservableCollection<VersionModel> _DataListVersion;
+
         public ObservableCollection<VersionModel> DataListVersion
         {
             get => _DataListVersion;
@@ -69,6 +78,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private bool _DataGot;
+
         public bool DataGot
         {
             get => _DataGot;
@@ -76,6 +86,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _searchText;
+
         public string SearchText
         {
             get => _searchText;
@@ -87,6 +98,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _LoadingStatus;
+
         public string LoadingStatus
         {
             get => _LoadingStatus;
@@ -94,6 +106,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private string _UpdatedDate;
+
         public string UpdatedDate
         {
             get => _UpdatedDate;
@@ -101,6 +114,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private int _Progress = 0;
+
         public int Progress
         {
             get => _Progress;
@@ -108,6 +122,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private bool _IsVisibleProgressButton;
+
         public bool IsVisibleProgressButton
         {
             get => _IsVisibleProgressButton;
@@ -115,6 +130,7 @@ namespace HandyWinGet.ViewModels
         }
 
         private bool _IsCheckedProgressButton = true;
+
         public bool IsCheckedProgressButton
         {
             get => _IsCheckedProgressButton;
@@ -129,11 +145,12 @@ namespace HandyWinGet.ViewModels
         }
 
         private DataGridRowDetailsVisibilityMode _RowDetailsVisibilityMode;
+
         public DataGridRowDetailsVisibilityMode RowDetailsVisibilityMode
         {
-            get => GlobalDataHelper<AppConfig>.Config.IsExtraDetail
-                    ? DataGridRowDetailsVisibilityMode.VisibleWhenSelected
-                    : DataGridRowDetailsVisibilityMode.Collapsed;
+            get => GlobalDataHelper<AppConfig>.Config.IsShowingExtraDetail
+                ? DataGridRowDetailsVisibilityMode.VisibleWhenSelected
+                : DataGridRowDetailsVisibilityMode.Collapsed;
             set => SetProperty(ref _RowDetailsVisibilityMode, value);
         }
 
@@ -155,8 +172,7 @@ namespace HandyWinGet.ViewModels
 
         public void SetDataGridGrouping()
         {
-
-            if (GlobalDataHelper<AppConfig>.Config.IsGroup)
+            if (GlobalDataHelper<AppConfig>.Config.IsShowingGroup)
             {
                 ItemsView.GroupDescriptions.Add(new PropertyGroupDescription("Publisher"));
             }
@@ -167,6 +183,7 @@ namespace HandyWinGet.ViewModels
         }
 
         #region Cloning Progress
+
         public bool RepositoryTransferProgress(TransferProgress progress)
         {
             LoadingStatus = $"Downloading {progress.ReceivedObjects} objects from {progress.TotalObjects}";
@@ -191,15 +208,15 @@ namespace HandyWinGet.ViewModels
             DeleteDirectory(path);
 
             CloneOptions cloneOptions = new CloneOptions();
-            cloneOptions.OnTransferProgress = RepositoryTransferProgress;
-            cloneOptions.OnCheckoutProgress = RepositoryOnCheckoutProgress;
             cloneOptions.RepositoryOperationStarting = RepositoryOperationStartingProgress;
-
+            cloneOptions.OnCheckoutProgress = RepositoryOnCheckoutProgress;
+            cloneOptions.OnTransferProgress = RepositoryTransferProgress;
             Repository.Clone("https://github.com/microsoft/winget-pkgs.git", path, cloneOptions);
             UpdatedDate = DateTime.Now.ToString();
             GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
             GlobalDataHelper<AppConfig>.Save();
         }
+
 
         private void GetPackages(bool ForceUpdate = false)
         {
@@ -218,8 +235,10 @@ namespace HandyWinGet.ViewModels
                 LoadingStatus = "Extracting packages...";
 
                 var pkgs = GetAllDirectories(path + @"\manifests").OrderByDescending(x => x).ToList();
-                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64), keys, InstalledApps);
-                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64), keys, InstalledApps);
+                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64), keys,
+                    InstalledApps);
+                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64), keys,
+                    InstalledApps);
 
                 InstalledApps = InstalledApps.Distinct().ToList();
                 foreach (string item in pkgs)
@@ -237,40 +256,62 @@ namespace HandyWinGet.ViewModels
                     var yaml = System.Text.Json.JsonSerializer.Deserialize<YamlModel>(json);
 
                     string installedVersion = string.Empty;
-
                     bool isInstalled = false;
-                    foreach (var itemApp in InstalledApps)
+
+                    switch (GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode)
                     {
-                        if (itemApp.DisplayName.Contains(yaml.Name))
-                        {
-                            installedVersion = $"Installed Version: {itemApp.Version}";
-                            isInstalled = true;
-                        }
+                        case IdentifyPackageMode.Off:
+                            isInstalled = false;
+                            break;
+                        case IdentifyPackageMode.Internal:
+                            foreach (var itemApp in InstalledApps)
+                            {
+                                if (itemApp.DisplayName.Contains(yaml.Name))
+                                {
+                                    installedVersion = $"Installed Version: {itemApp.Version}";
+                                    isInstalled = true;
+                                }
+                            }
+
+                            break;
+                        case IdentifyPackageMode.Wingetcli:
+                            isInstalled = IsWingetcliPackageInstalled(yaml.Name);
+                            break;
                     }
 
-                    var packge = new PackageModel { Publisher = yaml.Publisher, Name = yaml.Name, IsInstalled = isInstalled, 
-                        Version = yaml.Version, Id = yaml.Id, Url = yaml.Installers[0].Url, Description = yaml.Description, LicenseUrl = yaml.LicenseUrl,
-                        Homepage = yaml.Homepage, Arch = yaml.Id + " " + yaml.Installers[0].Arch, InstalledVersion = installedVersion };
+                    var packge = new PackageModel
+                    {
+                        Publisher = yaml.Publisher,
+                        Name = yaml.Name,
+                        IsInstalled = isInstalled,
+                        Version = yaml.Version,
+                        Id = yaml.Id,
+                        Url = yaml.Installers[0].Url,
+                        Description = yaml.Description,
+                        LicenseUrl = yaml.LicenseUrl,
+                        Homepage = yaml.Homepage,
+                        Arch = yaml.Id + " " + yaml.Installers[0].Arch,
+                        InstalledVersion = installedVersion
+                    };
 
                     if (!DataList.Contains(packge, new ItemEqualityComparer()))
                     {
                         DataList.Add(packge);
                     }
-                    DataListVersion.Add(new VersionModel { Id = yaml.Id, Version = yaml.Version, Url = yaml.Installers[0].Url });
+
+                    DataListVersion.Add(new VersionModel
+                        {Id = yaml.Id, Version = yaml.Version, Url = yaml.Installers[0].Url});
                 }
 
                 CleanRepo();
-            }).ContinueWith(obj =>
-            {
-                DataGot = true;
-            });
+            }).ContinueWith(obj => { DataGot = true; });
         }
 
         private bool Filter(PackageModel item)
         {
             return SearchText == null
-                            || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1
-                            || item.Publisher.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
+                   || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1
+                   || item.Publisher.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
         }
 
         private bool FilterCombo(VersionModel item)
@@ -278,26 +319,59 @@ namespace HandyWinGet.ViewModels
             return _Id == null || item.Id.Equals(_Id);
         }
 
+        private string wingetData = string.Empty;
+
+        bool IsWingetcliPackageInstalled(string packageName)
+        {
+            if (string.IsNullOrEmpty(wingetData))
+            {
+                Process p = new Process
+                {
+                    StartInfo =
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true,
+                        FileName = "winget",
+                        Arguments = "list"
+                    }
+                };
+
+                p.Start();
+                wingetData = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+            }
+
+            if (wingetData.Contains("Unrecognized command"))
+            {
+                Growl.ErrorGlobal("your Winget-cli is not supported please Update your winget-cli.");
+                Process.Start("https://github.com/microsoft/winget-cli/releases");
+                return false;
+            }
+
+            return wingetData.Contains(packageName);
+        }
+
         void ItemChanged(SelectionChangedEventArgs e)
         {
             if (e.OriginalSource is DataGrid dg)
             {
-                var dgItem = (PackageModel)dg.SelectedItem;
+                var dgItem = (PackageModel) dg.SelectedItem;
 
                 if (dgItem != null)
                 {
                     _Id = dgItem.Id;
                     ComboView.Refresh();
-                    SelectedPackage = new VersionModel { Id = dgItem.Id, Version = dgItem.Version, Url = dgItem.Url };
+                    SelectedPackage = new VersionModel {Id = dgItem.Id, Version = dgItem.Version, Url = dgItem.Url};
                 }
             }
 
             if (e.OriginalSource is HandyControl.Controls.ComboBox cmb)
             {
-                var cmbItem = (VersionModel)cmb.SelectedItem;
+                var cmbItem = (VersionModel) cmb.SelectedItem;
                 if (cmbItem != null)
                 {
-                    SelectedPackage = new VersionModel { Id = cmbItem.Id, Version = cmbItem.Version, Url = cmbItem.Url };
+                    SelectedPackage = new VersionModel {Id = cmbItem.Id, Version = cmbItem.Version, Url = cmbItem.Url};
                 }
             }
         }
@@ -307,24 +381,27 @@ namespace HandyWinGet.ViewModels
             switch (param)
             {
                 case "Install":
-                    switch (GlobalDataHelper<AppConfig>.Config.PackageInstallMode)
+                    switch (GlobalDataHelper<AppConfig>.Config.InstallMode)
                     {
-                        case PackageInstallMode.Wingetcli:
-                            if (((App)System.Windows.Application.Current).IsWingetInstalled())
+                        case InstallMode.Wingetcli:
+                            if (((App) System.Windows.Application.Current).IsWingetInstalled())
                             {
                                 InstallWingetMode();
                             }
                             else
                             {
-                                MessageBox.Error("Winget-cli is not installed, please download and install latest version.", "Install Winget");
+                                MessageBox.Error(
+                                    "Winget-cli is not installed, please download and install latest version.",
+                                    "Install Winget");
                                 StartProcess("https://github.com/microsoft/winget-cli/releases");
                             }
 
                             break;
-                        case PackageInstallMode.Internal:
+                        case InstallMode.Internal:
                             InstallInternalMode();
                             break;
                     }
+
                     break;
                 case "Uninstall":
                     break;
@@ -340,19 +417,19 @@ namespace HandyWinGet.ViewModels
         }
 
         #region Clean Repo
+
         public IEnumerable<string> GetAllDirectories(string rootDirectory)
         {
             foreach (string directory in System.IO.Directory.GetDirectories(
-                                                rootDirectory,
-                                                "*",
-                                                SearchOption.AllDirectories))
+                rootDirectory,
+                "*",
+                SearchOption.AllDirectories))
             {
                 foreach (string file in System.IO.Directory.GetFiles(directory))
                 {
                     yield return file;
                 }
             }
-
         }
 
         private void CleanRepo()
@@ -377,6 +454,7 @@ namespace HandyWinGet.ViewModels
                 {
                     DeleteDirectory(sub);
                 }
+
                 foreach (string f in System.IO.Directory.EnumerateFiles(d))
                 {
                     System.IO.FileInfo fi = new System.IO.FileInfo(f)
@@ -385,9 +463,11 @@ namespace HandyWinGet.ViewModels
                     };
                     fi.Delete();
                 }
+
                 System.IO.Directory.Delete(d);
             }
         }
+
         #endregion
 
         public void InstallWingetMode()
@@ -466,7 +546,7 @@ namespace HandyWinGet.ViewModels
                 {
                     string url = RemoveComment(SelectedPackage.Url);
 
-                    if (GlobalDataHelper<AppConfig>.Config.IsIDM)
+                    if (GlobalDataHelper<AppConfig>.Config.IsIDMEnabled)
                     {
                         DownloadWithIDM(url);
                     }
@@ -476,7 +556,8 @@ namespace HandyWinGet.ViewModels
                         LoadingStatus = $"Preparing to download {SelectedPackage.Id}";
                         DataGot = false;
 
-                        _tempLocation = $"{location}{SelectedPackage.Id}-{SelectedPackage.Version}{GetExtension(url)}".Trim();
+                        _tempLocation = $"{location}{SelectedPackage.Id}-{SelectedPackage.Version}{GetExtension(url)}"
+                            .Trim();
                         if (!File.Exists(_tempLocation))
                         {
                             downloader = new DownloadService();
@@ -515,7 +596,6 @@ namespace HandyWinGet.ViewModels
                 if (!ex.Message.Contains("The system cannot find the file specified."))
                 {
                     Growl.ErrorGlobal(ex.Message);
-
                 }
             }
         }
@@ -530,6 +610,7 @@ namespace HandyWinGet.ViewModels
                     {
                         continue;
                     }
+
                     foreach (string skName in rk.GetSubKeyNames())
                     {
                         using (RegistryKey sk = rk.OpenSubKey(skName))
@@ -540,16 +621,16 @@ namespace HandyWinGet.ViewModels
                                 {
                                     installed.Add(new InstalledAppModel
                                     {
-                                        DisplayName = (string)sk.GetValue("DisplayName"),
-                                        Version = (string)sk.GetValue("DisplayVersion"),
-                                        Publisher = (string)sk.GetValue("Publisher"),
-                                        UnninstallCommand = (string)sk.GetValue("UninstallString")
+                                        DisplayName = (string) sk.GetValue("DisplayName"),
+                                        Version = (string) sk.GetValue("DisplayVersion"),
+                                        Publisher = (string) sk.GetValue("Publisher"),
+                                        UnninstallCommand = (string) sk.GetValue("UninstallString")
                                     });
                                 }
                                 catch (Exception)
-                                { }
+                                {
+                                }
                             }
-
                         }
                     }
                 }
@@ -557,6 +638,7 @@ namespace HandyWinGet.ViewModels
         }
 
         #region Downloader
+
         public DownloadService downloader;
         public string _tempLocation = string.Empty;
         private readonly string location = Path.GetTempPath() + @"\";
@@ -576,7 +658,8 @@ namespace HandyWinGet.ViewModels
             }
             else
             {
-                Growl.ErrorGlobal("Internet Download Manager (IDM) is not installed on your system, please download and install it first");
+                Growl.ErrorGlobal(
+                    "Internet Download Manager (IDM) is not installed on your system, please download and install it first");
             }
         }
 
@@ -602,7 +685,6 @@ namespace HandyWinGet.ViewModels
                     else
                     {
                         return url.Substring(pointIndex + pointChar.Length);
-
                     }
                 }
                 else
@@ -649,9 +731,10 @@ namespace HandyWinGet.ViewModels
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
             var truncate = Math.Truncate(percentage);
-            Progress = (int)truncate;
+            Progress = (int) truncate;
             LoadingStatus = $"Downloading {SelectedPackage.Id}-{SelectedPackage.Version}   {truncate}%";
         }
+
         #endregion
 
         class ItemEqualityComparer : IEqualityComparer<PackageModel>

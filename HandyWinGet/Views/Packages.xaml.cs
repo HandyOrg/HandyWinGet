@@ -10,6 +10,7 @@ namespace HandyWinGet.Views
     public partial class Packages : UserControl
     {
         internal static Packages Instance;
+
         public Packages()
         {
             InitializeComponent();
@@ -19,7 +20,9 @@ namespace HandyWinGet.Views
 
         public void SetPublisherVisibility()
         {
-            dg.Columns[0].Visibility = GlobalDataHelper<AppConfig>.Config.IsGroup ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+            dg.Columns[0].Visibility = GlobalDataHelper<AppConfig>.Config.IsShowingGroup
+                ? System.Windows.Visibility.Collapsed
+                : System.Windows.Visibility.Visible;
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿
-
-namespace HandyWinGet.Models
+﻿namespace HandyWinGet.Models
 {
     public class InstalledAppModel
     {
