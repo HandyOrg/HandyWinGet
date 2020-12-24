@@ -1,5 +1,9 @@
 # HandyWinGet
- 
+<br>
+<p align="center">
+	<b>🙌 Use <a href="https://blockchain.com/btc/payment_request?address=19cmmVkh4ZsEdrcumbRMvQXmCFfw8nAbX5&amount=0.00041825&message=Buy a cup of tea">donations</a> to help support <b>your</b> projects! 🙌</b>
+</p>
+<br> 
 provides a GUI for installing apps through WinGet.
 
 - No need for winget cli
