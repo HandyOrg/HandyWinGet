@@ -24,7 +24,6 @@ namespace HandyWinGet
             containerRegistry.RegisterForNavigation<CreatePackage>();
             containerRegistry.RegisterForNavigation<Packages>();
             containerRegistry.RegisterForNavigation<Settings>();
-            containerRegistry.RegisterForNavigation<PackageManager>();
         }
     }
 }

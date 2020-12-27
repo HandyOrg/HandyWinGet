@@ -7,11 +7,22 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Runtime.InteropServices;
 
 namespace HandyWinGet.Data
 {
     public class Tools
     {
+        [DllImport("wininet.dll")]
+        private static extern bool InternetGetConnectedState(out int Description, int ReservedValue);
+        public static bool IsConnectedToInternet()
+        {
+            int Desc;
+            return InternetGetConnectedState(out Desc, 0);
+        }
+
+
         public static string ConvertBytesToMegabytes(long bytes)
         {
             return ((bytes / 1024f) / 1024f).ToString("0.00");
@@ -169,5 +180,35 @@ namespace HandyWinGet.Data
                 return false;
             }
         }
+
+        public static string PowerShellScript = @"
+Write-Host ""Checking winget...""
+Try{
+      # Check if winget is already installed
+	  $er = (invoke-expression ""winget -v"") 2>&1
+      if ($lastexitcode) {throw $er}
+      Write-Host ""winget is already installed.""
+    }
+Catch{
+      # winget is not installed. Install it from the Github release
+	  Write-Host ""winget is not found, installing it right now.""
+      $repo = ""microsoft/winget-cli""
+      $releases = ""https://api.github.com/repos/$repo/releases""
+	
+      Write-Host ""Determining latest release""
+      $json = Invoke-WebRequest $releases
+      $tag = ($json | ConvertFrom-Json)[0].tag_name
+      $file = ($json | ConvertFrom-Json)[0].assets[0].name
+	
+      $download = ""https://github.com/$repo/releases/download/$tag/$file""
+      $output = $PSScriptRoot + ""\winget-latest.appxbundle""
+      Write-Host ""Dowloading latest release""
+      Invoke-WebRequest -Uri $download -OutFile $output
+
+      Write-Host ""Installing the package""
+      Add-AppxPackage -Path $output
+    }
+Finally{            
+";
     }
 }

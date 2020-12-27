@@ -13,8 +13,8 @@
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                     <hc:LoadingCircle
                         IsRunning="{Binding DataGot, Converter={StaticResource Boolean2BooleanReConverter}}" />
-                    <TextBlock HorizontalAlignment="Center" Margin="0,10" Text="{Binding LoadingStatus}" />
-                    <mu:ProgressBar IsIndeterminate="{Binding IsIndeterminate}" HorizontalAlignment="Stretch" Value="{Binding Progress}" Margin="0,10" />
+                    <TextBlock Style="{StaticResource TextBlockSubTitle}" HorizontalAlignment="Center" Margin="0,10" Text="{Binding LoadingStatus}" />
+                    <mu:ProgressBar ShowError="{Binding IsShowError}" IsIndeterminate="{Binding IsIndeterminate}" HorizontalAlignment="Stretch" Value="{Binding Progress}" Margin="0,10" />
                     <hc:ProgressButton IsEnabled="{Binding IsCheckedProgressButton}" Progress="{Binding Progress}"
                                        Visibility="{Binding IsVisibleProgressButton, Converter={StaticResource Boolean2VisibilityConverter}}"
                                        Margin="5,0" Width="200" IsChecked="{Binding IsCheckedProgressButton}">
@@ -38,15 +38,22 @@
                         <RowDefinition />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
-                    <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="5,10"
-                                  hc:InfoElement.Placeholder="Search Application or Company..." IsRealTime="True"
-                                  ShowClearButton="True" Style="{StaticResource SearchBarPlus}" />
+                    <StackPanel>
+                        <hc:SearchBar Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="5,10"
+                                      hc:InfoElement.Placeholder="Search Application or Company..." IsRealTime="True"
+                                      ShowClearButton="True" Style="{StaticResource SearchBarPlus}" HorizontalAlignment="Stretch" />
+                        <ToggleButton IsChecked="{Binding IsShowOnlyInstalledApps}" HorizontalAlignment="Left" Margin="10,0" Content="Show Only Installed Apps" Style="{StaticResource ToggleButtonSwitch}"/>
+                    </StackPanel>
 
-                    <DataGrid x:Name="dg" RowDetailsVisibilityMode="{Binding RowDetailsVisibilityMode}"
+                    <DataGrid x:Name="dg" RowDetailsVisibilityMode="{Binding RowDetailsVisibilityMode}" ScrollViewer.CanContentScroll="True"
                               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                              hc:DataGridAttach.ShowRowNumber="True" Grid.Row="1" HeadersVisibility="All"
-                              SelectionMode="Single" RowHeaderWidth="60" AutoGenerateColumns="False"
-                              ItemsSource="{Binding DataList}">
+                              Grid.Row="1" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel"
+                              ItemsSource="{Binding DataList}" hc:DataGridAttach.ShowRowNumber="True" SelectionChanged="Dg_OnSelectionChanged">
+                        <DataGrid.RowHeaderTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>
+                            </DataTemplate>
+                        </DataGrid.RowHeaderTemplate>
                         <DataGrid.RowDetailsTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -97,6 +104,8 @@
                         </DataGrid.RowDetailsTemplate>
 
                         <DataGrid.Columns>
+                            <DataGridTextColumn IsReadOnly="True" Width="80" CanUserResize="False" Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}},
+                                      Path=Header}"/>
                             <DataGridTextColumn
                                 IsReadOnly="True" Binding="{Binding Publisher}" Width=".5*">
                                 <DataGridTextColumn.Header>
@@ -151,13 +160,22 @@
                                 </GroupStyle.ContainerStyle>
                             </GroupStyle>
                         </DataGrid.GroupStyle>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu Style="{StaticResource DefaultContextMenuStyle}">
+                                <MenuItem Header="Copy Install Command" Command="{Binding ButtonCmd}" CommandParameter="Copy" >
+                                    <MenuItem.Icon>
+                                        <Path Data="{DynamicResource ScriptGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="Uninstall" Command="{Binding ButtonCmd}" CommandParameter="Uninstall"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                         <hc:Interaction.Triggers>
                             <hc:EventTrigger EventName="SelectionChanged">
                                 <hc:EventToCommand Command="{Binding ItemChangedCmd}" PassEventArgsToCommand="True" />
                             </hc:EventTrigger>
                         </hc:Interaction.Triggers>
                     </DataGrid>
-
                     <StatusBar Grid.Row="2">
                         <StatusBarItem>
                             <hc:Shield Subject="Available Packages:" Status="{Binding DataList.Count}"
@@ -173,12 +191,19 @@
                                         hc:IconElement.Geometry="{DynamicResource RefreshGeometry}"
                                         hc:IconElement.Height="14" Style="{StaticResource ButtonPrimary}" Width="170"
                                         Content="Refresh" />
-                                <Button Margin=".5,0,0,0" hc:BorderElement.CornerRadius="0,6,6,0"
-                                        Style="{StaticResource ButtonPrimary}"
-                                        hc:IconElement.Geometry="{DynamicResource DownloadGeometry}"
-                                        hc:IconElement.Height="14" Width="170" Content="Install"
-                                        Command="{Binding ButtonCmd}" CommandParameter="Install"
-                                        HorizontalAlignment="Stretch" />
+                                <Button hc:BorderElement.CornerRadius="0" Command="{Binding ButtonCmd}"
+                                        CommandParameter="PowerShell" Margin="0.5,0,0,0"
+                                        hc:IconElement.Geometry="{DynamicResource ScriptGeometry}"
+                                        hc:IconElement.Height="14" Style="{StaticResource ButtonPrimary}"
+                                        Content="Export PowerShell Install Script" />
+                                <hc:Badge Status="Processing" Style="{StaticResource BadgeDanger}">
+                                    <Button Margin=".5,0,0,0" hc:BorderElement.CornerRadius="0,6,6,0"
+                                            Style="{StaticResource ButtonPrimary}"
+                                            hc:IconElement.Geometry="{DynamicResource DownloadGeometry}"
+                                            hc:IconElement.Height="14" Width="170" Content="Install Selected"
+                                            Command="{Binding ButtonCmd}" CommandParameter="Install"
+                                            HorizontalAlignment="Stretch" />
+                                </hc:Badge>
                             </StackPanel>
                         </StatusBarItem>
                     </StatusBar>
