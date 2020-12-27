@@ -1,8 +1,8 @@
-﻿using System.Windows;
-using HandyWinGet.Views;
+﻿using HandyWinGet.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
 using Prism.Regions;
+using System.Windows;
 
 namespace HandyWinGet
 {

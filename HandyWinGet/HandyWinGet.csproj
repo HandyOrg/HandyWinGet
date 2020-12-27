@@ -28,8 +28,6 @@
 		<PackageReference Include="HandyControls" Version="3.0.0" />
 		<PackageReference Include="ModernWpfUis" Version="1.0.0" />
 		<PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
-
-		<PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0096" />
 		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.0.0" />
 		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.0.0" />
 		<PackageReference Include="YamlDotNet" Version="9.1.0" />

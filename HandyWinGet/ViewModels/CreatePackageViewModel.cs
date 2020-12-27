@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Downloader;
+using HandyControl.Controls;
+using HandyControl.Tools;
+using HandyWinGet.Models;
+using Microsoft.Win32;
+using Prism.Commands;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,19 +13,149 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Downloader;
-using HandyControl.Controls;
-using HandyControl.Tools;
-using HandyWinGet.Models;
-using Microsoft.Win32;
-using Prism.Commands;
-using Prism.Mvvm;
 using YamlDotNet.Serialization;
 
 namespace HandyWinGet.ViewModels
 {
     public class CreatePackageViewModel : BindableBase
     {
+        #region Commands
+
+        private DelegateCommand _getHashCmd;
+        private DelegateCommand _createPackageCmd;
+        private DelegateCommand _copyToClipboardCmd;
+        private DelegateCommand _addTagCmd;
+
+        public DelegateCommand GetHashCmd =>
+            _getHashCmd ??= new DelegateCommand(GetHash);
+        public DelegateCommand CreatePackageCmd =>
+            _createPackageCmd ??= new DelegateCommand(CreatePackage);
+
+        public DelegateCommand CopyToClipboardCmd =>
+            _copyToClipboardCmd ??= new DelegateCommand(CopyToClipboard);
+
+        public DelegateCommand AddTagCmd =>
+            _addTagCmd ??= new DelegateCommand(AddTag);
+
+        #endregion
+
+        #region Property
+
+        private ComboBoxItem _selectedArchitecture;
+        private ObservableCollection<Tag> _tagDataList = new();
+        private string _tagName;
+        private bool _isEnabled = true;
+        private int _progress;
+        private string _appName;
+        private string _publisher;
+        private string _packageId;
+        private string _version;
+        private string _appMoniker;
+        private string _description;
+        private string _homePage;
+        private string _license;
+        private string _licenseUrl;
+        private string _url;
+        private string _hash;
+
+        public string TagName
+        {
+            get => _tagName;
+            set => SetProperty(ref _tagName, value);
+        }
+
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set => SetProperty(ref _isEnabled, value);
+        }
+
+        public int Progress
+        {
+            get => _progress;
+            set => SetProperty(ref _progress, value);
+        }
+
+        public string AppName
+        {
+            get => _appName;
+            set => SetProperty(ref _appName, value);
+        }
+
+        public string Publisher
+        {
+            get => _publisher;
+            set => SetProperty(ref _publisher, value);
+        }
+
+        public string PackageId
+        {
+            get => _packageId;
+            set => SetProperty(ref _packageId, value);
+        }
+
+        public string Version
+        {
+            get => _version;
+            set => SetProperty(ref _version, value);
+        }
+
+        public string AppMoniker
+        {
+            get => _appMoniker;
+            set => SetProperty(ref _appMoniker, value);
+        }
+
+        public string Description
+        {
+            get => _description;
+            set => SetProperty(ref _description, value);
+        }
+
+        public string HomePage
+        {
+            get => _homePage;
+            set => SetProperty(ref _homePage, value);
+        }
+
+        public string License
+        {
+            get => _license;
+            set => SetProperty(ref _license, value);
+        }
+
+        public string LicenseUrl
+        {
+            get => _licenseUrl;
+            set => SetProperty(ref _licenseUrl, value);
+        }
+
+        public string Url
+        {
+            get => _url;
+            set => SetProperty(ref _url, value);
+        }
+
+        public string Hash
+        {
+            get => _hash;
+            set => SetProperty(ref _hash, value);
+        }
+
+        public ComboBoxItem SelectedArchitecture
+        {
+            get => _selectedArchitecture;
+            set => SetProperty(ref _selectedArchitecture, value);
+        }
+
+        public ObservableCollection<Tag> TagDataList
+        {
+            get => _tagDataList;
+            set => SetProperty(ref _tagDataList, value);
+        }
+
+        #endregion
+
         public enum GenerateMode
         {
             CopyToClipboard,
@@ -29,13 +166,16 @@ namespace HandyWinGet.ViewModels
         {
             if (!string.IsNullOrEmpty(AppName) && !string.IsNullOrEmpty(Publisher)
                                                && !string.IsNullOrEmpty(PackageId) && !string.IsNullOrEmpty(Version)
-                                               && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(URL) &&
-                                               URL.IsUrl())
+                                               && !string.IsNullOrEmpty(License) && !string.IsNullOrEmpty(Url) &&
+                                               Url.IsUrl())
             {
                 var tags = string.Join(",", TagDataList.Select(p => p.Content));
 
-                var ext = Path.GetExtension(URL)?.Replace(".", "").Trim();
-                if (ext != null && ext.ToLower().Equals("msixbundle")) ext = "Msix";
+                var ext = Path.GetExtension(Url)?.Replace(".", "").Trim();
+                if (ext != null && ext.ToLower().Equals("msixbundle"))
+                {
+                    ext = "Msix";
+                }
 
                 var builder = new YamlModel
                 {
@@ -54,7 +194,7 @@ namespace HandyWinGet.ViewModels
                         new()
                         {
                             Arch = SelectedArchitecture?.Content.ToString(),
-                            Url = URL,
+                            Url = Url,
                             Sha256 = Hash
                         }
                     },
@@ -110,7 +250,7 @@ namespace HandyWinGet.ViewModels
 
         private void GetHash()
         {
-            if (!string.IsNullOrEmpty(URL) && URL.IsUrl())
+            if (!string.IsNullOrEmpty(Url) && Url.IsUrl())
             {
                 IsEnabled = false;
                 OnDownloadClick();
@@ -149,176 +289,20 @@ namespace HandyWinGet.ViewModels
             HomePage = string.Empty;
             License = string.Empty;
             LicenseUrl = string.Empty;
-            URL = string.Empty;
+            Url = string.Empty;
             Hash = string.Empty;
             Progress = 0;
             TagDataList.Clear();
         }
 
-        #region Commands
-
-        private DelegateCommand _GetHashCmd;
-
-        public DelegateCommand GetHashCmd =>
-            _GetHashCmd ?? (_GetHashCmd = new DelegateCommand(GetHash));
-
-        private DelegateCommand _CreatePackageCmd;
-
-        public DelegateCommand CreatePackageCmd =>
-            _CreatePackageCmd ?? (_CreatePackageCmd = new DelegateCommand(CreatePackage));
-
-        private DelegateCommand _CopyToClipboardCmd;
-
-        public DelegateCommand CopyToClipboardCmd =>
-            _CopyToClipboardCmd ?? (_CopyToClipboardCmd = new DelegateCommand(CopyToClipboard));
-
-        private DelegateCommand _AddTagCmd;
-
-        public DelegateCommand AddTagCmd =>
-            _AddTagCmd ?? (_AddTagCmd = new DelegateCommand(AddTag));
-
-        #endregion
-
-        #region Property
-
-        private string _tagName;
-
-        public string TagName
-        {
-            get => _tagName;
-            set => SetProperty(ref _tagName, value);
-        }
-
-        private bool _IsEnabled = true;
-
-        public bool IsEnabled
-        {
-            get => _IsEnabled;
-            set => SetProperty(ref _IsEnabled, value);
-        }
-
-        private int _Progress;
-
-        public int Progress
-        {
-            get => _Progress;
-            set => SetProperty(ref _Progress, value);
-        }
-
-        private string _AppName;
-
-        public string AppName
-        {
-            get => _AppName;
-            set => SetProperty(ref _AppName, value);
-        }
-
-        private string _Publisher;
-
-        public string Publisher
-        {
-            get => _Publisher;
-            set => SetProperty(ref _Publisher, value);
-        }
-
-        private string _PackageId;
-
-        public string PackageId
-        {
-            get => _PackageId;
-            set => SetProperty(ref _PackageId, value);
-        }
-
-        private string _Version;
-
-        public string Version
-        {
-            get => _Version;
-            set => SetProperty(ref _Version, value);
-        }
-
-        private string _AppMoniker;
-
-        public string AppMoniker
-        {
-            get => _AppMoniker;
-            set => SetProperty(ref _AppMoniker, value);
-        }
-
-        private string _Description;
-
-        public string Description
-        {
-            get => _Description;
-            set => SetProperty(ref _Description, value);
-        }
-
-        private string _HomePage;
-
-        public string HomePage
-        {
-            get => _HomePage;
-            set => SetProperty(ref _HomePage, value);
-        }
-
-        private string _License;
-
-        public string License
-        {
-            get => _License;
-            set => SetProperty(ref _License, value);
-        }
-
-        private string _LicenseUrl;
-
-        public string LicenseUrl
-        {
-            get => _LicenseUrl;
-            set => SetProperty(ref _LicenseUrl, value);
-        }
-
-        private string _URL;
-
-        public string URL
-        {
-            get => _URL;
-            set => SetProperty(ref _URL, value);
-        }
-
-        private string _Hash;
-
-        public string Hash
-        {
-            get => _Hash;
-            set => SetProperty(ref _Hash, value);
-        }
-
-        private ComboBoxItem _SelectedArchitecture;
-
-        public ComboBoxItem SelectedArchitecture
-        {
-            get => _SelectedArchitecture;
-            set => SetProperty(ref _SelectedArchitecture, value);
-        }
-
-        private ObservableCollection<Tag> _TagDataList = new();
-
-        public ObservableCollection<Tag> TagDataList
-        {
-            get => _TagDataList;
-            set => SetProperty(ref _TagDataList, value);
-        }
-
-        #endregion
-
         #region Downloader
 
-        private readonly string location = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\";
+        private readonly string _location = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\";
 
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             Progress = 0;
-            Hash = CryptographyHelper.GenerateSHA256ForFile(location + Path.GetFileName(URL));
+            Hash = CryptographyHelper.GenerateSHA256ForFile(_location + Path.GetFileName(Url));
             IsEnabled = true;
         }
 
@@ -338,7 +322,7 @@ namespace HandyWinGet.ViewModels
                 var downloader = new DownloadService();
                 downloader.DownloadProgressChanged += OnDownloadProgressChanged;
                 downloader.DownloadFileCompleted += OnDownloadFileCompleted;
-                await downloader.DownloadFileAsync(URL, location + Path.GetFileName(URL));
+                await downloader.DownloadFileAsync(Url, _location + Path.GetFileName(Url));
             }
             catch (NotSupportedException)
             {

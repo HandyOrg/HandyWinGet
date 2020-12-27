@@ -14,9 +14,7 @@
                     <hc:LoadingCircle
                         IsRunning="{Binding DataGot, Converter={StaticResource Boolean2BooleanReConverter}}" />
                     <TextBlock HorizontalAlignment="Center" Margin="0,10" Text="{Binding LoadingStatus}" />
-                    <mu:ProgressBar
-                        Visibility="{Binding IsVisibleProgressButton, Converter={StaticResource Boolean2VisibilityConverter}}"
-                        Value="{Binding Progress}" Margin="0,10" />
+                    <mu:ProgressBar IsIndeterminate="{Binding IsIndeterminate}" HorizontalAlignment="Stretch" Value="{Binding Progress}" Margin="0,10" />
                     <hc:ProgressButton IsEnabled="{Binding IsCheckedProgressButton}" Progress="{Binding Progress}"
                                        Visibility="{Binding IsVisibleProgressButton, Converter={StaticResource Boolean2VisibilityConverter}}"
                                        Margin="5,0" Width="200" IsChecked="{Binding IsCheckedProgressButton}">

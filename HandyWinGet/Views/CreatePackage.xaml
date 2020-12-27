@@ -62,7 +62,7 @@
                     <ComboBoxItem Content="arm64" />
                     <ComboBoxItem Content="Neutral" />
                 </hc:ComboBox>
-                <hc:TextBox Text="{Binding URL, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,10,10"
+                <hc:TextBox Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,10,10"
                             TextType="Url" hc:TitleElement.Title="Installer Url" hc:InfoElement.Necessary="True" />
                 <StackPanel Orientation="Horizontal">
                     <hc:TextBox Width="450" Text="{Binding Hash, UpdateSourceTrigger=PropertyChanged}" Margin="10,0"

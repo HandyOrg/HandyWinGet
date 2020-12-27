@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using HandyControl.Tools.Converter;
+﻿using HandyControl.Tools.Converter;
+using System.ComponentModel;
 
 namespace HandyWinGet.Data
 {

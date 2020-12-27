@@ -1,50 +1,159 @@
-﻿using System;
+﻿using Downloader;
+using HandyControl.Controls;
+using HandyWinGet.Data;
+using HandyWinGet.Models;
+using Microsoft.Win32;
+using Prism.Commands;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Downloader;
-using HandyControl.Controls;
-using HandyWinGet.Data;
-using HandyWinGet.Models;
-using LibGit2Sharp;
-using Microsoft.Win32;
-using Prism.Commands;
-using Prism.Mvvm;
 using YamlDotNet.Serialization;
 using ComboBox = HandyControl.Controls.ComboBox;
+using DownloadProgressChangedEventArgs = Downloader.DownloadProgressChangedEventArgs;
 using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace HandyWinGet.ViewModels
 {
     public class PackagesViewModel : BindableBase
     {
-        internal static PackagesViewModel Instance;
-        private static readonly object _lock = new();
+        #region Command
 
-        private readonly List<string> keys = new()
+        private DelegateCommand<string> _buttonCmd;
+        private DelegateCommand<SelectionChangedEventArgs> _itemChangedCmd;
+
+        public DelegateCommand<string> ButtonCmd =>
+            _buttonCmd ??= new DelegateCommand<string>(OnButtonAction);
+        public DelegateCommand<SelectionChangedEventArgs> ItemChangedCmd =>
+            _itemChangedCmd ??= new DelegateCommand<SelectionChangedEventArgs>(ItemChanged);
+
+        #endregion
+
+        #region Property
+
+        private ObservableCollection<PackageModel> _dataList;
+        private ObservableCollection<VersionModel> _dataListVersion;
+        private DataGridRowDetailsVisibilityMode _rowDetailsVisibilityMode;
+        private bool _dataGot;
+        private string _searchText;
+        private string _loadingStatus;
+        private string _updatedDate;
+        private int _progress;
+        private bool _isVisibleProgressButton;
+        private bool _isIndeterminate;
+        private bool _isCheckedProgressButton = true;
+
+        public ObservableCollection<PackageModel> DataList
+        {
+            get => _dataList;
+            set => SetProperty(ref _dataList, value);
+        }
+
+        public ObservableCollection<VersionModel> DataListVersion
+        {
+            get => _dataListVersion;
+            set => SetProperty(ref _dataListVersion, value);
+        }
+
+        public bool DataGot
+        {
+            get => _dataGot;
+            set => SetProperty(ref _dataGot, value);
+        }
+
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                SetProperty(ref _searchText, value);
+                ItemsView.Refresh();
+            }
+        }
+
+        public string LoadingStatus
+        {
+            get => _loadingStatus;
+            set => SetProperty(ref _loadingStatus, value);
+        }
+
+        public string UpdatedDate
+        {
+            get => _updatedDate;
+            set => SetProperty(ref _updatedDate, value);
+        }
+
+        public int Progress
+        {
+            get => _progress;
+            set => SetProperty(ref _progress, value);
+        }
+
+        public bool IsVisibleProgressButton
+        {
+            get => _isVisibleProgressButton;
+            set => SetProperty(ref _isVisibleProgressButton, value);
+        }
+        public bool IsIndeterminate
+        {
+            get => _isIndeterminate;
+            set => SetProperty(ref _isIndeterminate, value);
+        }
+
+        public bool IsCheckedProgressButton
+        {
+            get => _isCheckedProgressButton;
+            set
+            {
+                SetProperty(ref _isCheckedProgressButton, value);
+                if (!value)
+                {
+                    DownloaderService.CancelAsync();
+                }
+            }
+        }
+
+        public DataGridRowDetailsVisibilityMode RowDetailsVisibilityMode
+        {
+            get => GlobalDataHelper<AppConfig>.Config.IsShowingExtraDetail
+                ? DataGridRowDetailsVisibilityMode.VisibleWhenSelected
+                : DataGridRowDetailsVisibilityMode.Collapsed;
+            set => SetProperty(ref _rowDetailsVisibilityMode, value);
+        }
+
+        #endregion
+
+        internal static PackagesViewModel Instance;
+        public DownloadService DownloaderService;
+
+        public ICollectionView ItemsView => CollectionViewSource.GetDefaultView(DataList);
+        public ICollectionView ComboView => CollectionViewSource.GetDefaultView(DataListVersion);
+        private List<InstalledAppModel> _installedApps = new();
+        private VersionModel _selectedPackage = new();
+
+        private readonly List<string> _keys = new()
         {
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
             @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
         };
 
-        private readonly string path = Assembly.GetExecutingAssembly().Location
-            .Replace(Path.GetFileName(Assembly.GetExecutingAssembly().Location), "") + @"pkgs";
+        private readonly string _path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HandyWinGet");
+        private string _wingetData = string.Empty;
 
-        public string _Id = string.Empty;
-
-        private List<InstalledAppModel> InstalledApps = new();
-        private VersionModel SelectedPackage = new();
-
-        private string wingetData = string.Empty;
+        private static readonly object Lock = new();
+        public string Id = string.Empty;
+        public string TempLocation = string.Empty;
 
         public PackagesViewModel()
         {
@@ -52,59 +161,57 @@ namespace HandyWinGet.ViewModels
             UpdatedDate = GlobalDataHelper<AppConfig>.Config.UpdatedDate.ToString();
             DataList = new ObservableCollection<PackageModel>();
             DataListVersion = new ObservableCollection<VersionModel>();
-            BindingOperations.EnableCollectionSynchronization(DataList, _lock);
-            BindingOperations.EnableCollectionSynchronization(DataListVersion, _lock);
+            BindingOperations.EnableCollectionSynchronization(DataList, Lock);
+            BindingOperations.EnableCollectionSynchronization(DataListVersion, Lock);
             SetDataGridGrouping();
             ItemsView.Filter = o => Filter(o as PackageModel);
             ComboView.Filter = o => FilterCombo(o as VersionModel);
             GetPackages();
         }
 
-        public ICollectionView ItemsView => CollectionViewSource.GetDefaultView(DataList);
-        public ICollectionView ComboView => CollectionViewSource.GetDefaultView(DataListVersion);
-
-        public void SetDataGridGrouping()
+        private void GetPackages(bool isRefresh = false)
         {
-            if (GlobalDataHelper<AppConfig>.Config.IsShowingGroup)
-                ItemsView.GroupDescriptions.Add(new PropertyGroupDescription("Publisher"));
-            else
-                ItemsView.GroupDescriptions.Clear();
-        }
-
-        public void CloneRepository()
-        {
-            DeleteDirectory(path);
-
-            var cloneOptions = new CloneOptions();
-            cloneOptions.RepositoryOperationStarting = RepositoryOperationStartingProgress;
-            cloneOptions.OnCheckoutProgress = RepositoryOnCheckoutProgress;
-            cloneOptions.OnTransferProgress = RepositoryTransferProgress;
-            Repository.Clone("https://github.com/microsoft/winget-pkgs.git", path, cloneOptions);
-            UpdatedDate = DateTime.Now.ToString();
-            GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
-            GlobalDataHelper<AppConfig>.Save();
-        }
-
-
-        private void GetPackages(bool ForceUpdate = false)
-        {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                if (!Directory.Exists(path + @"\manifests")) CloneRepository();
+                if (!Directory.Exists(_path + @"\manifests") || isRefresh)
+                {
+                    var manifestUrl = "https://github.com/microsoft/winget-pkgs/archive/master.zip";
+                    //DownloaderService = new DownloadService();
+                    //DownloaderService.DownloadProgressChanged += delegate (object sender, DownloadProgressChangedEventArgs e)
+                    //{
+                    //    OnDownloadProgressChanged(sender, e, DownloadMode.Repository);
+                    //};
+                    //DownloaderService.DownloadFileCompleted += delegate (object sender, AsyncCompletedEventArgs e)
+                    //{
+                    //    OnDownloadFileCompleted(sender, e, DownloadMode.Repository);
+                    //};
+                    //await DownloaderService.DownloadFileAsync(manifestUrl, new DirectoryInfo(_path));
 
-                if (ForceUpdate) CloneRepository();
+                    WebClient client = new WebClient();
+                    client.DownloadFileCompleted += Client_DownloadFileCompleted;
+                    client.DownloadProgressChanged += Client_DownloadProgressChanged;
+                    await client.DownloadFileTaskAsync(new Uri(manifestUrl), Path.Combine(_path, "master.zip"));
+                }
 
                 LoadingStatus = "Extracting packages...";
 
-                var pkgs = GetAllDirectories(path + @"\manifests").OrderByDescending(x => x).ToList();
-                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64), keys,
-                    InstalledApps);
-                FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64), keys,
-                    InstalledApps);
+                var pkgs = Tools.EnumerateManifest(_path + @"\manifests").OrderByDescending(x=>x);
 
-                InstalledApps = InstalledApps.Distinct().ToList();
+                Tools.FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
+                    _keys,
+                    _installedApps);
+                Tools.FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64),
+                    _keys,
+                    _installedApps);
+                _installedApps = _installedApps.Distinct().ToList();
+                
+                int totalPackageCount = pkgs.Count();
+                int checkedPackageCount = 0;
                 foreach (var item in pkgs)
                 {
+                    checkedPackageCount += 1;
+                    Progress = checkedPackageCount * 100 / totalPackageCount;
+
                     var file = File.ReadAllText(item);
                     var input = new StringReader(file);
 
@@ -114,71 +221,146 @@ namespace HandyWinGet.ViewModels
                         .JsonCompatible()
                         .Build();
 
-                    var json = serializer.Serialize(yamlObject);
-                    var yaml = JsonSerializer.Deserialize<YamlModel>(json);
-
-                    var installedVersion = string.Empty;
-                    var isInstalled = false;
-
-                    switch (GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode)
+                    if (yamlObject != null)
                     {
-                        case IdentifyPackageMode.Off:
-                            isInstalled = false;
-                            break;
-                        case IdentifyPackageMode.Internal:
-                            foreach (var itemApp in InstalledApps)
-                                if (itemApp.DisplayName.Contains(yaml.Name))
-                                {
-                                    installedVersion = $"Installed Version: {itemApp.Version}";
-                                    isInstalled = true;
-                                }
+                        var json = serializer.Serialize(yamlObject);
+                        var yaml = JsonSerializer.Deserialize<YamlModel>(json);
+
+                        if (yaml != null)
+                        {
+                            var installedVersion = string.Empty;
+                            var isInstalled = false;
+
+                            switch (GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode)
+                            {
+                                case IdentifyPackageMode.Off:
+                                    isInstalled = false;
+                                    break;
+                                case IdentifyPackageMode.Internal:
+                                    foreach (var itemApp in _installedApps)
+                                    {
+                                        if (itemApp.DisplayName.Contains(yaml.Name))
+                                        {
+                                            installedVersion = $"Installed Version: {itemApp.Version}";
+                                            isInstalled = true;
+                                        }
+                                    }
+
+                                    break;
+                                case IdentifyPackageMode.Wingetcli:
+                                    isInstalled = await IsWingetcliPackageInstalled(yaml.Name);
+                                    break;
+                            }
+
+                            var packge = new PackageModel
+                            {
+                                Publisher = yaml.Publisher,
+                                Name = yaml.Name,
+                                IsInstalled = isInstalled,
+                                Version = yaml.Version,
+                                Id = yaml.Id,
+                                Url = yaml.Installers[0].Url,
+                                Description = yaml.Description,
+                                LicenseUrl = yaml.LicenseUrl,
+                                Homepage = yaml.Homepage,
+                                Arch = yaml.Id + " " + yaml.Installers[0].Arch,
+                                InstalledVersion = installedVersion
+                            };
+
+                            if (!DataList.Contains(packge, new ItemEqualityComparer()))
+                            {
+                                DataList.Add(packge);
+                            }
+
+                            DataListVersion.Add(new VersionModel
+                            { Id = yaml.Id, Version = yaml.Version, Url = yaml.Installers[0].Url });
+                        }
+                    }
+                }
+            }).ContinueWith(obj =>
+            {
+                DataGot = true;
+            });
+        }
+        
+        private void Client_DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
+        {
+            if (e.TotalBytesToReceive == -1)
+            {
+                if (!IsIndeterminate)
+                {
+                    IsIndeterminate = true;
+                }
+                LoadingStatus = "Downloading...";
+            }
+            else
+            {
+                if (IsIndeterminate)
+                {
+                    IsIndeterminate = false;
+                }
+                Progress = e.ProgressPercentage;
+                LoadingStatus = $"Downloading {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {e.ProgressPercentage}%";
+            }
+        }
+
+        private void Client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            UpdatedDate = DateTime.Now.ToString();
+            GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
+            GlobalDataHelper<AppConfig>.Save();
+            IsIndeterminate = true;
+            LoadingStatus = "Extracting Manifests...";
+            ZipFile.ExtractToDirectory(Path.Combine(_path, "master.zip"), Path.Combine(_path), true);
+            LoadingStatus = "Cleaning Directory...";
+            CleanDirectory();
+            Progress = 0;
+            IsIndeterminate = false;
+        }
+
+        private void OnButtonAction(string param)
+        {
+            switch (param)
+            {
+                case "Install":
+                    switch (GlobalDataHelper<AppConfig>.Config.InstallMode)
+                    {
+                        case InstallMode.Wingetcli:
+                            if (Tools.IsWingetInstalled())
+                            {
+                                InstallWingetMode();
+                            }
+                            else
+                            {
+                                MessageBox.Error(
+                                    "Winget-cli is not installed, please download and install latest version.",
+                                    "Install Winget");
+                                Tools.StartProcess("https://github.com/microsoft/winget-cli/releases");
+                            }
 
                             break;
-                        case IdentifyPackageMode.Wingetcli:
-                            isInstalled = IsWingetcliPackageInstalled(yaml.Name);
+                        case InstallMode.Internal:
+                            InstallInternalMode();
                             break;
                     }
-
-                    var packge = new PackageModel
-                    {
-                        Publisher = yaml.Publisher,
-                        Name = yaml.Name,
-                        IsInstalled = isInstalled,
-                        Version = yaml.Version,
-                        Id = yaml.Id,
-                        Url = yaml.Installers[0].Url,
-                        Description = yaml.Description,
-                        LicenseUrl = yaml.LicenseUrl,
-                        Homepage = yaml.Homepage,
-                        Arch = yaml.Id + " " + yaml.Installers[0].Arch,
-                        InstalledVersion = installedVersion
-                    };
-
-                    if (!DataList.Contains(packge, new ItemEqualityComparer())) DataList.Add(packge);
-
-                    DataListVersion.Add(new VersionModel
-                        {Id = yaml.Id, Version = yaml.Version, Url = yaml.Installers[0].Url});
-                }
-
-                CleanRepo();
-            }).ContinueWith(obj => { DataGot = true; });
+                    break;
+                case "Uninstall":
+                    break;
+                case "Refresh":
+                    IsIndeterminate = true;
+                    LoadingStatus = "Refreshing Packages...";
+                    DataList.Clear();
+                    DataListVersion.Clear();
+                    _installedApps.Clear();
+                    DataGot = false;
+                    GetPackages(true);
+                    break;
+            }
         }
 
-        private bool Filter(PackageModel item)
+        private async Task<bool> IsWingetcliPackageInstalled(string packageName)
         {
-            return SearchText == null
-                   || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1
-                   || item.Publisher.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
-        }
-
-        private bool FilterCombo(VersionModel item)
-        {
-            return _Id == null || item.Id.Equals(_Id);
-        }
-
-        private bool IsWingetcliPackageInstalled(string packageName)
-        {
-            if (string.IsNullOrEmpty(wingetData))
+            if (string.IsNullOrEmpty(_wingetData))
             {
                 var p = new Process
                 {
@@ -193,95 +375,57 @@ namespace HandyWinGet.ViewModels
                 };
 
                 p.Start();
-                wingetData = p.StandardOutput.ReadToEnd();
-                p.WaitForExit();
+                _wingetData = await p.StandardOutput.ReadToEndAsync();
+                await p.WaitForExitAsync();
             }
 
-            if (wingetData.Contains("Unrecognized command"))
+            if (_wingetData.Contains("Unrecognized command"))
             {
                 Growl.ErrorGlobal("your Winget-cli is not supported please Update your winget-cli.");
                 Process.Start("https://github.com/microsoft/winget-cli/releases");
                 return false;
             }
 
-            return wingetData.Contains(packageName);
+            return _wingetData.Contains(packageName);
         }
 
         private void ItemChanged(SelectionChangedEventArgs e)
         {
             if (e.OriginalSource is DataGrid dg)
             {
-                var dgItem = (PackageModel) dg.SelectedItem;
+                var dgItem = (PackageModel)dg.SelectedItem;
 
                 if (dgItem != null)
                 {
-                    _Id = dgItem.Id;
+                    Id = dgItem.Id;
                     ComboView.Refresh();
-                    SelectedPackage = new VersionModel {Id = dgItem.Id, Version = dgItem.Version, Url = dgItem.Url};
+                    _selectedPackage = new VersionModel { Id = dgItem.Id, Version = dgItem.Version, Url = dgItem.Url };
                 }
             }
 
             if (e.OriginalSource is ComboBox cmb)
             {
-                var cmbItem = (VersionModel) cmb.SelectedItem;
+                var cmbItem = (VersionModel)cmb.SelectedItem;
                 if (cmbItem != null)
-                    SelectedPackage = new VersionModel {Id = cmbItem.Id, Version = cmbItem.Version, Url = cmbItem.Url};
+                {
+                    _selectedPackage = new VersionModel { Id = cmbItem.Id, Version = cmbItem.Version, Url = cmbItem.Url };
+                }
             }
         }
 
-        private void OnButtonAction(string param)
+        private void InstallWingetMode()
         {
-            switch (param)
-            {
-                case "Install":
-                    switch (GlobalDataHelper<AppConfig>.Config.InstallMode)
-                    {
-                        case InstallMode.Wingetcli:
-                            if (((App) Application.Current).IsWingetInstalled())
-                            {
-                                InstallWingetMode();
-                            }
-                            else
-                            {
-                                MessageBox.Error(
-                                    "Winget-cli is not installed, please download and install latest version.",
-                                    "Install Winget");
-                                StartProcess("https://github.com/microsoft/winget-cli/releases");
-                            }
-
-                            break;
-                        case InstallMode.Internal:
-                            InstallInternalMode();
-                            break;
-                    }
-
-                    break;
-                case "Uninstall":
-                    break;
-                case "Refresh":
-                    LoadingStatus = "Refreshing Packages...";
-                    DataList.Clear();
-                    DataListVersion.Clear();
-                    InstalledApps.Clear();
-                    DataGot = false;
-                    GetPackages(true);
-                    break;
-            }
-        }
-
-        public void InstallWingetMode()
-        {
-            if (SelectedPackage.Id != null)
+            if (_selectedPackage.Id != null)
             {
                 DataGot = false;
-                LoadingStatus = $"Preparing to download {SelectedPackage.Id}";
+                LoadingStatus = $"Preparing to download {_selectedPackage.Id}";
 
                 var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "winget",
-                        Arguments = $"install {SelectedPackage.Id} {$"-v {SelectedPackage.Version}"}",
+                        Arguments = $"install {_selectedPackage.Id} -v {_selectedPackage.Version}",
                         UseShellExecute = false,
                         CreateNoWindow = true,
                         RedirectStandardOutput = true
@@ -293,13 +437,25 @@ namespace HandyWinGet.ViewModels
                 {
                     var line = args.Data ?? "";
 
-                    if (line.Contains("Download")) LoadingStatus = "Downloading Package...";
+                    if (line.Contains("Download"))
+                    {
+                        LoadingStatus = "Downloading Package...";
+                    }
 
-                    if (line.Contains("hash")) LoadingStatus = $"Validated hash for {SelectedPackage.Id}";
+                    if (line.Contains("hash"))
+                    {
+                        LoadingStatus = $"Validated hash for {_selectedPackage.Id}";
+                    }
 
-                    if (line.Contains("Installing")) LoadingStatus = $"Installing {SelectedPackage.Id}";
+                    if (line.Contains("Installing"))
+                    {
+                        LoadingStatus = $"Installing {_selectedPackage.Id}";
+                    }
 
-                    if (line.Contains("Failed")) LoadingStatus = $"Installation of {SelectedPackage.Id} failed";
+                    if (line.Contains("Failed"))
+                    {
+                        LoadingStatus = $"Installation of {_selectedPackage.Id} failed";
+                    }
                 };
 
                 proc.Exited += (o, args) =>
@@ -308,8 +464,8 @@ namespace HandyWinGet.ViewModels
                     {
                         var installFailed = (o as Process).ExitCode != 0;
                         LoadingStatus = installFailed
-                            ? $"Installation of {SelectedPackage.Id} failed"
-                            : $"Installed {SelectedPackage.Id}";
+                            ? $"Installation of {_selectedPackage.Id} failed"
+                            : $"Installed {_selectedPackage.Id}";
 
                         await Task.Delay(2000);
                         DataGot = true;
@@ -329,34 +485,41 @@ namespace HandyWinGet.ViewModels
         {
             try
             {
-                if (SelectedPackage.Id != null)
+                if (_selectedPackage.Id != null)
                 {
-                    var url = RemoveComment(SelectedPackage.Url);
+                    var url = Tools.RemoveComment(_selectedPackage.Url);
 
                     if (GlobalDataHelper<AppConfig>.Config.IsIDMEnabled)
                     {
-                        DownloadWithIDM(url);
+                        Tools.DownloadWithIDM(url);
                     }
                     else
                     {
                         IsVisibleProgressButton = true;
-                        LoadingStatus = $"Preparing to download {SelectedPackage.Id}";
+                        LoadingStatus = $"Preparing to download {_selectedPackage.Id}";
                         DataGot = false;
 
-                        _tempLocation = $"{location}{SelectedPackage.Id}-{SelectedPackage.Version}{GetExtension(url)}"
-                            .Trim();
-                        if (!File.Exists(_tempLocation))
+                        TempLocation =
+                            $@"{Path.GetTempPath()}\{_selectedPackage.Id}-{_selectedPackage.Version}{Tools.GetExtension(url)}"
+                                .Trim();
+                        if (!File.Exists(TempLocation))
                         {
-                            downloader = new DownloadService();
-                            downloader.DownloadProgressChanged += OnDownloadProgressChanged;
-                            downloader.DownloadFileCompleted += OnDownloadFileCompleted;
-                            await downloader.DownloadFileAsync(url, _tempLocation);
+                            DownloaderService = new DownloadService();
+                            DownloaderService.DownloadProgressChanged += delegate(object sender, DownloadProgressChangedEventArgs e)
+                                {
+                                    OnDownloadProgressChanged(sender, e, DownloadMode.Package);
+                                };
+                            DownloaderService.DownloadFileCompleted += delegate (object sender, AsyncCompletedEventArgs e)
+                            {
+                                OnDownloadFileCompleted(sender, e, DownloadMode.Package);
+                            };
+                            await DownloaderService.DownloadFileAsync(url, TempLocation);
                         }
                         else
                         {
                             IsVisibleProgressButton = false;
                             DataGot = true;
-                            StartProcess(_tempLocation);
+                            Tools.StartProcess(TempLocation);
                         }
                     }
                 }
@@ -367,320 +530,94 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        public void StartProcess(string path)
+        private void CleanDirectory()
         {
-            try
+            var rootDir = new DirectoryInfo(_path + @"\winget-pkgs-master");
+            var zipFile = new FileInfo(_path + @"\master.zip");
+            //var zipFile = new FileInfo(DownloaderService.Package.FileName);
+            var pkgDir = new DirectoryInfo(_path + @"\manifests");
+            var moveDir = new DirectoryInfo(_path + @"\winget-pkgs-master\manifests");
+            if (moveDir.Exists)
             {
-                var ps = new ProcessStartInfo(path)
+                if (pkgDir.Exists)
                 {
-                    UseShellExecute = true,
-                    Verb = "open"
-                };
-                Process.Start(ps);
-            }
-            catch (Win32Exception ex)
-            {
-                if (!ex.Message.Contains("The system cannot find the file specified.")) Growl.ErrorGlobal(ex.Message);
-            }
-        }
-
-        private void FindInstalledApps(RegistryKey regKey, List<string> keys, List<InstalledAppModel> installed)
-        {
-            foreach (var key in keys)
-                using (var rk = regKey.OpenSubKey(key))
-                {
-                    if (rk == null) continue;
-
-                    foreach (var skName in rk.GetSubKeyNames())
-                        using (var sk = rk.OpenSubKey(skName))
-                        {
-                            if (sk.GetValue("DisplayName") != null)
-                                try
-                                {
-                                    installed.Add(new InstalledAppModel
-                                    {
-                                        DisplayName = (string) sk.GetValue("DisplayName"),
-                                        Version = (string) sk.GetValue("DisplayVersion"),
-                                        Publisher = (string) sk.GetValue("Publisher"),
-                                        UnninstallCommand = (string) sk.GetValue("UninstallString")
-                                    });
-                                }
-                                catch (Exception)
-                                {
-                                }
-                        }
-                }
-        }
-
-        private class ItemEqualityComparer : IEqualityComparer<PackageModel>
-        {
-            public bool Equals(PackageModel x, PackageModel y)
-            {
-                // Two items are equal if their keys are equal.
-                return x?.Name == y?.Name;
-            }
-
-            public int GetHashCode(PackageModel obj)
-            {
-                return obj.Name.GetHashCode();
-            }
-        }
-
-        #region Command
-
-        private DelegateCommand<string> _ButtonCmd;
-
-        public DelegateCommand<string> ButtonCmd =>
-            _ButtonCmd ?? (_ButtonCmd = new DelegateCommand<string>(OnButtonAction));
-
-        private DelegateCommand<SelectionChangedEventArgs> _ItemChangedCmd;
-
-        public DelegateCommand<SelectionChangedEventArgs> ItemChangedCmd =>
-            _ItemChangedCmd ?? (_ItemChangedCmd = new DelegateCommand<SelectionChangedEventArgs>(ItemChanged));
-
-        #endregion
-
-        #region Property
-
-        private ObservableCollection<PackageModel> _DataList;
-
-        public ObservableCollection<PackageModel> DataList
-        {
-            get => _DataList;
-            set => SetProperty(ref _DataList, value);
-        }
-
-        private ObservableCollection<VersionModel> _DataListVersion;
-
-        public ObservableCollection<VersionModel> DataListVersion
-        {
-            get => _DataListVersion;
-            set => SetProperty(ref _DataListVersion, value);
-        }
-
-        private bool _DataGot;
-
-        public bool DataGot
-        {
-            get => _DataGot;
-            set => SetProperty(ref _DataGot, value);
-        }
-
-        private string _searchText;
-
-        public string SearchText
-        {
-            get => _searchText;
-            set
-            {
-                SetProperty(ref _searchText, value);
-                ItemsView.Refresh();
-            }
-        }
-
-        private string _LoadingStatus;
-
-        public string LoadingStatus
-        {
-            get => _LoadingStatus;
-            set => SetProperty(ref _LoadingStatus, value);
-        }
-
-        private string _UpdatedDate;
-
-        public string UpdatedDate
-        {
-            get => _UpdatedDate;
-            set => SetProperty(ref _UpdatedDate, value);
-        }
-
-        private int _Progress;
-
-        public int Progress
-        {
-            get => _Progress;
-            set => SetProperty(ref _Progress, value);
-        }
-
-        private bool _IsVisibleProgressButton;
-
-        public bool IsVisibleProgressButton
-        {
-            get => _IsVisibleProgressButton;
-            set => SetProperty(ref _IsVisibleProgressButton, value);
-        }
-
-        private bool _IsCheckedProgressButton = true;
-
-        public bool IsCheckedProgressButton
-        {
-            get => _IsCheckedProgressButton;
-            set
-            {
-                SetProperty(ref _IsCheckedProgressButton, value);
-                if (!value) downloader.CancelAsync();
-            }
-        }
-
-        private DataGridRowDetailsVisibilityMode _RowDetailsVisibilityMode;
-
-        public DataGridRowDetailsVisibilityMode RowDetailsVisibilityMode
-        {
-            get => GlobalDataHelper<AppConfig>.Config.IsShowingExtraDetail
-                ? DataGridRowDetailsVisibilityMode.VisibleWhenSelected
-                : DataGridRowDetailsVisibilityMode.Collapsed;
-            set => SetProperty(ref _RowDetailsVisibilityMode, value);
-        }
-
-        #endregion
-
-        #region Cloning Progress
-
-        public bool RepositoryTransferProgress(TransferProgress progress)
-        {
-            LoadingStatus = $"Downloading {progress.ReceivedObjects} objects from {progress.TotalObjects}";
-            return true;
-        }
-
-        private bool RepositoryOperationStartingProgress(RepositoryOperationContext context)
-        {
-            LoadingStatus = "Cloning Repository...";
-            return true;
-        }
-
-        private void RepositoryOnCheckoutProgress(string path, int completedSteps, int totalSteps)
-        {
-            LoadingStatus = "Checkout Repository...";
-        }
-
-        #endregion
-
-        #region Clean Repo
-
-        public IEnumerable<string> GetAllDirectories(string rootDirectory)
-        {
-            foreach (var directory in Directory.GetDirectories(
-                rootDirectory,
-                "*",
-                SearchOption.AllDirectories))
-            foreach (var file in Directory.GetFiles(directory))
-                yield return file;
-        }
-
-        private void CleanRepo()
-        {
-            DeleteDirectory(path + @"\DevOpsPipelineDefinitions");
-            DeleteDirectory(path + @"\Tools");
-            DeleteDirectory(path + @"\.git");
-            DeleteDirectory(path + @"\.github");
-
-            var filePaths = Directory.GetFiles(path);
-            foreach (var filePath in filePaths) File.Delete(filePath);
-        }
-
-        public static void DeleteDirectory(string d)
-        {
-            if (Directory.Exists(d))
-            {
-                foreach (var sub in Directory.EnumerateDirectories(d)) DeleteDirectory(sub);
-
-                foreach (var f in Directory.EnumerateFiles(d))
-                {
-                    var fi = new FileInfo(f)
-                    {
-                        Attributes = FileAttributes.Normal
-                    };
-                    fi.Delete();
+                    pkgDir.Delete(true);
                 }
 
-                Directory.Delete(d);
+                moveDir.MoveTo(_path + @"\manifests");
+                rootDir.Delete(true);
+
+                if (zipFile.Exists)
+                {
+                    zipFile.Delete();
+                }
             }
         }
 
-        #endregion
-
-        #region Downloader
-
-        public DownloadService downloader;
-        public string _tempLocation = string.Empty;
-        private readonly string location = Path.GetTempPath() + @"\";
-
-        public void DownloadWithIDM(string link)
+        public void SetDataGridGrouping()
         {
-            var command = $"/C /d \"{link}\"";
-            var IDManX64Location = @"C:\Program Files (x86)\Internet Download Manager\IDMan.exe";
-            var IDManX86Location = @"C:\Program Files\Internet Download Manager\IDMan.exe";
-            if (File.Exists(IDManX64Location))
-                Process.Start(IDManX64Location, command);
-            else if (File.Exists(IDManX86Location))
-                Process.Start(IDManX86Location, command);
+            if (GlobalDataHelper<AppConfig>.Config.IsShowingGroup)
+            {
+                ItemsView.GroupDescriptions.Add(new PropertyGroupDescription("Publisher"));
+            }
             else
-                Growl.ErrorGlobal(
-                    "Internet Download Manager (IDM) is not installed on your system, please download and install it first");
-        }
-
-        public string GetExtension(string url)
-        {
-            var ext = Path.GetExtension(url);
-            if (string.IsNullOrEmpty(ext))
             {
-                var pointChar = ".";
-                var slashChar = "/";
-
-                var pointIndex = url.LastIndexOf(pointChar);
-                var slashIndex = url.LastIndexOf(slashChar);
-
-                if (pointIndex >= 0)
-                {
-                    if (slashIndex >= 0)
-                    {
-                        var pFrom = pointIndex + pointChar.Length;
-                        var pTo = slashIndex;
-                        return $".{url.Substring(pFrom, pTo - pFrom)}";
-                    }
-
-                    return url.Substring(pointIndex + pointChar.Length);
-                }
-
-                return string.Empty;
+                ItemsView.GroupDescriptions.Clear();
             }
+        }
 
-            if (ext.Contains("?"))
+        private bool Filter(PackageModel item)
+        {
+            return SearchText == null
+                   || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1
+                   || item.Publisher.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) != -1;
+        }
+
+        private bool FilterCombo(VersionModel item)
+        {
+            return Id == null || item.Id.Equals(Id);
+        }
+
+        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e, DownloadMode mode)
+        {
+            switch (mode)
             {
-                var qTo = ext.IndexOf("?");
-                return ext.Substring(0, qTo - 0);
+                case DownloadMode.Repository:
+                   // UpdatedDate = DateTime.Now.ToString();
+                   // GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
+                   // GlobalDataHelper<AppConfig>.Save();
+                    
+                    //await Task.Delay(1000);
+                    //ZipFile.ExtractToDirectory(DownloaderService.Package.FileName, _path, true);
+                    CleanDirectory();
+                    break;
+                case DownloadMode.Package:
+                    IsVisibleProgressButton = false;
+                    IsCheckedProgressButton = true;
+                    Tools.StartProcess(TempLocation);
+                    break;
             }
-
-            return ext;
-        }
-
-        public string RemoveComment(string url)
-        {
-            var index = url.IndexOf("#");
-            if (index >= 0) return url.Substring(0, index).Trim();
-
-            return url.Trim();
-        }
-
-        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-        {
             Progress = 0;
-            IsVisibleProgressButton = false;
-            IsCheckedProgressButton = true;
-            DataGot = true;
-            StartProcess(_tempLocation);
         }
 
-        private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e, DownloadMode mode)
         {
-            var bytesIn = double.Parse(e.BytesReceived.ToString());
-            var totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
-            var percentage = bytesIn / totalBytes * 100;
-            var truncate = Math.Truncate(percentage);
-            Progress = (int) truncate;
-            LoadingStatus = $"Downloading {SelectedPackage.Id}-{SelectedPackage.Version}   {truncate}%";
+            Progress = (int)e.ProgressPercentage;
+            switch (mode)
+            {
+                case DownloadMode.Repository:
+                    LoadingStatus = $"Downloading {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB from {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {e.ProgressPercentage}%";
+                    break;
+                case DownloadMode.Package:
+                    LoadingStatus = $"Downloading {_selectedPackage.Id}-{_selectedPackage.Version} - {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB from {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {e.ProgressPercentage}%";
+                    break;
+            }
         }
-
-        #endregion
+        
+        private enum DownloadMode
+        {
+            Repository,
+            Package
+        }
     }
 }

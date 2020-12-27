@@ -1,7 +1,7 @@
-﻿using System;
-using HandyControl.Controls;
+﻿using HandyControl.Controls;
 using HandyControl.Data;
 using ModernWpf.Controls;
+using System;
 
 namespace HandyWinGet.Data
 {

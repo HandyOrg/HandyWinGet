@@ -1,7 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using HandyControl.Controls;
+﻿using HandyControl.Controls;
 using HandyWinGet.Data;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace HandyWinGet.Views
 {

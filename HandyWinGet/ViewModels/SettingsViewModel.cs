@@ -1,71 +1,49 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Windows.Controls;
-using HandyControl.Controls;
+﻿using HandyControl.Controls;
 using HandyWinGet.Data;
 using HandyWinGet.Views;
 using Microsoft.Win32;
 using ModernWpf.Controls;
 using Prism.Commands;
 using Prism.Mvvm;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Windows.Controls;
 
 namespace HandyWinGet.ViewModels
 {
     public class SettingsViewModel : BindableBase
     {
-        private DelegateCommand _CheckUpdateCommand;
-
-        private DelegateCommand<SelectionChangedEventArgs> _IdentifyPackageModeChangedCommand;
-
-        private int _IdentifyPackageModeIndex;
-
-        private DelegateCommand<SelectionChangedEventArgs> _InstallModeChangedCommand;
-
-        private int _InstallModeIndex;
-
-        private bool _isIdmEnabled;
-
-        private bool _isShowingExtraDetail;
-
-        private bool _isShowingGroup;
-
-        private bool _IsVisibleIDM;
-
-        private DelegateCommand<SelectionChangedEventArgs> _PaneDisplayModeChangedCommand;
-
-        private int _PaneIndex;
-
-        private string _version;
-
-        public SettingsViewModel()
-        {
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
-            PaneIndex = (int) GlobalDataHelper<AppConfig>.Config.PaneDisplayMode;
-            InstallModeIndex = (int) GlobalDataHelper<AppConfig>.Config.InstallMode;
-            IsVisibleIDM = InstallModeIndex == (int) InstallMode.Internal;
-            IdentifyPackageModeIndex = (int) GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode;
-
-            IsIDMEnabled = GlobalDataHelper<AppConfig>.Config.IsIDMEnabled;
-            IsShowingGroup = GlobalDataHelper<AppConfig>.Config.IsShowingGroup;
-            IsShowingExtraDetail = GlobalDataHelper<AppConfig>.Config.IsShowingExtraDetail;
-        }
+        #region Command
+        private DelegateCommand _checkUpdateCommand;
+        private DelegateCommand<SelectionChangedEventArgs> _identifyPackageModeChangedCommand;
+        private DelegateCommand<SelectionChangedEventArgs> _installModeChangedCommand;
+        private DelegateCommand<SelectionChangedEventArgs> _paneDisplayModeChangedCommand;
 
         public DelegateCommand CheckUpdateCommand =>
-            _CheckUpdateCommand ?? (_CheckUpdateCommand = new DelegateCommand(OnCheckUpdate));
+            _checkUpdateCommand ??= new DelegateCommand(OnCheckUpdate);
 
         public DelegateCommand<SelectionChangedEventArgs> PaneDisplayModeChangedCommand =>
-            _PaneDisplayModeChangedCommand ?? (_PaneDisplayModeChangedCommand =
-                new DelegateCommand<SelectionChangedEventArgs>(OnPaneDisplayModeChanged));
+            _paneDisplayModeChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(OnPaneDisplayModeChanged);
 
         public DelegateCommand<SelectionChangedEventArgs> InstallModeChangedCommand =>
-            _InstallModeChangedCommand ?? (_InstallModeChangedCommand =
-                new DelegateCommand<SelectionChangedEventArgs>(OnInstallModeChanged));
+            _installModeChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(OnInstallModeChanged);
 
         public DelegateCommand<SelectionChangedEventArgs> IdentifyPackageModeChangedCommand =>
-            _IdentifyPackageModeChangedCommand ?? (_IdentifyPackageModeChangedCommand =
-                new DelegateCommand<SelectionChangedEventArgs>(OnIdentifyPackageModeChanged));
+            _identifyPackageModeChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(OnIdentifyPackageModeChanged);
+        #endregion
+
+        #region Property
+
+        private int _identifyPackageModeIndex;
+        private int _installModeIndex;
+        private bool _isIdmEnabled;
+        private bool _isShowingExtraDetail;
+        private bool _isShowingGroup;
+        private bool _isVisibleIdm;
+        private int _paneIndex;
+        private string _version;
 
         public string Version
         {
@@ -75,23 +53,23 @@ namespace HandyWinGet.ViewModels
 
         public int PaneIndex
         {
-            get => _PaneIndex;
-            set => SetProperty(ref _PaneIndex, value);
+            get => _paneIndex;
+            set => SetProperty(ref _paneIndex, value);
         }
 
         public int InstallModeIndex
         {
-            get => _InstallModeIndex;
-            set => SetProperty(ref _InstallModeIndex, value);
+            get => _installModeIndex;
+            set => SetProperty(ref _installModeIndex, value);
         }
 
         public int IdentifyPackageModeIndex
         {
-            get => _IdentifyPackageModeIndex;
-            set => SetProperty(ref _IdentifyPackageModeIndex, value);
+            get => _identifyPackageModeIndex;
+            set => SetProperty(ref _identifyPackageModeIndex, value);
         }
 
-        public bool IsIDMEnabled
+        public bool IsIdmEnabled
         {
             get => _isIdmEnabled;
             set
@@ -103,10 +81,10 @@ namespace HandyWinGet.ViewModels
             }
         }
 
-        public bool IsVisibleIDM
+        public bool IsVisibleIdm
         {
-            get => _IsVisibleIDM;
-            set => SetProperty(ref _IsVisibleIDM, value);
+            get => _isVisibleIdm;
+            set => SetProperty(ref _isVisibleIdm, value);
         }
 
         public bool IsShowingGroup
@@ -137,12 +115,30 @@ namespace HandyWinGet.ViewModels
                     : DataGridRowDetailsVisibilityMode.Collapsed;
             }
         }
+        #endregion
+
+        public SettingsViewModel()
+        {
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+            PaneIndex = (int)GlobalDataHelper<AppConfig>.Config.PaneDisplayMode;
+            InstallModeIndex = (int)GlobalDataHelper<AppConfig>.Config.InstallMode;
+            IsVisibleIdm = InstallModeIndex == (int)InstallMode.Internal;
+            IdentifyPackageModeIndex = (int)GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode;
+
+            IsIdmEnabled = GlobalDataHelper<AppConfig>.Config.IsIDMEnabled;
+            IsShowingGroup = GlobalDataHelper<AppConfig>.Config.IsShowingGroup;
+            IsShowingExtraDetail = GlobalDataHelper<AppConfig>.Config.IsShowingExtraDetail;
+        }
 
         private void OnPaneDisplayModeChanged(SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 0) return;
+            if (e.AddedItems.Count == 0)
+            {
+                return;
+            }
 
             if (e.AddedItems[0] is NavigationViewPaneDisplayMode item)
+            {
                 if (!item.Equals(GlobalDataHelper<AppConfig>.Config.PaneDisplayMode))
                 {
                     GlobalDataHelper<AppConfig>.Config.PaneDisplayMode = item;
@@ -150,20 +146,25 @@ namespace HandyWinGet.ViewModels
                     GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
                     MainWindowViewModel.Instance.PaneDisplayMode = item;
                 }
+            }
         }
 
         private void OnInstallModeChanged(SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 0) return;
+            if (e.AddedItems.Count == 0)
+            {
+                return;
+            }
 
             if (e.AddedItems[0] is InstallMode item)
+            {
                 if (!item.Equals(GlobalDataHelper<AppConfig>.Config.InstallMode))
                 {
                     GlobalDataHelper<AppConfig>.Config.InstallMode = item;
 
                     if (item.Equals(InstallMode.Internal))
                     {
-                        IsVisibleIDM = true;
+                        IsVisibleIdm = true;
                     }
                     else
                     {
@@ -176,25 +177,31 @@ namespace HandyWinGet.ViewModels
                         }
                         else
                         {
-                            IsVisibleIDM = false;
+                            IsVisibleIdm = false;
                         }
                     }
 
                     GlobalDataHelper<AppConfig>.Save();
                     GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
                 }
+            }
         }
 
         private void OnIdentifyPackageModeChanged(SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 0) return;
+            if (e.AddedItems.Count == 0)
+            {
+                return;
+            }
 
             if (e.AddedItems[0] is IdentifyPackageMode item)
+            {
                 if (!item.Equals(GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode))
                 {
                     GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode = item;
 
                     if (item.Equals(IdentifyPackageMode.Wingetcli))
+                    {
                         if (!IsOsSupported())
                         {
                             MessageBox.Error(
@@ -202,10 +209,12 @@ namespace HandyWinGet.ViewModels
                                 "OS is not Supported");
                             IdentifyPackageModeIndex = 0;
                         }
+                    }
 
                     GlobalDataHelper<AppConfig>.Save();
                     GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
                 }
+            }
         }
 
         private void OnCheckUpdate()
@@ -216,9 +225,13 @@ namespace HandyWinGet.ViewModels
                     UpdateHelper.CheckForUpdateGithubRelease("HandyOrg", "HandyWinGet");
 
                 if (ver.IsExistNewVersion)
+                {
                     Growl.AskGlobal("we found a new Version, do you want to download?", b =>
                     {
-                        if (!b) return true;
+                        if (!b)
+                        {
+                            return true;
+                        }
 
                         var exeLocation = Environment.CurrentDirectory + @"\HandyWinGet.exe";
 
@@ -229,8 +242,11 @@ namespace HandyWinGet.ViewModels
                         Environment.Exit(0);
                         return true;
                     });
+                }
                 else
+                {
                     Growl.InfoGlobal("you are using Latest Version.");
+                }
             }
             catch (Exception ex)
             {

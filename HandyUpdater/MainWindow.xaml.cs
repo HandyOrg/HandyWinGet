@@ -2,9 +2,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Windows;
-
+using Downloader;
 namespace HandyUpdater
 {
     /// <summary>
@@ -12,8 +11,6 @@ namespace HandyUpdater
     /// </summary>
     public partial class MainWindow
     {
-        WebClient client = new WebClient();
-
         string tempRarFile = string.Empty;
 
         public MainWindow()
@@ -30,35 +27,18 @@ namespace HandyUpdater
             }
         }
 
-        private void btnDownload_Click(object sender, RoutedEventArgs e)
+        private async void btnDownload_Click(object sender, RoutedEventArgs e)
         {
             btnDownload.Content = "Downloading...";
             btnDownload.IsEnabled = false;
 
-            try
-            {
-                client = new WebClient();
-                client.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-                client.DownloadFileAsync(new Uri(App.Argument.Url), tempRarFile);
-            }
-
-            catch (Exception) { }
+            DownloadService downloadService = new DownloadService();
+            downloadService.DownloadProgressChanged += DownloadService_DownloadProgressChanged;
+            downloadService.DownloadFileCompleted += DownloadService_DownloadFileCompleted;
+            await downloadService.DownloadFileAsync(App.Argument.Url, tempRarFile);
         }
 
-        private void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            double bytesIn = double.Parse(e.BytesReceived.ToString());
-            double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
-            double percentage = bytesIn / totalBytes * 100;
-            prgStatus.Value = int.Parse(Math.Truncate(percentage).ToString());
-            txtStatus.Text = prgStatus.Value + "%  -  Downloaded " + ConvertBytesToMegabytes(e.BytesReceived).ToString("N2") + " of " + ConvertBytesToMegabytes(e.TotalBytesToReceive).ToString("N2");
-        }
-        double ConvertBytesToMegabytes(long bytes)
-        {
-            return (bytes / 1024f) / 1024f;
-        }
-        private void Completed(object sender, AsyncCompletedEventArgs e)
+        private void DownloadService_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             btnDownload.Content = "Downloaded";
             File.Delete(App.Argument?.ExeLocation);
@@ -68,13 +48,28 @@ namespace HandyUpdater
             Environment.Exit(0);
         }
 
+        private void DownloadService_DownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
+        {
+            prgStatus.Value = e.ProgressPercentage;
+            txtStatus.Text = $"Downloaded {ConvertBytesToMegabytes(e.BytesReceived):N2} MB of {ConvertBytesToMegabytes(e.TotalBytesToReceive):N2} MB  -  {(int)e.ProgressPercentage} %";
+        }
+
+        double ConvertBytesToMegabytes(long bytes)
+        {
+            return (bytes / 1024f) / 1024f;
+        }
         private void UnRar()
         {
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.FileName = "UnRAR.exe";
-            p.StartInfo.Arguments = string.Format(@"x -s ""{0}"" *.*", tempRarFile);
+            Process p = new Process
+            {
+                StartInfo =
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    FileName = "UnRAR.exe",
+                    Arguments = $@"x -s ""{tempRarFile}"" *.*"
+                }
+            };
             p.Start();
             p.WaitForExit();
         }
