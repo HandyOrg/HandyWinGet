@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyWinGet.Models;
+using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -145,8 +146,7 @@ namespace HandyWinGet.Data
                             {
                                 DisplayName = (string)sk.GetValue("DisplayName"),
                                 Version = (string)sk.GetValue("DisplayVersion"),
-                                Publisher = (string)sk.GetValue("Publisher"),
-                                UnninstallCommand = (string)sk.GetValue("UninstallString")
+                                Publisher = (string)sk.GetValue("Publisher")
                             });
                         }
                         catch (Exception)
@@ -156,6 +156,87 @@ namespace HandyWinGet.Data
                     }
                 }
             }
+        }
+
+        public static bool UninstallPackage(string packageName)
+        {
+            var result =
+                FindUninstallString(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64),
+                    packageName);
+            if (result.Item1)
+            {
+                Interaction.Shell(MakeUninstallString(result.Item2), AppWinStyle.NormalFocus);
+                return true;
+            }
+            else
+            {
+                result =
+                    FindUninstallString(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
+                        packageName);
+                if (result.Item1)
+                {
+                    Interaction.Shell(MakeUninstallString(result.Item2), AppWinStyle.NormalFocus);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        private static string MakeUninstallString(string uninstallstring)
+        {
+            if (uninstallstring.Substring(0, 1).Equals("\"") |
+                uninstallstring.ToLower().Contains("msiexec") |
+                uninstallstring.Contains("~"))
+            {
+                //ignore
+            }
+            else if (uninstallstring.ToLower().IndexOf(".exe") > 0)
+            {
+                uninstallstring = "\"" + uninstallstring.Insert(uninstallstring.ToLower().IndexOf(".exe") + 4, "\"");
+            }
+            else
+            {
+                uninstallstring = "\"" + uninstallstring + "\"";
+            }
+
+            return uninstallstring;
+        }
+
+        private static (bool, string) FindUninstallString(RegistryKey regKey, string packageName)
+        {
+            List<string> keys = new List<string>()
+            {
+                @"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+            foreach (var key in keys)
+            {
+                using var rk = regKey.OpenSubKey(key);
+                if (rk == null)
+                {
+                    continue;
+                }
+
+                foreach (var skName in rk.GetSubKeyNames())
+                {
+                    using var sk = rk.OpenSubKey(skName);
+                    if (sk?.GetValue("DisplayName") != null)
+                    {
+                        string displayName = (string)sk.GetValue("DisplayName");
+                        if (displayName.Contains(packageName))
+                        {
+                            string uninstall = (string)sk.GetValue("UninstallString");
+
+                            return (true, uninstall);
+                        }
+                    }
+                }
+            }
+
+            return (false, string.Empty);
         }
 
         public static bool IsWingetInstalled()

@@ -184,7 +184,7 @@
                                         <Path Data="{DynamicResource ScriptGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem InputGestureText="Ctrl+U" Header="Uninstall Package" Command="{Binding ButtonCmd}" CommandParameter="Uninstall">
+                                <MenuItem Name="mnuUninstall" InputGestureText="Ctrl+U" Header="Uninstall Package" Command="{Binding ButtonCmd}" CommandParameter="Uninstall">
                                     <MenuItem.Icon>
                                         <Path Data="{DynamicResource UninstallGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
                                     </MenuItem.Icon>

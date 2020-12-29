@@ -279,7 +279,6 @@ namespace HandyWinGet.ViewModels
                             {
                                 var installedVersion = string.Empty;
                                 var isInstalled = false;
-
                                 switch (GlobalDataHelper<AppConfig>.Config.IdentifyPackageMode)
                                 {
                                     case IdentifyPackageMode.Off:
@@ -460,7 +459,14 @@ namespace HandyWinGet.ViewModels
                     Clipboard.SetText(text);
                     break;
                 case "Uninstall":
-
+                    if (!string.IsNullOrEmpty(_selectedPackage.DisplayName) && ((PackageModel)(Packages.Instance.dg.SelectedItem)).IsInstalled)
+                    {
+                        var result = Tools.UninstallPackage(_selectedPackage.DisplayName);
+                        if (!result)
+                        {
+                            Growl.InfoGlobal("Sorry, we were unable to uninstall your package");
+                        }
+                    }
                     break;
                 case "SendToPow":
                     if (Packages.Instance.dg.SelectedItems.Count > 1)
@@ -520,7 +526,7 @@ namespace HandyWinGet.ViewModels
                 {
                     Id = dgItem.Id;
                     ComboView.Refresh();
-                    _selectedPackage = new VersionModel { Id = dgItem.Id, Version = dgItem.Version, Url = dgItem.Url };
+                    _selectedPackage = new VersionModel { Id = dgItem.Id, Version = dgItem.Version, Url = dgItem.Url, DisplayName = dgItem.Name };
                 }
             }
 
@@ -529,7 +535,7 @@ namespace HandyWinGet.ViewModels
                 var cmbItem = (VersionModel)cmb.SelectedItem;
                 if (cmbItem != null)
                 {
-                    _selectedPackage = new VersionModel { Id = cmbItem.Id, Version = cmbItem.Version, Url = cmbItem.Url };
+                    _selectedPackage = new VersionModel { Id = cmbItem.Id, Version = cmbItem.Version, Url = cmbItem.Url, DisplayName = cmbItem.DisplayName };
                 }
             }
         }

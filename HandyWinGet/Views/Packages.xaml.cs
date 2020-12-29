@@ -2,6 +2,7 @@
 using HandyWinGet.Data;
 using System.Windows;
 using System.Windows.Controls;
+using HandyWinGet.Models;
 
 namespace HandyWinGet.Views
 {
@@ -33,11 +34,22 @@ namespace HandyWinGet.Views
             {
                 dg.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
                 mnuCmd.IsEnabled = false;
+                mnuUninstall.IsEnabled = false;
             }
             else
             {
                 dg.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.VisibleWhenSelected;
                 mnuCmd.IsEnabled = true;
+                mnuUninstall.IsEnabled = true;
+            }
+
+            if (((PackageModel)dg.SelectedItem).IsInstalled && selectedRows == 1)
+            {
+                mnuUninstall.IsEnabled = true;
+            }
+            else
+            {
+                mnuUninstall.IsEnabled = false;
             }
         }
     }
