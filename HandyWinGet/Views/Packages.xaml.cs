@@ -1,11 +1,7 @@
-﻿using System.Diagnostics;
-using HandyControl.Controls;
+﻿using HandyControl.Controls;
 using HandyWinGet.Data;
 using System.Windows;
 using System.Windows.Controls;
-using HandyWinGet.Models;
-using HandyWinGet.ViewModels;
-using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace HandyWinGet.Views
 {
@@ -35,6 +31,5 @@ namespace HandyWinGet.Views
             var selectedRows = dg.SelectedItems.Count;
             dg.RowDetailsVisibilityMode = selectedRows > 1 ? DataGridRowDetailsVisibilityMode.Collapsed : DataGridRowDetailsVisibilityMode.VisibleWhenSelected;
         }
-
     }
 }

@@ -55,9 +55,6 @@
                                   Content="Download with Internet Download Manager (IDM)"
                                   IsChecked="{Binding IsIdmEnabled}"
                                   Visibility="{Binding IsVisibleIdm, Converter={StaticResource Boolean2VisibilityConverter}}" />
-                    <ToggleButton Margin="10" IsEnabled="False" Style="{StaticResource ToggleButtonSwitch}"
-                                  HorizontalAlignment="Left"
-                                  Content="Check if the application is already installed (Soon)" />
                     <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0"
                                   Content="Grouping packages by publisher" IsChecked="{Binding IsShowingGroup}" />
                     <ToggleButton Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10"
