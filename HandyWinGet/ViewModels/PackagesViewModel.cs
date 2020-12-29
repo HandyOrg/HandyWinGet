@@ -3,6 +3,7 @@ using HandyControl.Controls;
 using HandyWinGet.Data;
 using HandyWinGet.Models;
 using HandyWinGet.Views;
+using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -381,6 +382,8 @@ namespace HandyWinGet.ViewModels
 
         private async void OnButtonAction(string param)
         {
+            string text = $"winget install {_selectedPackage.Id} -v {_selectedPackage.Version}";
+
             switch (param)
             {
                 case "Install":
@@ -454,11 +457,24 @@ namespace HandyWinGet.ViewModels
                     GetPackages(true);
                     break;
                 case "Copy":
-                    string text = $"winget install {_selectedPackage.Id} -v {_selectedPackage.Version}";
                     Clipboard.SetText(text);
                     break;
                 case "Uninstall":
 
+                    break;
+                case "SendToPow":
+                    if (Packages.Instance.dg.SelectedItems.Count > 1)
+                    {
+                        var script = CreatePowerShellScript(false);
+                        Process.Start("powershell.exe", script.Item1);
+                    }
+                    else
+                    {
+                        Process.Start("powershell.exe", text);
+                    }
+                    break;
+                case "SendToCmd":
+                    Interaction.Shell(text, AppWinStyle.NormalFocus);
                     break;
             }
         }

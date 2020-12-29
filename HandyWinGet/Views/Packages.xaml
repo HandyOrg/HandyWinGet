@@ -6,6 +6,12 @@
              Name="self"
              xmlns:mu="http://schemas.modernwpf.com/2019"
              prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.InputBindings>
+        <KeyBinding Key="P" Modifiers="Control+Shift" Command="{Binding ButtonCmd}" CommandParameter="SendToPow" />
+        <KeyBinding Key="W" Modifiers="Control+Shift" Command="{Binding ButtonCmd}" CommandParameter="SendToCmd" />
+        <KeyBinding Key="C" Modifiers="Control+Shift" Command="{Binding ButtonCmd}" CommandParameter="Copy" />
+        <KeyBinding Key="U" Modifiers="Control" Command="{Binding ButtonCmd}" CommandParameter="Uninstall" />
+    </UserControl.InputBindings>
     <hc:TransitioningContentControl TransitionMode="Fade">
         <hc:ToggleBlock IsChecked="{Binding DataGot}" VerticalContentAlignment="Stretch"
                         HorizontalContentAlignment="Stretch">
@@ -162,12 +168,27 @@
                         </DataGrid.GroupStyle>
                         <DataGrid.ContextMenu>
                             <ContextMenu Style="{StaticResource DefaultContextMenuStyle}">
-                                <MenuItem Header="Copy Install Command" Command="{Binding ButtonCmd}" CommandParameter="Copy" >
+                                <MenuItem InputGestureText="Ctrl+Shift+P" Header="Send To Powershell" Command="{Binding ButtonCmd}" CommandParameter="SendToPow" >
+                                    <MenuItem.Icon>
+                                        <Path Data="{DynamicResource PowerShellGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Name="mnuCmd" InputGestureText="Ctrl+Shift+W" Header="Send To CMD" Command="{Binding ButtonCmd}" CommandParameter="SendToCmd" >
+                                    <MenuItem.Icon>
+                                        <Image Source="{DynamicResource ConsoleImage}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <Separator/>
+                                <MenuItem InputGestureText="Ctrl+Shift+C" Header="Copy Install Command" Command="{Binding ButtonCmd}" CommandParameter="Copy" >
                                     <MenuItem.Icon>
                                         <Path Data="{DynamicResource ScriptGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Uninstall" Command="{Binding ButtonCmd}" CommandParameter="Uninstall"/>
+                                <MenuItem InputGestureText="Ctrl+U" Header="Uninstall Package" Command="{Binding ButtonCmd}" CommandParameter="Uninstall">
+                                    <MenuItem.Icon>
+                                        <Path Data="{DynamicResource UninstallGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                         <hc:Interaction.Triggers>
@@ -193,7 +214,7 @@
                                         Content="Refresh" />
                                 <Button hc:BorderElement.CornerRadius="0" Command="{Binding ButtonCmd}"
                                         CommandParameter="PowerShell" Margin="0.5,0,0,0"
-                                        hc:IconElement.Geometry="{DynamicResource ScriptGeometry}"
+                                        hc:IconElement.Geometry="{DynamicResource PowerShellGeometry}"
                                         hc:IconElement.Height="14" Style="{StaticResource ButtonPrimary}"
                                         Content="Export PowerShell Install Script" />
                                 <hc:Badge Status="Processing" Style="{StaticResource BadgeDanger}">

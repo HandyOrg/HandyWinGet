@@ -22,6 +22,10 @@ namespace HandyWinGet.ViewModels
         private DelegateCommand<NavigationViewSelectionChangedEventArgs> _switchCommand;
         public DelegateCommand<NavigationViewSelectionChangedEventArgs> SwitchCommand =>
             _switchCommand ??= new DelegateCommand<NavigationViewSelectionChangedEventArgs>(Switch);
+
+        private DelegateCommand<string> _openTerminalCommand;
+        public DelegateCommand<string> OpenTerminalCommand =>
+            _openTerminalCommand ??= new DelegateCommand<string>(OpenTerminal);
         public MainWindowViewModel(IRegionManager regionManager)
         {
             Instance = this;
@@ -36,6 +40,18 @@ namespace HandyWinGet.ViewModels
                 {
                     _region.RequestNavigate("ContentRegion", item.Tag.ToString());
                 }
+            }
+        }
+        private void OpenTerminal(string param)
+        {
+            switch (param)
+            {
+                case "PowerShell":
+                    System.Diagnostics.Process.Start("powershell.exe");
+                    break;
+                case "Cmd":
+                    System.Diagnostics.Process.Start("cmd.exe");
+                    break;
             }
         }
     }

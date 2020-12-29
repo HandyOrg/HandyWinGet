@@ -29,7 +29,16 @@ namespace HandyWinGet.Views
         private void Dg_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectedRows = dg.SelectedItems.Count;
-            dg.RowDetailsVisibilityMode = selectedRows > 1 ? DataGridRowDetailsVisibilityMode.Collapsed : DataGridRowDetailsVisibilityMode.VisibleWhenSelected;
+            if (selectedRows > 1)
+            {
+                dg.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
+                mnuCmd.IsEnabled = false;
+            }
+            else
+            {
+                dg.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.VisibleWhenSelected;
+                mnuCmd.IsEnabled = true;
+            }
         }
     }
 }

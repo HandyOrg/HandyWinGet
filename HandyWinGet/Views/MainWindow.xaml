@@ -16,13 +16,31 @@
            MinHeight="600"
            Width="1300"
            MinWidth="1300">
+    <Window.InputBindings>
+        <KeyBinding Key="P" Modifiers="Control" Command="{Binding OpenTerminalCommand}" CommandParameter="PowerShell" />
+        <KeyBinding Key="W" Modifiers="Control" Command="{Binding OpenTerminalCommand}" CommandParameter="Cmd" />
+    </Window.InputBindings>
     <hc:Window.NonClientAreaContent>
         <Grid Margin="20,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Height="29">
+            <StackPanel Orientation="Horizontal" Height="29">
                 <ToggleButton x:Name="tg" BorderThickness="0" Content="Toggle Theme" Click="ToggleSkins_OnClick" />
+                <Menu>
+                    <MenuItem Header="Open Terminal">
+                        <MenuItem InputGestureText="Ctrl+P" Header="Powershell" CommandParameter="PowerShell" Command="{Binding OpenTerminalCommand}">
+                            <MenuItem.Icon>
+                                <Path Data="{DynamicResource PowerShellGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem InputGestureText="Ctrl+W" Header="CMD" CommandParameter="Cmd" Command="{Binding OpenTerminalCommand}">
+                            <MenuItem.Icon>
+                                <Image Source="{DynamicResource ConsoleImage}"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
             </StackPanel>
         </Grid>
     </hc:Window.NonClientAreaContent>

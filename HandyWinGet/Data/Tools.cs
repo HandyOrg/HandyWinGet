@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
 
 namespace HandyWinGet.Data
@@ -18,8 +16,7 @@ namespace HandyWinGet.Data
         private static extern bool InternetGetConnectedState(out int Description, int ReservedValue);
         public static bool IsConnectedToInternet()
         {
-            int Desc;
-            return InternetGetConnectedState(out Desc, 0);
+            return InternetGetConnectedState(out int Desc, 0);
         }
 
 
@@ -119,10 +116,14 @@ namespace HandyWinGet.Data
                 rootDirectory,
                 "*",
                 SearchOption.AllDirectories))
-            foreach (var file in Directory.GetFiles(directory))
-                yield return file;
+            {
+                foreach (var file in Directory.GetFiles(directory))
+                {
+                    yield return file;
+                }
+            }
         }
-        
+
         public static void FindInstalledApps(RegistryKey regKey, List<string> keys, List<InstalledAppModel> installed)
         {
             foreach (var key in keys)
