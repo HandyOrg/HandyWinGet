@@ -224,22 +224,17 @@ namespace HandyWinGet.ViewModels
                     if (!Directory.Exists(_path + @"\manifests") || isRefresh)
                     {
                         var manifestUrl = "https://github.com/microsoft/winget-pkgs/archive/master.zip";
-                        //Todo: A Fix Need Here
-                        //DownloaderService = new DownloadService();
-                        //DownloaderService.DownloadProgressChanged += delegate (object sender, DownloadProgressChangedEventArgs e)
-                        //{
-                        //    OnDownloadProgressChanged(sender, e, DownloadMode.Repository);
-                        //};
-                        //DownloaderService.DownloadFileCompleted += delegate (object sender, AsyncCompletedEventArgs e)
-                        //{
-                        //    OnDownloadFileCompleted(sender, e, DownloadMode.Repository);
-                        //};
-                        //await DownloaderService.DownloadFileAsync(manifestUrl, new DirectoryInfo(_path));
 
-                        WebClient client = new WebClient();
-                        client.DownloadFileCompleted += Client_DownloadFileCompleted;
-                        client.DownloadProgressChanged += Client_DownloadProgressChanged;
-                        await client.DownloadFileTaskAsync(new Uri(manifestUrl), Path.Combine(_path, "master.zip"));
+                        DownloaderService = new DownloadService();
+                        DownloaderService.DownloadProgressChanged += delegate (object sender, DownloadProgressChangedEventArgs e)
+                        {
+                            OnDownloadProgressChanged(sender, e, DownloadMode.Repository);
+                        };
+                        DownloaderService.DownloadFileCompleted += delegate (object sender, AsyncCompletedEventArgs e)
+                        {
+                            OnDownloadFileCompleted(sender, e, DownloadMode.Repository);
+                        };
+                        await DownloaderService.DownloadFileAsync(manifestUrl, new DirectoryInfo(_path));
                     }
 
                     LoadingStatus = "Extracting packages...";
@@ -332,50 +327,6 @@ namespace HandyWinGet.ViewModels
                 DataGot = true;
                 DownloaderService.CancelAsync();
                 Growl.ErrorGlobal(_connectionErrorMessage);
-            }
-        }
-
-        private void Client_DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
-        {
-            if (e.TotalBytesToReceive == -1)
-            {
-                if (!IsIndeterminate)
-                {
-                    IsIndeterminate = true;
-                }
-
-                LoadingStatus = "Downloading...";
-            }
-            else
-            {
-                if (IsIndeterminate)
-                {
-                    IsIndeterminate = false;
-                }
-
-                Progress = e.ProgressPercentage;
-                LoadingStatus =
-                    $"Downloading {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {e.ProgressPercentage}%";
-            }
-        }
-
-        private void Client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            try
-            {
-                UpdatedDate = DateTime.Now.ToString();
-                GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
-                GlobalDataHelper<AppConfig>.Save();
-                IsIndeterminate = true;
-                LoadingStatus = "Extracting Manifests...";
-                ZipFile.ExtractToDirectory(Path.Combine(_path, "master.zip"), Path.Combine(_path), true);
-                LoadingStatus = "Cleaning Directory...";
-                CleanDirectory();
-                Progress = 0;
-                IsIndeterminate = false;
-            }
-            catch (InvalidDataException)
-            {
             }
         }
 
@@ -687,9 +638,7 @@ namespace HandyWinGet.ViewModels
         private void CleanDirectory()
         {
             var rootDir = new DirectoryInfo(_path + @"\winget-pkgs-master");
-            //Todo: A Fix Need Here
-            var zipFile = new FileInfo(_path + @"\master.zip");
-            //var zipFile = new FileInfo(DownloaderService.Package.FileName);
+            var zipFile = new FileInfo(DownloaderService.Package.FileName);
             var pkgDir = new DirectoryInfo(_path + @"\manifests");
             var moveDir = new DirectoryInfo(_path + @"\winget-pkgs-master\manifests");
             if (moveDir.Exists)
@@ -728,16 +677,25 @@ namespace HandyWinGet.ViewModels
 
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e, DownloadMode mode)
         {
-            //Todo: A Fix Need Here
             switch (mode)
             {
                 case DownloadMode.Repository:
-                    // UpdatedDate = DateTime.Now.ToString();
-                    // GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
-                    // GlobalDataHelper<AppConfig>.Save();
-
-                    //await Task.Delay(1000);
-                    //ZipFile.ExtractToDirectory(DownloaderService.Package.FileName, _path, true);
+                    try
+                    {
+                        UpdatedDate = DateTime.Now.ToString();
+                        GlobalDataHelper<AppConfig>.Config.UpdatedDate = DateTime.Now;
+                        GlobalDataHelper<AppConfig>.Save();
+                        IsIndeterminate = true;
+                        LoadingStatus = "Extracting Manifests...";
+                        ZipFile.ExtractToDirectory(DownloaderService.Package.FileName, _path, true);
+                        LoadingStatus = "Cleaning Directory...";
+                        CleanDirectory();
+                        Progress = 0;
+                        IsIndeterminate = false;
+                    }
+                    catch (InvalidDataException)
+                    {
+                    }
                     CleanDirectory();
                     break;
                 case DownloadMode.Package:
@@ -752,17 +710,35 @@ namespace HandyWinGet.ViewModels
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e, DownloadMode mode)
         {
-            //Todo: A Fix Need Here
             Progress = (int)e.ProgressPercentage;
             switch (mode)
             {
                 case DownloadMode.Repository:
-                    LoadingStatus =
-                        $"Downloading {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB from {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {(int)e.ProgressPercentage}%";
+
+                    if (e.TotalBytesToReceive == -1)
+                    {
+                        if (!IsIndeterminate)
+                        {
+                            IsIndeterminate = true;
+                        }
+
+                        LoadingStatus = "Downloading...";
+                    }
+                    else
+                    {
+                        if (IsIndeterminate)
+                        {
+                            IsIndeterminate = false;
+                        }
+
+                        Progress = Progress;
+                        LoadingStatus =
+                            $"Downloading {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {Progress}%";
+                    }
                     break;
                 case DownloadMode.Package:
                     LoadingStatus =
-                        $"Downloading {_selectedPackage.Id}-{_selectedPackage.Version} - {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB from {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {(int)e.ProgressPercentage}%";
+                        $"Downloading {_selectedPackage.Id}-{_selectedPackage.Version} - {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {Progress}%";
                     break;
             }
         }
