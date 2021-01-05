@@ -6,6 +6,10 @@
 <br> 
 provides a GUI for installing apps through WinGet.
 
+- Uninstall Installed Packages
+- Install Multiple Packages
+- Export PowerShell Script
+- Install Packages via Terminal or Other Options
 - No need for winget cli
 - No need for Windows 10 (Older versions of Windows are supported (If .NET 5 is supported on Windows, HandyWinget is also supported)
 - Support Internal Downloader and Winget-cli
@@ -14,11 +18,10 @@ provides a GUI for installing apps through WinGet.
 - Redesigned user interface
 - Ability to install different versions
 - Ability to recognize Installed Packages (Internal Method and WingetCli Method Supported)
-- Faster than Version 1
+- Fast
 - Powered by .NET 5
 - Create Package
 - Light/Dark Theme
-- New Navigation Menu
 - Prism MVVM
 
 ## Installing and running HandyWinGet
@@ -31,4 +34,6 @@ To install HandyWinGet, run the following command from the command line / PowerS
 ![HandyWinGet](ScreenShot/3.png)
 ![HandyWinGet](ScreenShot/4.png)
 ![HandyWinGet](ScreenShot/5.png)
+![HandyWinGet](https://user-images.githubusercontent.com/9213496/103655377-62f9a900-4f7c-11eb-9356-9cd65af74725.png)
+
 
