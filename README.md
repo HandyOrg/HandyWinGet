@@ -11,7 +11,8 @@ provides a GUI for installing apps through WinGet.
 - Export PowerShell Script
 - Install Packages via Terminal or Other Options
 - No need for winget cli
-- No need for Windows 10 (Older versions of Windows are supported (If .NET 5 is supported on Windows, HandyWinget is also supported)
+- No need for Windows 10 
+- Windows 7 Supported
 - Support Internal Downloader and Winget-cli
 - Ability to download with Internet Download Manager (IDM)
 - Ability to cache data and no need to download all information
