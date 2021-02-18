@@ -9,6 +9,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <mu:ThemeResources/>
                 <mu:XamlControlsResources/>
+                <hc:ThemeResources/>
                 <hc:Theme/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

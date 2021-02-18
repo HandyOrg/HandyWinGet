@@ -51,7 +51,7 @@ namespace HandyUpdater
         private void DownloadService_DownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
         {
             prgStatus.Value = e.ProgressPercentage;
-            txtStatus.Text = $"Downloaded {ConvertBytesToMegabytes(e.BytesReceived):N2} MB of {ConvertBytesToMegabytes(e.TotalBytesToReceive):N2} MB  -  {(int)e.ProgressPercentage} %";
+            txtStatus.Text = $"Downloaded {ConvertBytesToMegabytes(e.ReceivedBytesSize):N2} MB of {ConvertBytesToMegabytes(e.TotalBytesToReceive):N2} MB  -  {(int)e.ProgressPercentage} %";
         }
 
         double ConvertBytesToMegabytes(long bytes)

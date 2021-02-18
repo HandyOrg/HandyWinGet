@@ -6,7 +6,8 @@ namespace HandyWinGet.Data
     [TypeConverter(typeof(EnumDescriptionTypeConverter))]
     public enum IdentifyPackageMode
     {
-        [Description("Off (Fast)")] Off,
+        [Description("Off (Fast)")] 
+        Off,
 
         [Description("Internal Method (Normal)")]
         Internal,

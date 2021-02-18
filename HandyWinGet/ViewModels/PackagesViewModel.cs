@@ -1,5 +1,6 @@
 ﻿using Downloader;
 using HandyControl.Controls;
+using HandyControl.Tools.Extension;
 using HandyWinGet.Data;
 using HandyWinGet.Models;
 using HandyWinGet.Views;
@@ -309,7 +310,7 @@ namespace HandyWinGet.ViewModels
                                     InstalledVersion = installedVersion
                                 };
 
-                                if (!DataList.Contains(packge, new ItemEqualityComparer()))
+                                if (!DataList.Contains(packge, new GenericCompare<PackageModel>(x => x.Name)))
                                 {
                                     DataList.Add(packge);
                                 }
@@ -674,7 +675,7 @@ namespace HandyWinGet.ViewModels
             return Id == null || item.Id.Equals(Id);
         }
 
-        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e, DownloadMode mode)
+        private async void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e, DownloadMode mode)
         {
             switch (mode)
             {
@@ -686,6 +687,8 @@ namespace HandyWinGet.ViewModels
                         GlobalDataHelper<AppConfig>.Save();
                         IsIndeterminate = true;
                         LoadingStatus = "Extracting Manifests...";
+                        await Task.Delay(2000);
+
                         ZipFile.ExtractToDirectory(DownloaderService.Package.FileName, _path, true);
                         LoadingStatus = "Cleaning Directory...";
                         CleanDirectory();
@@ -732,12 +735,12 @@ namespace HandyWinGet.ViewModels
 
                         Progress = Progress;
                         LoadingStatus =
-                            $"Downloading {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {Progress}%";
+                            $"Downloading {Tools.ConvertBytesToMegabytes(e.ReceivedBytesSize)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {Progress}%";
                     }
                     break;
                 case DownloadMode.Package:
                     LoadingStatus =
-                        $"Downloading {_selectedPackage.Id}-{_selectedPackage.Version} - {Tools.ConvertBytesToMegabytes(e.BytesReceived)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {Progress}%";
+                        $"Downloading {_selectedPackage.Id}-{_selectedPackage.Version} - {Tools.ConvertBytesToMegabytes(e.ReceivedBytesSize)} MB of {Tools.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {Progress}%";
                     break;
             }
         }

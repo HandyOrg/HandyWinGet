@@ -1,7 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyWinGet.Data;
 using HandyWinGet.Views;
-using Microsoft.Win32;
 using ModernWpf.Controls;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -168,7 +167,7 @@ namespace HandyWinGet.ViewModels
                     }
                     else
                     {
-                        if (!IsOsSupported())
+                        if (!OSVersionHelper.IsWindows10_1709_OrGreater)
                         {
                             MessageBox.Error(
                                 "Your Windows Is Not Supported, Winget-cli requires Windows 10 version 1709 (build 16299) Please Update to Windows 10 1709 (build 16299) or later",
@@ -202,7 +201,7 @@ namespace HandyWinGet.ViewModels
 
                     if (item.Equals(IdentifyPackageMode.Wingetcli))
                     {
-                        if (!IsOsSupported())
+                        if (!OSVersionHelper.IsWindows10_1709_OrGreater)
                         {
                             MessageBox.Error(
                                 "Your Windows Is Not Supported, Winget-cli requires Windows 10 version 1709 (build 16299) Please Update to Windows 10 1709 (build 16299) or later",
@@ -222,7 +221,7 @@ namespace HandyWinGet.ViewModels
             try
             {
                 var ver =
-                    UpdateHelper.CheckForUpdateGithubRelease("HandyOrg", "HandyWinGet");
+                    UpdateHelper.Instance.CheckUpdate("HandyOrg", "HandyWinGet");
 
                 if (ver.IsExistNewVersion)
                 {
@@ -252,24 +251,6 @@ namespace HandyWinGet.ViewModels
             {
                 Growl.ErrorGlobal(ex.Message);
             }
-        }
-
-        public bool IsOsSupported()
-        {
-            var subKey = @"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion";
-            var key = Registry.LocalMachine;
-            var skey = key.OpenSubKey(subKey);
-
-            var name = skey?.GetValue("ProductName")?.ToString();
-            if (name != null && name.Contains("Windows 10"))
-            {
-                var releaseId =
-                    Convert.ToInt32(Registry.GetValue(
-                        @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", ""));
-                return releaseId >= 1709;
-            }
-
-            return false;
         }
     }
 }

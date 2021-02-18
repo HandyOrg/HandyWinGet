@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data;
+using HandyControl.Themes;
 using ModernWpf.Controls;
 using System;
 
@@ -14,6 +15,6 @@ namespace HandyWinGet.Data
         public NavigationViewPaneDisplayMode PaneDisplayMode { get; set; } = NavigationViewPaneDisplayMode.Left;
         public InstallMode InstallMode { get; set; } = InstallMode.Wingetcli;
         public IdentifyPackageMode IdentifyPackageMode { get; set; } = IdentifyPackageMode.Off;
-        public SkinType Skin { get; set; } = SkinType.Default;
+        public ApplicationTheme Theme { get; set; } = ApplicationTheme.Light;
     }
 }

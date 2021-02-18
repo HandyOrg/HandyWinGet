@@ -1,4 +1,4 @@
-﻿<hc:Window x:Class="HandyWinGet.Views.MainWindow"
+﻿<Window x:Class="HandyWinGet.Views.MainWindow"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,45 +8,78 @@
            xmlns:prism="http://prismlibrary.com/"
            xmlns:ui="http://schemas.modernwpf.com/2019"
            prism:ViewModelLocator.AutoWireViewModel="True"
-           Title="HandyWinGet"
+           Title="HandyWinGet" ui:WindowHelper.UseModernWindowStyle="True"
+           ui:TitleBar.ExtendViewIntoTitleBar="True"
            Background="{DynamicResource SecondaryRegionBrush}"
            ResizeMode="CanResizeWithGrip"
            WindowStartupLocation="CenterScreen"
-           Height="600"
+           Height="600" KeyDown="Window_KeyDown"
            MinHeight="600"
            Width="1300"
            MinWidth="1300">
-    <Window.InputBindings>
-        <KeyBinding Key="P" Modifiers="Control" Command="{Binding OpenTerminalCommand}" CommandParameter="PowerShell" />
-        <KeyBinding Key="W" Modifiers="Control" Command="{Binding OpenTerminalCommand}" CommandParameter="Cmd" />
-    </Window.InputBindings>
-    <hc:Window.NonClientAreaContent>
-        <Grid Margin="20,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal" Height="29">
-                <ToggleButton x:Name="tg" BorderThickness="0" Content="Toggle Theme" Click="ToggleSkins_OnClick" />
-                <Menu>
-                    <MenuItem Header="Open Terminal">
-                        <MenuItem InputGestureText="Ctrl+P" Header="Powershell" CommandParameter="PowerShell" Command="{Binding OpenTerminalCommand}">
-                            <MenuItem.Icon>
-                                <Path Data="{DynamicResource PowerShellGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem InputGestureText="Ctrl+W" Header="CMD" CommandParameter="Cmd" Command="{Binding OpenTerminalCommand}">
-                            <MenuItem.Icon>
-                                <Image Source="{DynamicResource ConsoleImage}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </MenuItem>
-                </Menu>
-            </StackPanel>
-        </Grid>
-    </hc:Window.NonClientAreaContent>
-
-    <ui:NavigationView IsBackButtonVisible="Collapsed" IsTabStop="False" PaneTitle="HandyWinGet"
+    <ui:NavigationView IsBackButtonVisible="Collapsed" IsTabStop="False" PaneTitle="HandyWinGet" AlwaysShowHeader="True" Header="{Binding SelectedItem.Content, RelativeSource={RelativeSource Mode=Self}}"
                        IsSettingsVisible="True" PaneDisplayMode="{Binding PaneDisplayMode}">
+
+        <ui:NavigationView.HeaderTemplate>
+            <DataTemplate>
+                <Grid Margin="16,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="appTitle" Style="{StaticResource TitleTextBlockStyle}"
+                                   FontSize="28"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding}"/>
+                    <ui:CommandBar Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    DefaultLabelPosition="Right">
+                        <ui:AppBarButton Label="Theme">
+                            <ui:AppBarButton.Icon>
+                                <ui:FontIcon
+                                    Glyph="&#xE771;"
+                                    Margin="0,-2,0,0" />
+                            </ui:AppBarButton.Icon>
+                            <ui:AppBarButton.Flyout>
+                                <ui:MenuFlyout Placement="Bottom">
+                                    <ui:RadioMenuItem Click="MenuSkins_OnClick" Tag="{x:Static hc:ApplicationTheme.Light}" Header="Light">
+                                        <ui:RadioMenuItem.Icon>
+                                            <ui:PathIcon Data="M3,38V10h42v28H3z" Opacity="0.95" Foreground="White"/>
+                                        </ui:RadioMenuItem.Icon>
+                                    </ui:RadioMenuItem>
+                                    <ui:RadioMenuItem Click="MenuSkins_OnClick" Tag="{x:Static hc:ApplicationTheme.Dark}" Header="Dark">
+                                        <ui:RadioMenuItem.Icon>
+                                            <ui:PathIcon Data="M3,38V10h42v28H3z" Opacity="0.75" Foreground="Black"/>
+                                        </ui:RadioMenuItem.Icon>
+                                    </ui:RadioMenuItem>
+                                </ui:MenuFlyout>
+                            </ui:AppBarButton.Flyout>
+                        </ui:AppBarButton>
+                        <ui:AppBarButton Label="Open Terminal">
+                            <ui:AppBarButton.Flyout>
+                                <ui:MenuFlyout Placement="Bottom">
+                                    <ui:RadioMenuItem InputGestureText="Ctrl+P" Header="Powershell" Click="MenuTerminal_OnClick">
+                                        <ui:RadioMenuItem.Icon>
+                                            <Path Data="{DynamicResource PowerShellGeometry}" Fill="{DynamicResource PrimaryTextBrush}"/>
+                                        </ui:RadioMenuItem.Icon>
+                                    </ui:RadioMenuItem>
+                                    <ui:RadioMenuItem InputGestureText="Ctrl+W" Header="CMD" Click="MenuTerminal_OnClick">
+                                        <ui:RadioMenuItem.Icon>
+                                            <Image Source="{DynamicResource ConsoleImage}"/>
+                                        </ui:RadioMenuItem.Icon>
+                                    </ui:RadioMenuItem>
+                                </ui:MenuFlyout>
+                            </ui:AppBarButton.Flyout>
+                            <ui:AppBarButton.Icon>
+                                <ui:PathIcon Data="{DynamicResource PowerShellGeometry}" Foreground="{DynamicResource PrimaryTextBrush}"/>
+                            </ui:AppBarButton.Icon>
+                        </ui:AppBarButton>
+                    </ui:CommandBar>
+                </Grid>
+            </DataTemplate>
+        </ui:NavigationView.HeaderTemplate>
+
         <ui:NavigationView.MenuItems>
             <ui:NavigationViewItem IsSelected="True" Icon="home" IsTabStop="False" Tag="Packages" Content="Packages"/>
                 <ui:NavigationViewItem IsTabStop="False" Icon="add" Tag="CreatePackage" Content="Create New Package" />
@@ -59,4 +92,4 @@
             </hc:EventTrigger>
         </hc:Interaction.Triggers>
     </ui:NavigationView>
-</hc:Window>
+</Window>

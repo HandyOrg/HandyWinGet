@@ -308,7 +308,7 @@ namespace HandyWinGet.ViewModels
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            var bytesIn = double.Parse(e.BytesReceived.ToString());
+            var bytesIn = double.Parse(e.ReceivedBytesSize.ToString());
             var totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             var percentage = bytesIn / totalBytes * 100;
             Progress = int.Parse(Math.Truncate(percentage).ToString());

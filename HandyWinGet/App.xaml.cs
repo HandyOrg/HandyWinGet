@@ -1,16 +1,13 @@
 ﻿using HandyControl.Controls;
-using HandyControl.Data;
-using HandyControl.Themes;
-using HandyControl.Tools;
 using HandyWinGet.Data;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
-using ModernWpf;
 using System;
 using System.IO;
 using System.Runtime;
 using System.Windows;
+using ApplicationTheme = HandyControl.Themes.ApplicationTheme;
 
 namespace HandyWinGet
 {
@@ -35,9 +32,9 @@ namespace HandyWinGet
         {
             base.OnStartup(e);
             GlobalDataHelper<AppConfig>.Init($"{AppDomain.CurrentDomain.BaseDirectory}AppConfig.json");
-            if (GlobalDataHelper<AppConfig>.Config.Skin != SkinType.Default)
+            if (GlobalDataHelper<AppConfig>.Config.Theme != ApplicationTheme.Light)
             {
-                UpdateSkin(GlobalDataHelper<AppConfig>.Config.Skin);
+                UpdateSkin(GlobalDataHelper<AppConfig>.Config.Theme);
             }
 
             var boot = new Bootstrapper();
@@ -47,14 +44,11 @@ namespace HandyWinGet
                 typeof(Analytics), typeof(Crashes));
         }
 
-        public void UpdateSkin(SkinType skin)
+        public void UpdateSkin(ApplicationTheme theme)
         {
-            SharedResourceDictionary.SharedDictionaries.Clear();
-            ResourceHelper.GetTheme("hcTheme", Resources).Skin = skin;
+            HandyControl.Themes.ThemeManager.Current.ApplicationTheme = theme;
 
-            ThemeManager.Current.ApplicationTheme = skin == SkinType.Dark ? ApplicationTheme.Dark : ApplicationTheme.Light;
-
-            Current.MainWindow?.OnApplyTemplate();
+            ModernWpf.ThemeManager.Current.ApplicationTheme = theme == ApplicationTheme.Dark ? ModernWpf.ApplicationTheme.Dark : ModernWpf.ApplicationTheme.Light;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace HandyWinGet.Views
                 mnuUninstall.IsEnabled = true;
             }
 
-            if (((PackageModel)dg.SelectedItem).IsInstalled && selectedRows == 1)
+            if (dg.SelectedItem != null && ((PackageModel)dg.SelectedItem).IsInstalled && selectedRows == 1)
             {
                 mnuUninstall.IsEnabled = true;
             }
