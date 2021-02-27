@@ -1,0 +1,24 @@
+﻿<Application x:Class="HandyWinget.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemeResources/>
+                <ui:XamlControlsResources/>
+                <hc:ThemeResources/>
+                <hc:Theme/>
+                <ResourceDictionary Source="/Resources/Geometries.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="ui:AutoSuggestBox">
+                <Style.Resources>
+                    <Style TargetType="ListView" BasedOn="{StaticResource DefaultListViewStyle}"/>
+                </Style.Resources>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

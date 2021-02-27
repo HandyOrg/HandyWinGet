@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+	<TargetFramework>net5.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+    <AssemblyName>HandyWinget</AssemblyName>
+    <RootNamespace>HandyWinget</RootNamespace>
+    <Version>3.0.0.0</Version>
+    <Configurations>Debug;Release</Configurations>
+    <Copyright>Copyright © Mahdi 2018-2021</Copyright>
+    <FileVersion>3.0.0.0</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <LangVersion>latest</LangVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	<ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;Core</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;Core</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="HandyControls" Version="3.1.1" />
+    <PackageReference Include="Downloader" Version="2.2.2" />
+    <PackageReference Include="ModernWpfUis" Version="1.2.0" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.1.0" />
+	<PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.1.0" />
+	<PackageReference Include="nucs.JsonSettings" Version="1.0.7" />
+	<PackageReference Include="nucs.JsonSettings.Autosave" Version="1.0.0" />
+	<PackageReference Include="YamlDotNet" Version="9.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icon.ico" />
+  </ItemGroup>
+</Project>
