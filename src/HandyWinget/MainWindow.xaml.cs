@@ -145,7 +145,7 @@ namespace HandyWinget
 
         private void appBarRefresh_Click(object sender, RoutedEventArgs e)
         {
-            Packages.Instance.LoadManifests(true);
+            Packages.Instance.DownloadManifests(true);
         }
 
         private void appBarExport_Click(object sender, RoutedEventArgs e)

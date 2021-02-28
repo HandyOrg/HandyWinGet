@@ -50,11 +50,11 @@ namespace HandyWinget.Views
             BindingOperations.EnableCollectionSynchronization(DataList, Lock);
             BindingOperations.EnableCollectionSynchronization(_temoList, Lock);
             BindingOperations.EnableCollectionSynchronization(_tempVersions, Lock);
-            LoadManifests();
-            InitSettings();
+            DownloadManifests();
+            SetDataListGrouping();
         }
 
-        private void InitSettings()
+        private void SetDataListGrouping()
         {
             dataGrid.RowDetailsVisibilityMode = Settings.ShowExtraDetails;
 
@@ -69,11 +69,8 @@ namespace HandyWinget.Views
             }
         }
 
-        public async void LoadManifests(bool IsRefresh = false)
+        public async void DownloadManifests(bool IsRefresh = false)
         {
-            int _totalmanifestsCount = 0;
-            int _currentManifestCount = 0;
-
             DataList?.Clear();
             _temoList?.Clear();
             _tempVersions?.Clear();
@@ -83,29 +80,40 @@ namespace HandyWinget.Views
             tgCancelDownload.Visibility = Visibility.Collapsed;
 
             MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
-
-            if (Helper.IsConnectedToInternet())
+            bool _isConnected = Helper.IsConnectedToInternet();
+            if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true))
             {
-                if (!Directory.Exists(Consts.ManifestPath) || IsRefresh is true)
+                if (IsRefresh)
                 {
-                    if (IsRefresh)
-                    {
-                        txtStatus.Text = "Refreshing Packages...";
-                    }
-                    var manifestUrl = Consts.WingetPkgsRepository;
-
-                    WebClient client = new WebClient();
-
-                    client.DownloadFileCompleted += Client_DownloadFileCompleted;
-                    client.DownloadProgressChanged += Client_DownloadProgressChanged;
-                    await client.DownloadFileTaskAsync(new Uri(manifestUrl), Consts.RootPath + @"\winget-pkgs-master.zip");
+                    txtStatus.Text = "Refreshing Packages...";
                 }
+                var manifestUrl = Consts.WingetPkgsRepository;
+
+                WebClient client = new WebClient();
+
+                client.DownloadFileCompleted += Client_DownloadFileCompleted;
+                client.DownloadProgressChanged += Client_DownloadProgressChanged;
+                await client.DownloadFileTaskAsync(new Uri(manifestUrl), Consts.RootPath + @"\winget-pkgs-master.zip");
+                
+            }
+            else if (Directory.Exists(Consts.ManifestPath))
+            {
+                if (!_isConnected && IsRefresh)
+                {
+                    Growl.WarningGlobal("Unable to connect to the Internet, we Load local packages.");
+                }
+                LoadLocalManifests();
             }
             else
             {
                 Growl.ErrorGlobal("Unable to connect to the Internet");
             }
+        }
 
+        private async void LoadLocalManifests()
+        {
+            int _totalmanifestsCount = 0;
+            int _currentManifestCount = 0;
             if (Directory.Exists(Consts.ManifestPath))
             {
                 prgStatus.IsIndeterminate = false;
@@ -277,6 +285,7 @@ namespace HandyWinget.Views
                     }
                 }
             });
+            LoadLocalManifests();
         }
 
         private async void tgCancelDownload_Checked(object sender, RoutedEventArgs e)

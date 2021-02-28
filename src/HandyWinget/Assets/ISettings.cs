@@ -22,7 +22,7 @@ namespace HandyWinget
         public virtual bool GroupByPublisher { get; set; } = false;
         public virtual DataGridRowDetailsVisibilityMode ShowExtraDetails { get; set; } = DataGridRowDetailsVisibilityMode.Collapsed;
         public virtual NavigationViewPaneDisplayMode PaneDisplayMode { get; set; } = NavigationViewPaneDisplayMode.Top;
-        public virtual InstallMode InstallMode { get; set; } = InstallMode.Wingetcli;
+        public virtual InstallMode InstallMode { get; set; } = InstallMode.Internal;
         public virtual IdentifyPackageMode IdentifyPackageMode { get; set; } = IdentifyPackageMode.Off;
         public virtual ApplicationTheme Theme { get; set; } = ApplicationTheme.Light;
         public virtual Brush Accent { get; set; }
