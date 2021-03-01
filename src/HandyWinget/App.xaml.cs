@@ -1,9 +1,13 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Themes;
 using HandyWinget.Assets;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using nucs.JsonSettings;
 using nucs.JsonSettings.Autosave;
 using System.IO;
+using System.Runtime;
 using System.Windows;
 using System.Windows.Media;
 
@@ -13,6 +17,16 @@ namespace HandyWinget
     {
         ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
 
+        public App()
+        {
+            if (!Directory.Exists(Consts.CachePath))
+            {
+                Directory.CreateDirectory(Consts.CachePath);
+            }
+
+            ProfileOptimization.SetProfileRoot(Consts.CachePath);
+            ProfileOptimization.StartProfile("Profile");
+        }
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -28,6 +42,7 @@ namespace HandyWinget
 
             UpdateTheme(Settings.Theme);
             UpdateAccent(Settings.Accent);
+            AppCenter.Start(Consts.AppSecret, typeof(Analytics), typeof(Crashes));
         }
 
         internal void UpdateTheme(ApplicationTheme theme)
