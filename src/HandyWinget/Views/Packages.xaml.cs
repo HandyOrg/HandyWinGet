@@ -44,14 +44,12 @@ namespace HandyWinget.Views
             InitializeComponent();
             Instance = this;
             DataContext = this;
-
             BindingOperations.EnableCollectionSynchronization(DataList, Lock);
             BindingOperations.EnableCollectionSynchronization(_temoList, Lock);
             BindingOperations.EnableCollectionSynchronization(_tempVersions, Lock);
             DownloadManifests();
             SetDataListGrouping();
         }
-
         private void SetDataListGrouping()
         {
             dataGrid.RowDetailsVisibilityMode = Settings.ShowExtraDetails;
@@ -123,89 +121,103 @@ namespace HandyWinget.Views
                     var _installedApps = Helper.GetInstalledApps();
                     foreach (var item in manifests)
                     {
-                        _currentManifestCount += 1;
-                        DispatcherHelper.RunOnMainThread(delegate
+                        try
                         {
-                            prgStatus.Value = _currentManifestCount * 100 / _totalmanifestsCount;
-                            txtStatus.Text = $"Parsing Manifests... {_currentManifestCount}/{_totalmanifestsCount}";
-                        });
-
-                        var file = File.ReadAllText(item);
-                        var input = new StringReader(file);
-
-                        var deserializer = new DeserializerBuilder().Build();
-                        var yamlObject = deserializer.Deserialize(input);
-                        var serializer = new SerializerBuilder().JsonCompatible().Build();
-
-                        if (yamlObject != null)
-                        {
-                            var json = serializer.Serialize(yamlObject);
-                            var yaml = JsonConvert.DeserializeObject<YamlPackageModel>(json);
-                            if (yaml != null)
+                            _currentManifestCount += 1;
+                            DispatcherHelper.RunOnMainThread(delegate
                             {
-                                var installedVersion = string.Empty;
-                                var isInstalled = false;
-                                switch (Settings.IdentifyPackageMode)
+                                prgStatus.Value = _currentManifestCount * 100 / _totalmanifestsCount;
+                                txtStatus.Text = $"Parsing Manifests... {_currentManifestCount}/{_totalmanifestsCount}";
+                            });
+
+                            var file = File.ReadAllText(item);
+                            var input = new StringReader(file);
+
+                            var deserializer = new DeserializerBuilder().Build();
+                            var yamlObject = deserializer.Deserialize(input);
+                            var serializer = new SerializerBuilder().JsonCompatible().Build();
+
+                            if (yamlObject != null)
+                            {
+                                var json = serializer.Serialize(yamlObject);
+                                var yaml = JsonConvert.DeserializeObject<YamlPackageModel>(json);
+                                if (yaml != null)
                                 {
-                                    case IdentifyPackageMode.Off:
-                                        isInstalled = false;
-                                        installedVersion = string.Empty;
-                                        break;
-                                    case IdentifyPackageMode.Internal:
-                                        var data = _installedApps.Where(x => x.DisplayName.Contains(yaml.Name)).Select(x => x.Version);
-                                        isInstalled = data.Any();
-                                        installedVersion = isInstalled ? $"Installed Version: {data.FirstOrDefault()}" : string.Empty;
-                                        break;
-                                    case IdentifyPackageMode.Wingetcli:
-                                        isInstalled = await IsPackageInstalledWingetcliMode(yaml.Name);
-                                        installedVersion = string.Empty;
-                                        break;
+                                    var installedVersion = string.Empty;
+                                    var isInstalled = false;
+                                    switch (Settings.IdentifyPackageMode)
+                                    {
+                                        case IdentifyPackageMode.Off:
+                                            isInstalled = false;
+                                            installedVersion = string.Empty;
+                                            break;
+                                        case IdentifyPackageMode.Internal:
+                                            var data = _installedApps.Where(x => x.DisplayName.Contains(yaml.Name)).Select(x => x.Version);
+                                            isInstalled = data.Any();
+                                            installedVersion = isInstalled ? $"Installed Version: {data.FirstOrDefault()}" : string.Empty;
+                                            break;
+                                        case IdentifyPackageMode.Wingetcli:
+                                            isInstalled = await IsPackageInstalledWingetcliMode(yaml.Name);
+                                            installedVersion = string.Empty;
+                                            break;
+                                    }
+
+                                    var package = new PackageModel
+                                    {
+                                        Publisher = yaml.Publisher,
+                                        Name = yaml.Name,
+                                        IsInstalled = isInstalled,
+                                        Version = yaml.Version,
+                                        Id = yaml.Id,
+                                        Url = yaml.Installers[0].Url,
+                                        Description = yaml.Description,
+                                        LicenseUrl = yaml.LicenseUrl,
+                                        Homepage = yaml.Homepage,
+                                        Arch = yaml.Id + " " + yaml.Installers[0].Arch,
+                                        InstalledVersion = installedVersion
+                                    };
+
+                                    if (!_temoList.Contains(package, new GenericCompare<PackageModel>(x => x.Name)))
+                                    {
+                                        _temoList.Add(package);
+                                    }
+
+                                    _tempVersions.Add(new VersionModel { Id = package.Id, Version = package.Version });
                                 }
-
-                                var package = new PackageModel
-                                {
-                                    Publisher = yaml.Publisher,
-                                    Name = yaml.Name,
-                                    IsInstalled = isInstalled,
-                                    Version = yaml.Version,
-                                    Id = yaml.Id,
-                                    Url = yaml.Installers[0].Url,
-                                    Description = yaml.Description,
-                                    LicenseUrl = yaml.LicenseUrl,
-                                    Homepage = yaml.Homepage,
-                                    Arch = yaml.Id + " " + yaml.Installers[0].Arch,
-                                    InstalledVersion = installedVersion
-                                };
-
-                                if (!_temoList.Contains(package, new GenericCompare<PackageModel>(x => x.Name)))
-                                {
-                                    _temoList.Add(package);
-                                }
-
-                                _tempVersions.Add(new VersionModel { Id = package.Id, Version = package.Version });
                             }
+                        }
+                        catch (Exception)
+                        {
+                            continue;
                         }
                     }
 
                     foreach (var item in _temoList)
                     {
-                        var _versions = _tempVersions.Where(v => v.Id == item.Id).Select(v => v.Version).OrderByDescending(v => v).ToList();
-
-                        DataList.Add(new PackageModel
+                        try
                         {
-                            Id = item.Id,
-                            Arch = item.Arch,
-                            Description = item.Description,
-                            Homepage = item.Homepage,
-                            InstalledVersion = item.InstalledVersion,
-                            IsInstalled = item.IsInstalled,
-                            LicenseUrl = item.LicenseUrl,
-                            Name = item.Name,
-                            Publisher = item.Publisher,
-                            Url = item.Url,
-                            Versions = _versions,
-                            Version = _versions[0]
-                        });
+                            var _versions = _tempVersions.Where(v => v.Id == item.Id).Select(v => v.Version).OrderByDescending(v => v).ToList();
+
+                            DataList.Add(new PackageModel
+                            {
+                                Id = item.Id,
+                                Arch = item.Arch,
+                                Description = item.Description,
+                                Homepage = item.Homepage,
+                                InstalledVersion = item.InstalledVersion,
+                                IsInstalled = item.IsInstalled,
+                                LicenseUrl = item.LicenseUrl,
+                                Name = item.Name,
+                                Publisher = item.Publisher,
+                                Url = item.Url,
+                                Versions = _versions,
+                                Version = _versions[0]
+                            });
+                        }
+                        catch (Exception)
+                        {
+                            continue;
+                        }
                     }
 
                 });
@@ -429,7 +441,7 @@ namespace HandyWinget.Views
                 case "Uninstall":
                     if (selectedRows == 1 && !string.IsNullOrEmpty(item.Name) && item.IsInstalled)
                     {
-                        var result = Helper.UninstallPackage(item.Name);
+                        var result = UninstallPackage(item.Name);
                         if (!result)
                         {
                             Growl.InfoGlobal("Sorry, we were unable to uninstall your package");

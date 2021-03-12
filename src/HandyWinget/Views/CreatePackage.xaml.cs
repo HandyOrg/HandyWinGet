@@ -60,32 +60,34 @@ namespace HandyWinget.Views
 
         public void GenerateScript(GenerateScriptMode mode)
         {
-            if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text)
-                                               && !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
+            try
             {
-
-                var tags = string.Join(",", tagContainer.Items.Cast<Tag>().Select(p => p.Content));
-                
-
-                var ext = System.IO.Path.GetExtension(txtUrl.Text)?.Replace(".", "").Trim();
-                if (ext != null && ext.ToLower().Equals("msixbundle"))
+                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text)
+                                               && !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
-                    ext = "Msix";
-                }
 
-                var builder = new YamlPackageModel
-                {
-                    Id = txtId.Text,
-                    Version = txtVersion.Text,
-                    Name = txtAppName.Text,
-                    Publisher = txtPublisher.Text,
-                    License = txtLicense.Text,
-                    LicenseUrl = txtLicenseUrl.Text,
-                    AppMoniker = txtMoniker.Text,
-                    Tags = tags,
-                    Description = txtDescription.Text,
-                    Homepage = txtHomePage.Text,
-                    Installers = new List<Installer>
+                    var tags = string.Join(",", tagContainer.Items.Cast<Tag>().Select(p => p.Content));
+
+
+                    var ext = System.IO.Path.GetExtension(txtUrl.Text)?.Replace(".", "").Trim();
+                    if (ext != null && ext.ToLower().Equals("msixbundle"))
+                    {
+                        ext = "Msix";
+                    }
+
+                    var builder = new YamlPackageModel
+                    {
+                        Id = txtId.Text,
+                        Version = txtVersion.Text,
+                        Name = txtAppName.Text,
+                        Publisher = txtPublisher.Text,
+                        License = txtLicense.Text,
+                        LicenseUrl = txtLicenseUrl.Text,
+                        AppMoniker = txtMoniker.Text,
+                        Tags = tags,
+                        Description = txtDescription.Text,
+                        Homepage = txtHomePage.Text,
+                        Installers = new List<Installer>
                     {
                         new()
                         {
@@ -94,43 +96,48 @@ namespace HandyWinget.Views
                             Sha256 = txtHash.Text
                         }
                     },
-                    InstallerType = ext,
-                    Switches = ext != null && ext.ToLower().Equals("exe")
-                        ? new Switches
-                        {
-                            Silent = "/S",
-                            SilentWithProgress = "/S"
-                        }
-                        : new Switches()
-                };
+                        InstallerType = ext,
+                        Switches = ext != null && ext.ToLower().Equals("exe")
+                            ? new Switches
+                            {
+                                Silent = "/S",
+                                SilentWithProgress = "/S"
+                            }
+                            : new Switches()
+                    };
 
-                var serializer = new SerializerBuilder().Build();
-                var yaml = serializer.Serialize(builder);
-                switch (mode)
-                {
-                    case GenerateScriptMode.CopyToClipboard:
-                        Clipboard.SetText(yaml);
-                        Growl.SuccessGlobal("Script Copied to clipboard.");
-                        ClearInputs();
-                        break;
-                    case GenerateScriptMode.SaveToFile:
-                        var dialog = new SaveFileDialog();
-                        dialog.Title = "Save Package";
-                        dialog.FileName = $"{txtVersion.Text}.yaml";
-                        dialog.DefaultExt = "yaml";
-                        dialog.Filter = "Yaml File (*.yaml)|*.yaml";
-                        if (dialog.ShowDialog() == true)
-                        {
-                            File.WriteAllText(dialog.FileName, yaml);
+                    var serializer = new SerializerBuilder().Build();
+                    var yaml = serializer.Serialize(builder);
+                    switch (mode)
+                    {
+                        case GenerateScriptMode.CopyToClipboard:
+                            Clipboard.SetText(yaml);
+                            Growl.SuccessGlobal("Script Copied to clipboard.");
                             ClearInputs();
-                        }
+                            break;
+                        case GenerateScriptMode.SaveToFile:
+                            var dialog = new SaveFileDialog();
+                            dialog.Title = "Save Package";
+                            dialog.FileName = $"{txtVersion.Text}.yaml";
+                            dialog.DefaultExt = "yaml";
+                            dialog.Filter = "Yaml File (*.yaml)|*.yaml";
+                            if (dialog.ShowDialog() == true)
+                            {
+                                File.WriteAllText(dialog.FileName, yaml);
+                                ClearInputs();
+                            }
 
-                        break;
+                            break;
+                    }
+                }
+                else
+                {
+                    Growl.ErrorGlobal("Required fields must be filled");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Growl.ErrorGlobal("Required fields must be filled");
+                Growl.ErrorGlobal(ex.Message);
             }
         }
 
@@ -152,29 +159,36 @@ namespace HandyWinget.Views
 
         private async void btnGetHashWeb_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
+            try
             {
-                prgStatus.IsIndeterminate = false;
-                btnGetHashWeb.IsEnabled = false;
-                btnGetHashLocal.IsEnabled = false;
-                txtHash.IsEnabled = false;
-                try
+                if (!string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
-                    var downloader = new DownloadService();
-                    downloader.DownloadProgressChanged += OnDownloadProgressChanged;
-                    downloader.DownloadFileCompleted += OnDownloadFileCompleted;
-                    await downloader.DownloadFileTaskAsync(txtUrl.Text, new DirectoryInfo(Consts.TempSetupPath));
+                    prgStatus.IsIndeterminate = false;
+                    btnGetHashWeb.IsEnabled = false;
+                    btnGetHashLocal.IsEnabled = false;
+                    txtHash.IsEnabled = false;
+                    try
+                    {
+                        var downloader = new DownloadService();
+                        downloader.DownloadProgressChanged += OnDownloadProgressChanged;
+                        downloader.DownloadFileCompleted += OnDownloadFileCompleted;
+                        await downloader.DownloadFileTaskAsync(txtUrl.Text, new DirectoryInfo(Consts.TempSetupPath));
+                    }
+                    catch (Exception ex)
+                    {
+                        prgStatus.IsIndeterminate = true;
+                        prgStatus.ShowError = true;
+                        Growl.ErrorGlobal(ex.Message);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    prgStatus.IsIndeterminate = true;
-                    prgStatus.ShowError = true;
-                    Growl.ErrorGlobal(ex.Message);
+                    Growl.ErrorGlobal("Url field is Empty or Invalid");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Growl.ErrorGlobal("Url field is Empty or Invalid");
+                Growl.ErrorGlobal(ex.Message);
             }
         }
 

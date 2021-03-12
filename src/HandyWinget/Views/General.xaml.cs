@@ -60,7 +60,7 @@ namespace HandyWinget.Views
         {
             var mode = (IdentifyPackageMode)cmbIdentify.SelectedItem;
 
-            if (!Helper.IsOsSupported())
+            if (!IsOsSupported())
             {
                 cmbIdentify.SelectedIndex = 0;
             }
@@ -78,12 +78,12 @@ namespace HandyWinget.Views
             {
                 case InstallMode.Wingetcli:
                     tgIDM.Visibility = Visibility.Collapsed;
-                    if (!Helper.IsOsSupported())
+                    if (!IsOsSupported())
                     {
                         cmbInstall.SelectedIndex = 1;
                     }
 
-                    if (!Helper.IsWingetInstalled())
+                    if (!IsWingetInstalled())
                     {
                         cmbInstall.SelectedIndex = 1;
                     }
