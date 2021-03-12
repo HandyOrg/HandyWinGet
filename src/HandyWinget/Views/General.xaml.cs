@@ -1,13 +1,12 @@
 ﻿using HandyControl.Controls;
+using HandyControl.Tools;
 using HandyWinget.Assets;
 using ModernWpf.Controls;
-using nucs.JsonSettings;
-using nucs.JsonSettings.Autosave;
 using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-
+using static HandyWinget.Assets.Helper;
 namespace HandyWinget.Views
 {
     /// <summary>
@@ -15,8 +14,6 @@ namespace HandyWinget.Views
     /// </summary>
     public partial class General : UserControl
     {
-        ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
-
         string Version = string.Empty;
         public General()
         {

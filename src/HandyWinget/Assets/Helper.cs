@@ -1,40 +1,25 @@
 ﻿using HandyControl.Controls;
+using HandyControl.Tools;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
+using nucs.JsonSettings;
+using nucs.JsonSettings.Autosave;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Windows.Media;
 
 namespace HandyWinget.Assets
 {
     public abstract class Helper
     {
-        [DllImport("wininet.dll")]
-        private static extern bool InternetGetConnectedState(out int Description, int ReservedValue);
-        public static bool IsConnectedToInternet()
-        {
-            return InternetGetConnectedState(out int Desc, 0);
-        }
+        public static ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
+
         public static string ConvertBytesToMegabytes(long bytes)
         {
             return ((bytes / 1024f) / 1024f).ToString("0.00");
-        }
-        public static Color GetColorFromBrush(Brush brush)
-        {
-            if (brush.GetType() == typeof(LinearGradientBrush))
-            {
-                var linearBrush = (LinearGradientBrush)brush;
-                return new SolidColorBrush(linearBrush.GradientStops[1].Color).Color;
-            }
-            else
-            {
-                return ((SolidColorBrush)brush).Color;
-            }
         }
 
         public static bool IsWingetInstalled()

@@ -1,13 +1,12 @@
 ﻿using Downloader;
 using HandyControl.Controls;
+using HandyControl.Tools;
 using HandyControl.Tools.Extension;
 using HandyWinget.Assets;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using ModernWpf.Controls;
 using Newtonsoft.Json;
-using nucs.JsonSettings;
-using nucs.JsonSettings.Autosave;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,12 +22,11 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using YamlDotNet.Serialization;
-
+using static HandyWinget.Assets.Helper;
 namespace HandyWinget.Views
 {
     public partial class Packages : UserControl
     {
-        ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
 
         internal static Packages Instance;
 
@@ -80,7 +78,7 @@ namespace HandyWinget.Views
             tgCancelDownload.Visibility = Visibility.Collapsed;
 
             MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
-            bool _isConnected = Helper.IsConnectedToInternet();
+            bool _isConnected = ApplicationHelper.IsConnectedToInternet();
             if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true))
             {
                 if (IsRefresh)
@@ -539,7 +537,7 @@ namespace HandyWinget.Views
             prgStatus.ShowError = false;
             prgStatus.IsIndeterminate = true;
             prgStatus.Value = 0;
-            if (Helper.IsConnectedToInternet())
+            if (ApplicationHelper.IsConnectedToInternet())
             {
                 switch (Settings.InstallMode)
                 {
@@ -693,7 +691,7 @@ namespace HandyWinget.Views
                             downloaderService = new DownloadService();
                             downloaderService.DownloadProgressChanged += DownloaderService_DownloadProgressChanged;
                             downloaderService.DownloadFileCompleted += DownloaderService_DownloadFileCompleted;
-                            await downloaderService.DownloadFileAsync(url, _TempSetupPath);
+                            await downloaderService.DownloadFileTaskAsync(url, _TempSetupPath);
                         }
                         else
                         {

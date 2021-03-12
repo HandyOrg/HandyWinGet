@@ -1,22 +1,17 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Themes;
 using HandyControl.Tools;
-using HandyWinget.Assets;
 using HandyWinget.Views;
 using ModernWpf.Controls;
 using ModernWpf.Controls.Primitives;
-using nucs.JsonSettings;
-using nucs.JsonSettings.Autosave;
-using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using static HandyWinget.Assets.Helper;
 namespace HandyWinget
 {
     public partial class MainWindow
     {
-        ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
         internal static MainWindow Instance;
 
         public MainWindow()
@@ -46,9 +41,9 @@ namespace HandyWinget
             appBarIsInstalled.Visibility = visibility;
             appBarSeperator.Visibility = visibility;
         }
-        private void NavigationView_SelectionChanged(ModernWpf.Controls.NavigationView sender, ModernWpf.Controls.NavigationViewSelectionChangedEventArgs args)
+        private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            var selectedItem = (ModernWpf.Controls.NavigationViewItem)args.SelectedItem;
+            var selectedItem = (NavigationViewItem)args.SelectedItem;
             if (selectedItem != null)
             {
                 switch (selectedItem.Tag)
@@ -94,7 +89,7 @@ namespace HandyWinget
 
                 if (Settings.Accent !=null)
                 {
-                    picker.SelectedBrush = new SolidColorBrush(Helper.GetColorFromBrush(Settings.Accent));
+                    picker.SelectedBrush = new SolidColorBrush(ApplicationHelper.GetColorFromBrush(Settings.Accent));
                 }
 
                 picker.SelectedColorChanged += delegate
@@ -108,7 +103,7 @@ namespace HandyWinget
             }
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.P)
             {
@@ -165,9 +160,8 @@ namespace HandyWinget
 
         private void OpenFlyout(string resourceKey, FrameworkElement element)
         {
-            ISettings _setting = JsonSettings.Load<ISettings>();
             var cmdBarFlyout = (CommandBarFlyout)Resources[resourceKey];
-            var paneMode = _setting.PaneDisplayMode;
+            var paneMode = Settings.PaneDisplayMode;
             switch (paneMode)
             {
                 case NavigationViewPaneDisplayMode.Auto:

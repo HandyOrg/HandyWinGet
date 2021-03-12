@@ -1,43 +1,33 @@
-﻿using HandyControl.Controls;
-using HandyControl.Themes;
+﻿using HandyControl.Themes;
+using HandyControl.Tools;
 using HandyWinget.Assets;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
-using nucs.JsonSettings;
-using nucs.JsonSettings.Autosave;
 using System.IO;
-using System.Runtime;
 using System.Windows;
 using System.Windows.Media;
-
+using static HandyWinget.Assets.Helper;
 namespace HandyWinget
 {
     public partial class App : Application
     {
-        ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
-
         public App()
         {
-            if (!Directory.Exists(Consts.CachePath))
-            {
-                Directory.CreateDirectory(Consts.CachePath);
-            }
-
-            ProfileOptimization.SetProfileRoot(Consts.CachePath);
-            ProfileOptimization.StartProfile("Profile");
+            ApplicationHelper.StartProfileOptimization();
         }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            if (!Settings.Version.Equals(RegistryHelper.GetKey<int>(Consts.VersionKey, Consts.AppName, HKEYType.CurrentUser)))
+            if (!Settings.Version.Equals(RegistryHelper.GetValue<int>(Consts.VersionKey, Consts.AppName)))
             {
                 if (File.Exists(Consts.ConfigPath))
                 {
                     File.Delete(Consts.ConfigPath);
                 }
-                RegistryHelper.AddOrUpdateKey(Consts.VersionKey, Consts.AppName, Settings.Version, HKEYType.CurrentUser);
+                RegistryHelper.AddOrUpdateKey(Consts.VersionKey, Consts.AppName, Settings.Version);
             }
 
             UpdateTheme(Settings.Theme);
@@ -59,7 +49,7 @@ namespace HandyWinget
             if (ThemeManager.Current.AccentColor != accent)
             {
                 ThemeManager.Current.AccentColor = accent;
-                ModernWpf.ThemeManager.Current.AccentColor = accent == null ? null : (Color?)Helper.GetColorFromBrush(accent);
+                ModernWpf.ThemeManager.Current.AccentColor = accent == null ? null : ApplicationHelper.GetColorFromBrush(accent);
             }
         }
     }

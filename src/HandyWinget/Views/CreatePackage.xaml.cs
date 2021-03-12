@@ -163,7 +163,7 @@ namespace HandyWinget.Views
                     var downloader = new DownloadService();
                     downloader.DownloadProgressChanged += OnDownloadProgressChanged;
                     downloader.DownloadFileCompleted += OnDownloadFileCompleted;
-                    await downloader.DownloadFileAsync(txtUrl.Text, new DirectoryInfo(Consts.TempSetupPath));
+                    await downloader.DownloadFileTaskAsync(txtUrl.Text, new DirectoryInfo(Consts.TempSetupPath));
                 }
                 catch (Exception ex)
                 {
