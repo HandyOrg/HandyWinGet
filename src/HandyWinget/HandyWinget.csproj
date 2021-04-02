@@ -26,14 +26,14 @@
     <None Remove="Resources\icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HandyControls" Version="3.2.0" />
-    <PackageReference Include="Downloader" Version="2.2.3" />
+    <PackageReference Include="HandyControls" Version="3.3.3" />
+    <PackageReference Include="Downloader" Version="2.2.8" />
     <PackageReference Include="ModernWpfUis" Version="1.2.0" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.1.0" />
-	<PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.1.0" />
-	<PackageReference Include="nucs.JsonSettings" Version="1.0.7" />
-	<PackageReference Include="nucs.JsonSettings.Autosave" Version="1.0.0" />
-	<PackageReference Include="YamlDotNet" Version="9.1.4" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.2.0" />
+	<PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.2.0" />
+	<PackageReference Include="nucs.JsonSettings" Version="2.0.0-alpha2" />
+	<PackageReference Include="nucs.JsonSettings.Autosave" Version="2.0.0-alpha2" />
+	<PackageReference Include="YamlDotNet" Version="11.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\icon.ico" />

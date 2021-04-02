@@ -318,6 +318,11 @@ namespace HandyWinget.Views
 
         private async Task<bool> IsPackageInstalledWingetcliMode(string packageName)
         {
+            if (packageName.IsNullOrEmpty())
+            {
+                return false;
+            }
+
             if (string.IsNullOrEmpty(_wingetData))
             {
                 var p = new Process
@@ -352,22 +357,22 @@ namespace HandyWinget.Views
             if (MainWindow.Instance.appBarIsInstalled.IsChecked.Value)
             {
                 DataList.ShapeView().Where(x =>
-                        (x.IsInstalled && x.Name.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
-                        (x.IsInstalled && x.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) !=-1)).Apply();
+                        (x.IsInstalled && x.Name != null && x.Name.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
+                        (x.IsInstalled && x.Publisher != null && x.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) !=-1)).Apply();
             }
             else
             {
                 DataList.ShapeView().Where(p =>
-                         (p.Name.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
-                         (p.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1)).Apply();
+                         (p.Name != null && p.Name.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
+                         (p.Publisher != null && p.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1)).Apply();
             }
 
             var suggestions = new List<string>();
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 var matchingItems = DataList.Where(p =>
-                          (p.Name.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
-                          (p.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1));
+                          (p.Name != null && p.Name.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
+                          (p.Publisher != null && p.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1));
                 foreach (var item in matchingItems)
                 {
                     suggestions.Add(item.Name);

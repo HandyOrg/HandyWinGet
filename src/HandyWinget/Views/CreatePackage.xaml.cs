@@ -197,7 +197,7 @@ namespace HandyWinget.Views
             DispatcherHelper.RunOnMainThread(() => {
                 string fileName = ((DownloadPackage)e.UserState).FileName;
                 prgStatus.Value = 0;
-                txtHash.Text = CryptographyHelper.GenerateSHA256ForFile(fileName);
+                txtHash.Text = CryptographyHelper.GenerateSHA256FromFile(fileName);
                 btnGetHashWeb.IsEnabled = true;
                 btnGetHashLocal.IsEnabled = true;
                 txtHash.IsEnabled = true;
@@ -220,7 +220,7 @@ namespace HandyWinget.Views
             dialog.Filter = "All Files (*.*)|*.*";
             if (dialog.ShowDialog() == true)
             {
-                txtHash.Text = CryptographyHelper.GenerateSHA256ForFile(dialog.FileName);
+                txtHash.Text = CryptographyHelper.GenerateSHA256FromFile(dialog.FileName);
             }
         }
 

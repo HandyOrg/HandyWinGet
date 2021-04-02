@@ -2,8 +2,8 @@
 using HandyControl.Tools;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
-using nucs.JsonSettings;
-using nucs.JsonSettings.Autosave;
+using Nucs.JsonSettings;
+using Nucs.JsonSettings.Autosave;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

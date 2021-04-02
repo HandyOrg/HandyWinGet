@@ -1,7 +1,7 @@
 ﻿using HandyControl.Themes;
 using HandyWinget.Assets;
 using ModernWpf.Controls;
-using nucs.JsonSettings;
+using Nucs.JsonSettings;
 using System;
 using System.Windows.Controls;
 using System.Windows.Media;

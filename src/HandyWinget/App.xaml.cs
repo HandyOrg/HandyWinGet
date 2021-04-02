@@ -49,7 +49,7 @@ namespace HandyWinget
             if (ThemeManager.Current.AccentColor != accent)
             {
                 ThemeManager.Current.AccentColor = accent;
-                ModernWpf.ThemeManager.Current.AccentColor = accent == null ? null : ApplicationHelper.GetColorFromBrush(accent);
+                ModernWpf.ThemeManager.Current.AccentColor = accent == null ? null : ColorHelper.GetColorFromBrush(accent);
             }
         }
     }

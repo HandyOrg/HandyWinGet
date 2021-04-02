@@ -119,7 +119,7 @@ namespace HandyWinget.Views
             try
             {
                 btnCheck.IsEnabled = false;
-                var ver = await UpdateHelper.Instance.CheckUpdateAsync("HandyOrg", "HandyWinGet");
+                var ver = await UpdateHelper.CheckUpdateAsync("HandyOrg", "HandyWinGet");
 
                 if (ver.IsExistNewVersion)
                 {
@@ -129,8 +129,7 @@ namespace HandyWinget.Views
                         {
                             return true;
                         }
-
-                        Helper.StartProcess(ver.Asset[0].browser_download_url);
+                        StartProcess(ver.Assets[0].Url);
                         return true;
                     });
                 }
