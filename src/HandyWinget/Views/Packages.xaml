@@ -86,9 +86,9 @@
                                 <TextBlock Text="Publisher" Style="{StaticResource TextBlockSubTitle}" />
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
-                        <DataGridTextColumn IsReadOnly="True" Binding="{Binding Name}" Width=".5*">
+                        <DataGridTextColumn IsReadOnly="True" Binding="{Binding PackageName}" Width=".5*">
                             <DataGridTextColumn.Header>
-                                <TextBlock Text="Name" Style="{StaticResource TextBlockSubTitle}" />
+                                <TextBlock Text="Package Name" Style="{StaticResource TextBlockSubTitle}" />
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                         <DataGridCheckBoxColumn Binding="{Binding IsInstalled}" IsReadOnly="True" Width=".3*">
@@ -96,7 +96,7 @@
                                 <TextBlock Text="Installed" Style="{StaticResource TextBlockSubTitle}" />
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
-                        <DataGridComboBoxColumn MinWidth="250" Width="*" SelectedItemBinding="{Binding Version, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGridComboBoxColumn MinWidth="250" Width="*" SelectedItemBinding="{Binding PackageVersion, UpdateSourceTrigger=PropertyChanged}">
                             <DataGridComboBoxColumn.Header>
                                 <TextBlock Text="Available Versions" Style="{StaticResource TextBlockSubTitle}" />
                             </DataGridComboBoxColumn.Header>

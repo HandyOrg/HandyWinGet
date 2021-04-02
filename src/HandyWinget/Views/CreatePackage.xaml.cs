@@ -66,45 +66,26 @@ namespace HandyWinget.Views
                                                && !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
 
-                    var tags = string.Join(",", tagContainer.Items.Cast<Tag>().Select(p => p.Content));
-
-
-                    var ext = System.IO.Path.GetExtension(txtUrl.Text)?.Replace(".", "").Trim();
-                    if (ext != null && ext.ToLower().Equals("msixbundle"))
-                    {
-                        ext = "Msix";
-                    }
-
                     var builder = new YamlPackageModel
                     {
-                        Id = txtId.Text,
-                        Version = txtVersion.Text,
-                        Name = txtAppName.Text,
+                        PackageIdentifier = txtId.Text,
+                        PackageVersion = txtVersion.Text,
+                        PackageName = txtAppName.Text,
                         Publisher = txtPublisher.Text,
                         License = txtLicense.Text,
                         LicenseUrl = txtLicenseUrl.Text,
-                        AppMoniker = txtMoniker.Text,
-                        Tags = tags,
-                        Description = txtDescription.Text,
-                        Homepage = txtHomePage.Text,
+                        ShortDescription = txtDescription.Text,
+                        PackageUrl = txtHomePage.Text,
                         Installers = new List<Installer>
-                    {
-                        new()
                         {
-                            Arch = (cmbArchitecture.SelectedItem as ComboBoxItem).Content.ToString(),
-                            Url = txtUrl.Text,
-                            Sha256 = txtHash.Text
-                        }
-                    },
-                        InstallerType = ext,
-                        Switches = ext != null && ext.ToLower().Equals("exe")
-                            ? new Switches
+                            new()
                             {
-                                Silent = "/S",
-                                SilentWithProgress = "/S"
+                                Architecture = (cmbArchitecture.SelectedItem as ComboBoxItem).Content.ToString(),
+                                InstallerUrl = txtUrl.Text,
+                                InstallerSha256 = txtHash.Text
                             }
-                            : new Switches()
-                    };
+                            }
+                        };
 
                     var serializer = new SerializerBuilder().Build();
                     var yaml = serializer.Serialize(builder);
