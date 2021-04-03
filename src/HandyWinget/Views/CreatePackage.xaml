@@ -6,44 +6,53 @@
     <hc:ScrollViewer>
         <StackPanel>
             <TextBlock Margin="10" HorizontalAlignment="Left" Text="General" Style="{StaticResource TextBlockTitleBold}" />
-            <hc:TextBox Name="txtAppName" Margin="10,0,10,10" hc:InfoElement.Placeholder="Excel" hc:TitleElement.Title="Name" hc:InfoElement.Necessary="True" />
-            <hc:TextBox Name="txtPublisher" Margin="10,0,10,10" hc:InfoElement.Placeholder="Microsoft" hc:TitleElement.Title="Publisher" hc:InfoElement.Necessary="True" />
-            <hc:TextBox Name="txtId" Margin="10,0,10,10" hc:InfoElement.Placeholder="Publisher.Appname: Microsoft.Excel" hc:TitleElement.Title="Package Id" hc:InfoElement.Necessary="True" />
+            <hc:TextBox Name="txtAppName" Margin="10,0,10,10" hc:InfoElement.Placeholder="Excel" hc:TitleElement.Title="Package Name" hc:InfoElement.Necessary="True" />
+            <hc:TextBox Name="txtPublisher" TextChanged="txtPublisher_TextChanged" Margin="10,0,10,10" hc:InfoElement.Placeholder="Microsoft" hc:TitleElement.Title="Publisher" hc:InfoElement.Necessary="True" />
+            <hc:TextBox Name="txtId" Margin="10,0,10,10" hc:InfoElement.Placeholder="Publisher.PackageName: Microsoft.Excel" hc:TitleElement.Title="Package Identifier" hc:InfoElement.Necessary="True" />
             <hc:TextBox Name="txtVersion" Margin="10,0,10,10" hc:InfoElement.Placeholder="1.0 OR 1.0.0.0" hc:TitleElement.Title="Package Version" hc:InfoElement.Necessary="True" />
-            <hc:TextBox Name="txtMoniker" Margin="10,0,10,10" hc:InfoElement.Placeholder="msexcel" hc:TitleElement.Title="Alternate Name" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Button x:Name="btnAddTag" Click="btnAddTag_Click" Width="150" Margin="10,0,0,0" Content="Add Tag" Style="{StaticResource DefaultButtonStyle}"/>
-                <hc:TextBox Name="txtTags" Margin="10,0" Grid.Column="1" hc:InfoElement.Placeholder="Tag" />
-            </Grid>
-            <hc:TagContainer Name="tagContainer" Margin="10" Padding="10"/>
-            <hc:TextBox Name="txtDescription" VerticalContentAlignment="Top" Margin="10,0,10,10" Height="100" TextWrapping="Wrap" hc:TitleElement.Title="Description" />
+            <hc:TextBox Name="txtDescription" VerticalContentAlignment="Top" Margin="10,0,10,10" Height="100" TextWrapping="Wrap" hc:TitleElement.Title="Short Description" />
+            <Separator Margin="0,10"/>
 
             <TextBlock Margin="10" HorizontalAlignment="Left" Text="License" Style="{StaticResource TextBlockTitleBold}" />
 
-            <hc:TextBox Name="txtHomePage" Margin="10,0,10,10" TextType="Url" hc:InfoElement.Placeholder="https://github.com/microsoft/winget-pkgs" hc:TitleElement.Title="HomePage" />
+            <hc:TextBox Name="txtHomePage" Margin="10,0,10,10" TextType="Url" hc:InfoElement.Placeholder="https://github.com/microsoft/winget-pkgs" hc:TitleElement.Title="Package Url" />
             <hc:TextBox Name="txtLicense" Margin="10,0,10,10" hc:InfoElement.Placeholder="MIT" hc:TitleElement.Title="License" hc:InfoElement.Necessary="True" />
-            <hc:TextBox Name="txtLicenseUrl" Margin="10,0,10,10" TextType="Url" hc:InfoElement.Placeholder="https://github.com/microsoft/winget-pkgs/blob/master/LICENSE" hc:TitleElement.Title="License URL" />
+            <hc:TextBox Name="txtLicenseUrl" Margin="10,0,10,10" TextType="Url" hc:InfoElement.Placeholder="https://github.com/microsoft/winget-pkgs/blob/master/LICENSE" hc:TitleElement.Title="License Url" />
+            <Separator Margin="0,10"/>
 
             <TextBlock Margin="10" HorizontalAlignment="Left" Text="Url" Style="{StaticResource TextBlockTitleBold}" />
 
-            <hc:ComboBox Name="cmbArchitecture" Margin="10,0,10,10" hc:InfoElement.Placeholder="x86, x64, arm, arm64, Neutral" hc:TitleElement.Title="Architecture">
-                <ComboBoxItem Content="x86" />
-                <ComboBoxItem Content="x64" />
-                <ComboBoxItem Content="arm" />
-                <ComboBoxItem Content="arm64" />
-                <ComboBoxItem Content="Neutral" />
-            </hc:ComboBox>
-            <hc:TextBox Name="txtUrl" Margin="10,0,10,10" TextType="Url" hc:TitleElement.Title="Installer Url" hc:InfoElement.Necessary="True" />
-            <StackPanel Orientation="Horizontal">
-                <hc:TextBox Name="txtHash" Width="500" Margin="10,0" hc:TitleElement.Title="Hash" hc:InfoElement.Placeholder="1017c8ff310e4cb4fb843de26c93baa170fe5a4764065d9faa25a45a6d724514" />
-                <Button x:Name="btnGetHashWeb" Click="btnGetHashWeb_Click" Content="Get Hash From Link" Width="150" Margin="10,30,10,0" Style="{StaticResource DefaultButtonStyle}"/>
-                <Button x:Name="btnGetHashLocal" Click="btnGetHashLocal_Click" Content="Get Hash From Local" Width="150" Margin="0,30,10,0" Style="{StaticResource DefaultButtonStyle}"/>
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <ListBox x:Name="lstInstaller" DisplayMemberPath="Architecture" ItemsSource="{Binding Installers}" Margin="10,10,0,0"/>
+
+                <StackPanel Grid.Column="1">
+                    <hc:ComboBox Name="cmbArchitecture" hc:InfoElement.Necessary="True" SelectedIndex="1" Margin="10,0,10,10" hc:InfoElement.Placeholder="x86, x64, arm, arm64, Neutral" hc:TitleElement.Title="Architecture">
+                        <ComboBoxItem Content="x86" />
+                        <ComboBoxItem Content="x64" />
+                        <ComboBoxItem Content="arm" />
+                        <ComboBoxItem Content="arm64" />
+                        <ComboBoxItem Content="Neutral" />
+                    </hc:ComboBox>
+                    <hc:TextBox Name="txtUrl" Margin="10,0,10,10" TextType="Url" hc:TitleElement.Title="Installer Url" hc:InfoElement.Necessary="True" />
+                    <StackPanel Orientation="Horizontal">
+                        <hc:TextBox Name="txtHash" hc:InfoElement.Necessary="True" Width="300" Margin="10,0" hc:TitleElement.Title="Installer Sha256" hc:InfoElement.Placeholder="1017c8ff310e4cb4fb843de26c93baa170fe5a4764065d9faa25a45a6d724514" />
+                        <Button x:Name="btnGetHashWeb" Click="btnGetHashWeb_Click" Content="Get Hash From Installer Url" Width="200" Margin="10,30,10,0" Style="{StaticResource DefaultButtonStyle}"/>
+                        <Button x:Name="btnGetHashLocal" Click="btnGetHashLocal_Click" Content="Get Hash From Local Installer" Width="200" Margin="0,30,10,0" Style="{StaticResource DefaultButtonStyle}"/>
+                    </StackPanel>
+                    <Separator Margin="0,10"/>
+                    <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
+                        <Button x:Name="btnAddInstaller" Click="btnAddInstaller_Click" Content="Add Installer" Width="200" Style="{StaticResource DefaultButtonStyle}"/>
+                        <Button x:Name="btnRemoveInstaller" Click="btnRemoveInstaller_Click" Margin="10,0" Content="Remove Installer" Width="200" Style="{StaticResource DefaultButtonStyle}"/>
+
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
             <ui:ProgressBar Name="prgStatus" Margin="10"/>
+            <Separator Margin="0,10"/>
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="btnCreate" Click="btnCreate_Click" Margin="10,10,0,10" Width="150" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Right" Content="Create Package" />
                 <Button x:Name="btnValidate" IsEnabled="False" Click="btnValidate_Click" Margin="10" Width="150" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Right" Content="Validate Package" />

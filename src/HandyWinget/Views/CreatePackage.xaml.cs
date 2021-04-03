@@ -4,11 +4,12 @@ using HandyControl.Tools;
 using HandyWinget.Assets;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using YamlDotNet.Serialization;
@@ -18,12 +19,30 @@ namespace HandyWinget.Views
     /// <summary>
     /// Interaction logic for CreatePackage.xaml
     /// </summary>
-    public partial class CreatePackage : UserControl
+    public partial class CreatePackage : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private ObservableCollection<Installer> installers = new ObservableCollection<Installer>();
+
+        public ObservableCollection<Installer> Installers
+        {
+            get { return installers; }
+            set 
+            { 
+                installers = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public CreatePackage()
         {
             InitializeComponent();
-
+            DataContext = this;
             if (Helper.IsWingetInstalled())
             {
                 btnValidate.IsEnabled = true;
@@ -46,8 +65,6 @@ namespace HandyWinget.Views
             txtPublisher.Text = string.Empty;
             txtId.Text = string.Empty;
             txtVersion.Text = string.Empty;
-            txtMoniker.Text = string.Empty;
-            txtTags.Text = string.Empty;
             txtDescription.Text = string.Empty;
             txtHomePage.Text = string.Empty;
             txtLicense.Text = string.Empty;
@@ -55,7 +72,7 @@ namespace HandyWinget.Views
             txtUrl.Text = string.Empty;
             txtHash.Text = string.Empty;
             prgStatus.Value = 0;
-            tagContainer.Items.Clear();
+            Installers.Clear();
         }
 
         public void GenerateScript(GenerateScriptMode mode)
@@ -65,7 +82,6 @@ namespace HandyWinget.Views
                 if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text)
                                                && !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
-
                     var builder = new YamlPackageModel
                     {
                         PackageIdentifier = txtId.Text,
@@ -76,16 +92,11 @@ namespace HandyWinget.Views
                         LicenseUrl = txtLicenseUrl.Text,
                         ShortDescription = txtDescription.Text,
                         PackageUrl = txtHomePage.Text,
-                        Installers = new List<Installer>
-                        {
-                            new()
-                            {
-                                Architecture = (cmbArchitecture.SelectedItem as ComboBoxItem).Content.ToString(),
-                                InstallerUrl = txtUrl.Text,
-                                InstallerSha256 = txtHash.Text
-                            }
-                            }
-                        };
+                        ManifestType = "singleton",
+                        ManifestVersion = "1.0.0",
+                        PackageLocale = "en-US",
+                        Installers = Installers.ToList()
+                    };
 
                     var serializer = new SerializerBuilder().Build();
                     var yaml = serializer.Serialize(builder);
@@ -99,7 +110,7 @@ namespace HandyWinget.Views
                         case GenerateScriptMode.SaveToFile:
                             var dialog = new SaveFileDialog();
                             dialog.Title = "Save Package";
-                            dialog.FileName = $"{txtVersion.Text}.yaml";
+                            dialog.FileName = $"{txtId.Text}.yaml";
                             dialog.DefaultExt = "yaml";
                             dialog.Filter = "Yaml File (*.yaml)|*.yaml";
                             if (dialog.ShowDialog() == true)
@@ -120,22 +131,6 @@ namespace HandyWinget.Views
             {
                 Growl.ErrorGlobal(ex.Message);
             }
-        }
-
-        private void btnAddTag_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(txtTags.Text))
-            {
-                Growl.WarningGlobal("Please Enter Content");
-                return;
-            }
-
-            tagContainer.Items.Add(new Tag
-            {
-                Content = txtTags.Text,
-                ShowCloseButton = true
-            });
-            txtTags.Text = string.Empty;
         }
 
         private async void btnGetHashWeb_Click(object sender, RoutedEventArgs e)
@@ -214,6 +209,51 @@ namespace HandyWinget.Views
             {
                 string command = $"/K winget validate {dialog.FileName}";
                 Process.Start("cmd.exe", command);
+            }
+        }
+
+        private void txtPublisher_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            txtId.Text = $"{txtAppName.Text}.{txtPublisher.Text}";
+        }
+
+        private void btnAddInstaller_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(txtUrl.Text) || !string.IsNullOrEmpty(txtHash.Text))
+            {
+                var arch = (cmbArchitecture.SelectedItem as ComboBoxItem).Content.ToString();
+                var item = new Installer
+                {
+                    Architecture = arch,
+                    InstallerUrl = txtUrl.Text,
+                    InstallerSha256 = txtHash.Text
+                };
+
+                if (!Installers.Contains(item, new GenericCompare<Installer>(x => x.Architecture)))
+                {
+                    Installers.Add(item);
+                }
+                else
+                {
+                    Growl.ErrorGlobal($"{arch} Architecture already exist.");
+                }
+            }
+            else
+            {
+                Growl.ErrorGlobal("Installer Url and Installer Sha256 must be filled");
+            }
+        }
+
+        private void btnRemoveInstaller_Click(object sender, RoutedEventArgs e)
+        {
+            var item = lstInstaller.SelectedItem as Installer;
+            if (item != null)
+            {
+                Installers.Remove(item);
+            }
+            else
+            {
+                Growl.ErrorGlobal("Please Select Installer from list");
             }
         }
     }

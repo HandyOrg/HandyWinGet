@@ -13,6 +13,8 @@ namespace HandyWinget.Assets
         public string PackageUrl { get; set; }
         public string ShortDescription { get; set; }
         public string ManifestType { get; set; }
+        public string ManifestVersion { get; set; }
+        public string PackageLocale { get; set; }
         public List<Installer> Installers { get; set; }
     }
 
