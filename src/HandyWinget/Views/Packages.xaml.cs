@@ -27,7 +27,6 @@ namespace HandyWinget.Views
 {
     public partial class Packages : UserControl
     {
-
         internal static Packages Instance;
 
         private string _wingetData = string.Empty;
@@ -39,6 +38,7 @@ namespace HandyWinget.Views
         public DownloadService downloaderService;
 
         public Process _wingetProcess;
+
         public Packages()
         {
             InitializeComponent();
@@ -164,56 +164,50 @@ namespace HandyWinget.Views
                                         Publisher = result.Publisher,
                                         PackageName = result.PackageName,
                                         IsInstalled = isInstalled,
-                                        PackageVersion = result.PackageVersion,
                                         PackageIdentifier = result.PackageIdentifier,
-                                        Installers = result.Installers,
                                         Description = result.ShortDescription,
                                         LicenseUrl = result.LicenseUrl,
                                         Homepage = result.PackageUrl,
                                         InstalledVersion = installedVersion
                                     };
+                                    installer = result.Installers;
+                                    packageVersion = result.PackageVersion;
                                 }
                                 else
                                 {
-                                    continue;
+                                    var localPath = item.Value.Replace(".yaml", ".locale.en-US.yaml");
+                                    var installerPath = item.Value.Replace(".yaml", ".installer.yaml");
+
+                                    if (File.Exists(localPath))
+                                    {
+                                        var multiYamlResult = deserializer.Deserialize<YamlPackageModel>(File.OpenText(localPath));
+                                        packageIdentifier = multiYamlResult.PackageIdentifier;
+                                        packageVersion = multiYamlResult.PackageVersion;
+                                        publisher = multiYamlResult.Publisher;
+                                        packageName = multiYamlResult.PackageName;
+                                        licenseUrl = multiYamlResult.LicenseUrl;
+                                        license = multiYamlResult.License;
+                                        description = multiYamlResult.ShortDescription;
+                                    }
+
+                                    if (File.Exists(installerPath))
+                                    {
+                                        var multiYamlResult = deserializer.Deserialize<YamlPackageModel>(File.OpenText(installerPath));
+                                        installer = multiYamlResult.Installers;
+                                    }
+
+                                    package = new PackageModel
+                                    {
+                                        Publisher = publisher,
+                                        PackageName = packageName,
+                                        IsInstalled = isInstalled,
+                                        PackageIdentifier = packageIdentifier,
+                                        Description = description,
+                                        LicenseUrl = licenseUrl,
+                                        Homepage = homePage,
+                                        InstalledVersion = installedVersion
+                                    };
                                 }
-                                //else
-                                //{
-                                //    var localPath = item.Value.Replace(".yaml", ".locale.en-US.yaml");
-                                //    var installerPath = item.Value.Replace(".yaml", ".installer.yaml");
-
-                                //    if (File.Exists(localPath))
-                                //    {
-                                //        var multiYamlResult = deserializer.Deserialize<YamlPackageModel>(File.OpenText(localPath));
-                                //        packageIdentifier = multiYamlResult.PackageIdentifier;
-                                //        packageVersion = multiYamlResult.PackageVersion;
-                                //        publisher = multiYamlResult.Publisher;
-                                //        packageName = multiYamlResult.PackageName;
-                                //        licenseUrl = multiYamlResult.LicenseUrl;
-                                //        license = multiYamlResult.License;
-                                //        description = multiYamlResult.ShortDescription;
-                                //    }
-
-                                //    if (File.Exists(installerPath))
-                                //    {
-                                //        var multiYamlResult = deserializer.Deserialize<YamlPackageModel>(File.OpenText(installerPath));
-                                //        installer = multiYamlResult.Installers;
-                                //    }
-
-                                //    package = new PackageModel
-                                //    {
-                                //        Publisher = publisher,
-                                //        PackageName = packageName,
-                                //        IsInstalled = isInstalled,
-                                //        PackageVersion = packageVersion,
-                                //        PackageIdentifier = packageIdentifier,
-                                //        Installers = installer,
-                                //        Description = description,
-                                //        LicenseUrl = licenseUrl,
-                                //        Homepage = homePage,
-                                //        InstalledVersion = installedVersion
-                                //    };
-                                //}
 
                                 switch (Settings.IdentifyPackageMode)
                                 {
@@ -237,7 +231,7 @@ namespace HandyWinget.Views
                                     _temoList.Add(package);
                                 }
 
-                                _tempVersions.Add(new VersionModel { Id = package.PackageIdentifier, Version = package.PackageVersion});
+                                _tempVersions.Add(new VersionModel { Id = package.PackageIdentifier, Version = packageVersion, Installers = installer});
 
                             }
                         }
@@ -246,12 +240,11 @@ namespace HandyWinget.Views
                             continue;
                         }
                     }
-
                     foreach (var item in _temoList)
                     {
                         try
                         {
-                            var _versions = _tempVersions.Where(v => v.Id == item.PackageIdentifier).Select(v => v.Version).OrderByDescending(v => v).ToList();
+                            var _versionsAndArchitecture = _tempVersions.Where(v => v.Id == item.PackageIdentifier).OrderByDescending(v => v.Version).ToList();
 
                             DataList.Add(new PackageModel
                             {
@@ -263,9 +256,9 @@ namespace HandyWinget.Views
                                 LicenseUrl = item.LicenseUrl,
                                 PackageName = item.PackageName,
                                 Publisher = item.Publisher,
-                                Installers = item.Installers,
-                                Versions = _versions,
-                                PackageVersion = _versions[0]
+                                Versions = _versionsAndArchitecture,
+                                PackageVersion = _versionsAndArchitecture[0],
+                                PackageArchitecture = _versionsAndArchitecture[0].Installers[0]
                             });
                         }
                         catch (Exception)
@@ -273,7 +266,6 @@ namespace HandyWinget.Views
                             continue;
                         }
                     }
-
                 });
 
                 tgBlock.IsChecked = true;
@@ -468,8 +460,8 @@ namespace HandyWinget.Views
         private void ContextMenuActions(string tag)
         {
             var selectedRows = dataGrid.SelectedItems.Count;
-            var item = (PackageModel)dataGrid.SelectedItem;
-            string text = $"winget install {item?.PackageIdentifier} -v {item?.PackageVersion}";
+            var item = GetSelectedPackage();
+            string text = $"winget install {item.PackageIdentifier} -v {item.Version}";
 
             switch (tag)
             {
@@ -520,7 +512,7 @@ namespace HandyWinget.Views
 
             foreach (var item in dataGrid.SelectedItems)
             {
-                builder.Append($"winget install {((PackageModel)item).PackageIdentifier} -v {((PackageModel)item).PackageVersion} -e ; ");
+                builder.Append($"winget install {((PackageModel)item).PackageIdentifier} -v {((PackageModel)item).PackageVersion.Version} -e ; ");
             }
 
             builder.Remove(builder.ToString().LastIndexOf(";"), 1);
@@ -638,8 +630,8 @@ namespace HandyWinget.Views
 
         private void InstallWingetMode()
         {
-            var item = (PackageModel)dataGrid.SelectedItem;
-            if (item != null && item.PackageIdentifier != null)
+            var item = GetSelectedPackage();
+            if (item.PackageIdentifier != null)
             {
                 MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
 
@@ -665,7 +657,7 @@ namespace HandyWinget.Views
                 else
                 {
                     startInfo.FileName = @"winget";
-                    startInfo.Arguments = $"install {item.PackageIdentifier} -v {item.PackageVersion}";
+                    startInfo.Arguments = $"install {item.PackageIdentifier} -v {item.Version}";
                 }
 
                 _wingetProcess = new Process
@@ -745,13 +737,13 @@ namespace HandyWinget.Views
         {
             try
             {
-                var item = (PackageModel)dataGrid.SelectedItem;
+                var item = GetSelectedPackage();
 
-                if (item != null && item.PackageIdentifier != null)
+                if (item.PackageIdentifier != null)
                 {
                     MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
 
-                    var url = RemoveComment(item.Installers[0].InstallerUrl);
+                    var url = RemoveComment(item.InstallerUrl);
 
                     if (Settings.IsIDMEnabled)
                     {
@@ -762,7 +754,7 @@ namespace HandyWinget.Views
                         txtStatus.Text = $"Preparing to download {item.PackageIdentifier}";
                         tgBlock.IsChecked = false;
                         prgStatus.IsIndeterminate = false;
-                        _TempSetupPath = $@"{Consts.TempSetupPath}\{item.PackageIdentifier}-{item.PackageVersion}{GetExtension(url)}".Trim();
+                        _TempSetupPath = $@"{Consts.TempSetupPath}\{item.PackageIdentifier}-{item.Version}{GetExtension(url)}".Trim();
                         if (!File.Exists(_TempSetupPath))
                         {
                             downloaderService = new DownloadService();
@@ -786,19 +778,48 @@ namespace HandyWinget.Views
 
         private void DownloaderService_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            StartProcess(_TempSetupPath);
             DispatcherHelper.RunOnMainThread(() => {
                 MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
+                tgBlock.IsChecked = true;
             });
+            StartProcess(_TempSetupPath);
         }
 
         private void DownloaderService_DownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
         {
             DispatcherHelper.RunOnMainThread(() => {
                 prgStatus.Value = (int)e.ProgressPercentage;
-                var item = (PackageModel)dataGrid.SelectedItem;
-                txtStatus.Text = $"Downloading {item.PackageIdentifier}-{item.PackageVersion} - {ConvertBytesToMegabytes(e.ReceivedBytesSize)} MB of {Helper.ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {(int)e.ProgressPercentage}%";
+                var item = GetSelectedPackage();
+                txtStatus.Text = $"Downloading {item.PackageIdentifier}-{item.Version} - {ConvertBytesToMegabytes(e.ReceivedBytesSize)} MB of {ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {(int)e.ProgressPercentage}%";
             });
+        }
+
+        public (string PackageIdentifier, string Version, string Architecture, string InstallerUrl, string PackageName, bool IsInstalled) GetSelectedPackage()
+        {
+            var pkg = dataGrid.SelectedItem as PackageModel;
+            string id = string.Empty;
+            string version = string.Empty;
+            string arch = string.Empty;
+            string url = string.Empty;
+            string pName = string.Empty;
+            bool isInstalled = false;
+
+            if (pkg != null && pkg.PackageIdentifier != null)
+            {
+                id = pkg.PackageVersion.Id;
+                version = pkg.PackageVersion.Version;
+                arch = pkg.PackageArchitecture.Architecture;
+                url = pkg.PackageArchitecture.InstallerUrl;
+                pName = pkg.PackageName;
+                isInstalled = pkg.IsInstalled;
+                
+            }
+            return (id, version, arch, url, pName, isInstalled);
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 }

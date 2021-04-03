@@ -12,7 +12,7 @@
         ui:TitleBar.ExtendViewIntoTitleBar="True"
         KeyDown="Window_KeyDown"
         Height="600" 
-        Width="1100">
+        Width="1200">
     <Window.Resources>
         <ui:CommandBarFlyout x:Key="ThemeCommandBar" ShowMode="Standard">
             <ui:CommandBarFlyout.SecondaryCommands>

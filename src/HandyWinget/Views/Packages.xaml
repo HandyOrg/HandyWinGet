@@ -96,23 +96,19 @@
                                 <TextBlock Text="Installed" Style="{StaticResource TextBlockSubTitle}" />
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
-                        <DataGridComboBoxColumn MinWidth="250" Width="*" SelectedItemBinding="{Binding PackageVersion, UpdateSourceTrigger=PropertyChanged}">
-                            <DataGridComboBoxColumn.Header>
-                                <TextBlock Text="Available Versions" Style="{StaticResource TextBlockSubTitle}" />
-                            </DataGridComboBoxColumn.Header>
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=Versions}" />
-                                    <Setter Property="MinWidth" Value="200"/>
-                                </Style>
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                            <DataGridComboBoxColumn.ElementStyle>
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="ItemsSource" Value="{Binding Path=Versions}" />
-                                    <Setter Property="MinWidth" Value="200"/>
-                                </Style>
-                            </DataGridComboBoxColumn.ElementStyle>
-                        </DataGridComboBoxColumn>
+                        <DataGridTemplateColumn MinWidth="250" Width="*">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="Available Versions and Architecture" Style="{StaticResource TextBlockSubTitle}" />
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ComboBox Name="cmbVersion" ItemsSource="{Binding Versions}" SelectedItem="{Binding PackageVersion, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Version" MinWidth="200"/>
+                                        <ComboBox Name="cmbArch" IsSynchronizedWithCurrentItem="True" Margin="10,0" DataContext="{Binding ElementName=cmbVersion, Path=SelectedItem}" ItemsSource="{Binding Installers}" SelectedItem="{Binding ElementName=cmbVersion, Path=DataContext.PackageArchitecture, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Architecture" MinWidth="200"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                     <DataGrid.GroupStyle>
                         <GroupStyle>
