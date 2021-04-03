@@ -325,36 +325,32 @@ namespace HandyWinget.Views
                 var zipFile = new FileInfo(FileName);
                 var pkgDir = new DirectoryInfo(Consts.ManifestPath);
                 var moveDir = new DirectoryInfo(Consts.RootPath + @"\winget-pkgs-master\manifests");
+                await Task.Delay(3000);
+
                try
                {
-                   DeleteFolders(moveDir, pkgDir, rootDir, zipFile);
+                   if (moveDir.Exists)
+                   {
+                       if (pkgDir.Exists)
+                       {
+                           pkgDir.Delete(true);
+                       }
+
+                       moveDir.MoveTo(pkgDir.FullName);
+                       rootDir.Delete(true);
+
+                       if (zipFile.Exists)
+                       {
+                           zipFile.Delete();
+                       }
+                   }
                }
                catch (IOException)
                {
-                   await Task.Delay(1000);
-                   DeleteFolders(moveDir, pkgDir, rootDir, zipFile);
+                   Growl.ErrorGlobal("Something is wrong, please try again.");
                }
             });
             LoadLocalManifests();
-        }
-
-        private void DeleteFolders(DirectoryInfo moveDir, DirectoryInfo pkgDir, DirectoryInfo rootDir, FileInfo zipFile)
-        {
-            if (moveDir.Exists)
-            {
-                if (pkgDir.Exists)
-                {
-                    pkgDir.Delete(true);
-                }
-
-                moveDir.MoveTo(pkgDir.FullName);
-                rootDir.Delete(true);
-
-                if (zipFile.Exists)
-                {
-                    zipFile.Delete();
-                }
-            }
         }
 
         private async void tgCancelDownload_Checked(object sender, RoutedEventArgs e)

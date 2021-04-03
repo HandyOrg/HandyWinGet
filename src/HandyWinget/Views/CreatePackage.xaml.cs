@@ -2,6 +2,7 @@
 using HandyControl.Controls;
 using HandyControl.Tools;
 using HandyWinget.Assets;
+using HandyWinget.Assets.Models.Export;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
@@ -51,12 +52,26 @@ namespace HandyWinget.Views
 
         private void btnCreate_Click(object sender, RoutedEventArgs e)
         {
-            GenerateScript(GenerateScriptMode.SaveToFile);
+            if (Installers.Count > 1)
+            {
+                GenerateScript();
+            }
+            else
+            {
+                GenerateScript(GenerateScriptMode.SaveToFile);
+            }
         }
 
         private void btnCopy_Click(object sender, RoutedEventArgs e)
         {
-            GenerateScript(GenerateScriptMode.CopyToClipboard);
+            if (Installers.Count > 1)
+            {
+                Growl.ErrorGlobal("You have Multiple installer We do not support this scenario yet.");
+            }
+            else
+            {
+                GenerateScript(GenerateScriptMode.CopyToClipboard);
+            }
         }
 
         public void ClearInputs()
@@ -74,7 +89,67 @@ namespace HandyWinget.Views
             prgStatus.Value = 0;
             Installers.Clear();
         }
+        public void GenerateScript()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text)
+                                               && !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
+                {
+                    var versionBuilder = new ExportVersionModel
+                    {
+                        PackageIdentifier = txtId.Text,
+                        PackageVersion = txtVersion.Text,
+                        PackageName = txtAppName.Text,
+                        Publisher = txtPublisher.Text,
+                        License = txtLicense.Text,
+                        LicenseUrl = txtLicenseUrl.Text,
+                        ShortDescription = txtDescription.Text,
+                        PackageUrl = txtHomePage.Text,
+                        ManifestType = "version",
+                        ManifestVersion = "1.0.0",
+                        DefaultLocale = "en-US"
+                    };
 
+                    var installerBuilder = new ExportInstallerModel
+                    {
+                        PackageIdentifier = txtId.Text,
+                        PackageVersion = txtVersion.Text,
+                        ManifestType = "installer",
+                        ManifestVersion = "1.0.0",
+                        Installers = Installers.ToList()
+                    };
+
+                    var versionSerializer = new SerializerBuilder().Build();
+                    var installerSerializer = new SerializerBuilder().Build();
+                    var versionYaml = versionSerializer.Serialize(versionBuilder);
+                    var installerYaml = installerSerializer.Serialize(installerBuilder);
+
+                    var dialog = new SaveFileDialog();
+                    dialog.Title = "Save Package";
+                    dialog.FileName = $"{txtId.Text}.yaml";
+                    dialog.DefaultExt = "yaml";
+                    dialog.Filter = "Yaml File (*.yaml)|*.yaml";
+                    if (dialog.ShowDialog() == true)
+                    {
+                        var path = Path.GetDirectoryName(dialog.FileName) + @"\" + txtVersion.Text;
+
+                        Directory.CreateDirectory(path);
+                        File.WriteAllText(path + @"\" + txtId.Text + ".yaml", versionYaml);
+                        File.WriteAllText(path + @"\" + txtId.Text + ".installer.yaml", installerYaml);
+                        ClearInputs();
+                    }
+                }
+                else
+                {
+                    Growl.ErrorGlobal("Required fields must be filled");
+                }
+            }
+            catch (Exception ex)
+            {
+                Growl.ErrorGlobal(ex.Message);
+            }
+        }
         public void GenerateScript(GenerateScriptMode mode)
         {
             try
