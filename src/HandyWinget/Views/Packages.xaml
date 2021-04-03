@@ -139,6 +139,11 @@
                                     <ui:PathIcon Data="{DynamicResource ConsoleGeometry}"/>
                                 </MenuItem.Icon>
                             </MenuItem>
+                            <MenuItem Name="mnuExport" Click="ContextMenu_Click" InputGestureText="Ctrl+Shift+X" Header="Export Powershell Script" Tag="Export" >
+                                <MenuItem.Icon>
+                                    <ui:PathIcon Data="{DynamicResource PowerShellGeometry}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                             <Separator/>
                             <MenuItem Name="mnuCmd" Click="ContextMenu_Click" InputGestureText="Ctrl+Shift+C" Header="Copy Install Command" Tag="Copy" >
                                 <MenuItem.Icon>

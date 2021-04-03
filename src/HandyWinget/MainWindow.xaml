@@ -73,11 +73,6 @@
                     <ui:PathIcon Data="{DynamicResource InstalledGeometry}"/>
                 </ui:AppBarToggleButton.Icon>
             </ui:AppBarToggleButton>
-            <ui:AppBarButton Name="appBarExport" Click="appBarExport_Click" Label="Export Powershell Script">
-                <ui:AppBarButton.Icon>
-                    <ui:PathIcon Data="{DynamicResource PowerShellGeometry}"/>
-                </ui:AppBarButton.Icon>
-            </ui:AppBarButton>
             <ui:CommandBar.Content>
                 <TextBlock x:Name="txtStatus" Margin="10"/>
             </ui:CommandBar.Content>

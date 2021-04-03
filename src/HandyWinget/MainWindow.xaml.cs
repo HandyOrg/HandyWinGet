@@ -37,7 +37,6 @@ namespace HandyWinget
         {
             appBarInstall.Visibility = visibility;
             appBarRefresh.Visibility = visibility;
-            appBarExport.Visibility = visibility;
             appBarIsInstalled.Visibility = visibility;
             appBarSeperator.Visibility = visibility;
         }
@@ -141,11 +140,6 @@ namespace HandyWinget
         private void appBarRefresh_Click(object sender, RoutedEventArgs e)
         {
             Packages.Instance.DownloadManifests(true);
-        }
-
-        private void appBarExport_Click(object sender, RoutedEventArgs e)
-        {
-            Packages.Instance.ExportPowerShellScript();
         }
 
         private void appBarInstall_Click(object sender, RoutedEventArgs e)
