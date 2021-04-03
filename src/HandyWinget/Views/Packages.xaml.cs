@@ -15,6 +15,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,12 +45,28 @@ namespace HandyWinget.Views
             InitializeComponent();
             Instance = this;
             DataContext = this;
+            Loaded += Packages_Loaded;
             BindingOperations.EnableCollectionSynchronization(DataList, Lock);
             BindingOperations.EnableCollectionSynchronization(_temoList, Lock);
             BindingOperations.EnableCollectionSynchronization(_tempVersions, Lock);
+        }
+
+        private async void Packages_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!Settings.Version.Equals(RegistryHelper.GetValue<int>(Consts.VersionKey, Consts.AppName)))
+            {
+                if (Directory.Exists(Consts.ManifestPath))
+                {
+                    txtStatus.Text = "Please wait...";
+                    Directory.Delete(Consts.ManifestPath, true);
+                    await Task.Delay(10000);
+                }
+                RegistryHelper.AddOrUpdateKey(Consts.VersionKey, Consts.AppName, Settings.Version);
+            }
             DownloadManifests();
             SetDataListGrouping();
         }
+
         private void SetDataListGrouping()
         {
             dataGrid.RowDetailsVisibilityMode = Settings.ShowExtraDetails;

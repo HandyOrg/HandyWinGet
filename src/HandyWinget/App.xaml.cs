@@ -27,7 +27,6 @@ namespace HandyWinget
                 {
                     File.Delete(Consts.ConfigPath);
                 }
-                RegistryHelper.AddOrUpdateKey(Consts.VersionKey, Consts.AppName, Settings.Version);
             }
 
             UpdateTheme(Settings.Theme);

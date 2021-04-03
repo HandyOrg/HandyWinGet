@@ -31,7 +31,7 @@ namespace HandyWinget
 
         public ISettings()
         {
-            Version = 13991209;
+            Version = 14000115;
         }
 
         public ISettings(string fileName) : base(fileName)
