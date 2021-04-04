@@ -7,7 +7,7 @@ namespace HandyWinget.Assets
     {
         public static readonly string AppName = "HandyWinGet";
         public static readonly string VersionKey = "VersionCode";
-        private static readonly string ManifestFolderName = "manifests";
+        private static readonly string ManifestFolderName = "manifestsV1";
         private static readonly string TempFolderName = "Temp";
 
         public static readonly string RootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppName);

@@ -15,7 +15,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,24 +44,9 @@ namespace HandyWinget.Views
             InitializeComponent();
             Instance = this;
             DataContext = this;
-            Loaded += Packages_Loaded;
             BindingOperations.EnableCollectionSynchronization(DataList, Lock);
             BindingOperations.EnableCollectionSynchronization(_temoList, Lock);
             BindingOperations.EnableCollectionSynchronization(_tempVersions, Lock);
-        }
-
-        private async void Packages_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!Settings.Version.Equals(RegistryHelper.GetValue<int>(Consts.VersionKey, Consts.AppName)))
-            {
-                if (Directory.Exists(Consts.ManifestPath))
-                {
-                    txtStatus.Text = "Please wait...";
-                    Directory.Delete(Consts.ManifestPath, true);
-                    await Task.Delay(10000);
-                }
-                RegistryHelper.AddOrUpdateKey(Consts.VersionKey, Consts.AppName, Settings.Version);
-            }
             DownloadManifests();
             SetDataListGrouping();
         }
@@ -174,6 +158,23 @@ namespace HandyWinget.Views
 
                             if (result != null)
                             {
+                                switch (Settings.IdentifyPackageMode)
+                                {
+                                    case IdentifyPackageMode.Off:
+                                        isInstalled = false;
+                                        installedVersion = string.Empty;
+                                        break;
+                                    case IdentifyPackageMode.Internal:
+                                        var installedStatus = _installedApps.Where(x => x.DisplayName != null && result.PackageName != null && x.DisplayName.Contains(result.PackageName)).Select(x => x.Version);
+                                        isInstalled = installedStatus.Any();
+                                        installedVersion = isInstalled ? $"Installed Version: {installedStatus.FirstOrDefault()}" : string.Empty;
+                                        break;
+                                    case IdentifyPackageMode.Wingetcli:
+                                        isInstalled = await IsPackageInstalledWingetcliMode(result.PackageName);
+                                        installedVersion = string.Empty;
+                                        break;
+                                }
+
                                 if (result.ManifestType.Contains("singleton"))
                                 {
                                     package = new PackageModel
@@ -226,30 +227,12 @@ namespace HandyWinget.Views
                                     };
                                 }
 
-                                switch (Settings.IdentifyPackageMode)
-                                {
-                                    case IdentifyPackageMode.Off:
-                                        isInstalled = false;
-                                        installedVersion = string.Empty;
-                                        break;
-                                    case IdentifyPackageMode.Internal:
-                                        var data = _installedApps.Where(x => x.DisplayName.Contains(result.PackageName)).Select(x => x.Version);
-                                        isInstalled = data.Any();
-                                        installedVersion = isInstalled ? $"Installed Version: {data.FirstOrDefault()}" : string.Empty;
-                                        break;
-                                    case IdentifyPackageMode.Wingetcli:
-                                        isInstalled = await IsPackageInstalledWingetcliMode(result.PackageName);
-                                        installedVersion = string.Empty;
-                                        break;
-                                }
-
                                 if (!_temoList.Contains(package, new GenericCompare<PackageModel>(x => x.PackageName)))
                                 {
                                     _temoList.Add(package);
                                 }
 
-                                _tempVersions.Add(new VersionModel { Id = package.PackageIdentifier, Version = packageVersion, Installers = installer});
-
+                                _tempVersions.Add(new VersionModel { Id = package.PackageIdentifier, Version = packageVersion, Installers = installer });
                             }
                         }
                         catch (Exception)
@@ -283,8 +266,9 @@ namespace HandyWinget.Views
                             continue;
                         }
                     }
-                });
 
+                });
+                
                 tgBlock.IsChecked = true;
                 DataList.ShapeView().OrderBy(x => x.Publisher).ThenBy(x => x.PackageName).Apply();
                 MainWindow.Instance.txtStatus.Text = $"Available Packages: {DataList.Count} | Updated: {Settings.UpdatedDate}";

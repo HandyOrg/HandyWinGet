@@ -27,7 +27,7 @@
                     <ColumnDefinition/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <ListBox x:Name="lstInstaller" DisplayMemberPath="Architecture" ItemsSource="{Binding Installers}" Margin="10,10,0,0"/>
+                <ListBox x:Name="lstInstaller" hc:Empty.ShowEmpty="True" DisplayMemberPath="Architecture" ItemsSource="{Binding Installers}" Margin="10,10,0,0"/>
 
                 <StackPanel Grid.Column="1">
                     <hc:ComboBox Name="cmbArchitecture" hc:InfoElement.Necessary="True" SelectedIndex="1" Margin="10,0,10,10" hc:InfoElement.Placeholder="x86, x64, arm, arm64, Neutral" hc:TitleElement.Title="Architecture">
