@@ -33,10 +33,10 @@ namespace HandyWinget.Views
             switch (Settings.InstallMode)
             {
                 case InstallMode.Wingetcli:
-                    tgIDM.Visibility = System.Windows.Visibility.Collapsed;
+                    tgIDM.Visibility = Visibility.Collapsed;
                     break;
                 case InstallMode.Internal:
-                    tgIDM.Visibility = System.Windows.Visibility.Visible;
+                    tgIDM.Visibility = Visibility.Visible;
                     break;
             }
 

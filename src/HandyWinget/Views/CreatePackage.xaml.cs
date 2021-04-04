@@ -22,21 +22,23 @@ namespace HandyWinget.Views
     /// </summary>
     public partial class CreatePackage : UserControl, INotifyPropertyChanged
     {
+        #region INotify
         public event PropertyChangedEventHandler PropertyChanged;
         private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private ObservableCollection<Installer> installers = new ObservableCollection<Installer>();
+        #endregion
 
+        private ObservableCollection<Installer> installers = new ObservableCollection<Installer>();
         public ObservableCollection<Installer> Installers
         {
             get { return installers; }
             set 
             { 
                 installers = value;
-                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(installers));
             }
         }
 
@@ -44,6 +46,7 @@ namespace HandyWinget.Views
         {
             InitializeComponent();
             DataContext = this;
+            
             if (Helper.IsWingetInstalled())
             {
                 btnValidate.IsEnabled = true;
@@ -89,12 +92,14 @@ namespace HandyWinget.Views
             prgStatus.Value = 0;
             Installers.Clear();
         }
+
         public void GenerateScript()
         {
             try
             {
-                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text)
-                                               && !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
+                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) &&
+                    !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text) && 
+                    !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
                     var versionBuilder = new ExportVersionModel
                     {
@@ -154,8 +159,9 @@ namespace HandyWinget.Views
         {
             try
             {
-                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text)
-                                               && !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
+                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && 
+                    !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text) && 
+                    !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
                     var builder = new YamlPackageModel
                     {

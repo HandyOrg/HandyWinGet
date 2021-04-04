@@ -3,7 +3,7 @@ using System.IO;
 
 namespace HandyWinget.Assets
 {
-    public abstract class Consts
+    public static class Consts
     {
         public static readonly string AppName = "HandyWinGet";
         public static readonly string VersionKey = "VersionCode";

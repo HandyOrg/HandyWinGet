@@ -32,9 +32,16 @@ namespace HandyWinget.Views
         private string _wingetData = string.Empty;
         private static readonly object Lock = new();
         private string _TempSetupPath = string.Empty;
+
+        //Final List that contain Packages
         public ObservableCollection<PackageModel> DataList { get; set; } = new ObservableCollection<PackageModel>();
+
+        // temp list for storing packages
         List<PackageModel> _temoList = new List<PackageModel>();
+
+        // temp list for storing package multiple versions
         List<VersionModel> _tempVersions = new List<VersionModel>();
+
         public DownloadService downloaderService;
 
         public Process _wingetProcess;
@@ -44,72 +51,22 @@ namespace HandyWinget.Views
             InitializeComponent();
             Instance = this;
             DataContext = this;
+
+            //Task protection
             BindingOperations.EnableCollectionSynchronization(DataList, Lock);
             BindingOperations.EnableCollectionSynchronization(_temoList, Lock);
             BindingOperations.EnableCollectionSynchronization(_tempVersions, Lock);
+
             DownloadManifests();
             SetDataListGrouping();
         }
 
-        private void SetDataListGrouping()
-        {
-            dataGrid.RowDetailsVisibilityMode = Settings.ShowExtraDetails;
+        #region Parse Manifests
 
-            // Set Group for DataGrid
-            if (Settings.GroupByPublisher)
-            {
-                DataList.ShapeView().GroupBy(x => x.Publisher).Apply();
-            }
-            else
-            {
-                DataList.ShapeView().ClearGrouping().Apply();
-            }
-        }
-
-        public async void DownloadManifests(bool IsRefresh = false)
-        {
-            DataList?.Clear();
-            _temoList?.Clear();
-            _tempVersions?.Clear();
-            prgStatus.Value = 0;
-            tgBlock.IsChecked = false;
-            prgStatus.IsIndeterminate = true;
-            tgCancelDownload.Visibility = Visibility.Collapsed;
-
-            MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
-            bool _isConnected = ApplicationHelper.IsConnectedToInternet();
-            if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true))
-            {
-                if (IsRefresh)
-                {
-                    txtStatus.Text = "Refreshing Packages...";
-                }
-                var manifestUrl = Consts.WingetPkgsRepository;
-
-                WebClient client = new WebClient();
-
-                client.DownloadFileCompleted += Client_DownloadFileCompleted;
-                client.DownloadProgressChanged += Client_DownloadProgressChanged;
-                await client.DownloadFileTaskAsync(new Uri(manifestUrl), Consts.RootPath + @"\winget-pkgs-master.zip");
-                
-            }
-            else if (Directory.Exists(Consts.ManifestPath))
-            {
-                if (!_isConnected && IsRefresh)
-                {
-                    Growl.WarningGlobal("Unable to connect to the Internet, we Load local packages.");
-                }
-                LoadLocalManifests();
-            }
-            else
-            {
-                Growl.ErrorGlobal("Unable to connect to the Internet");
-            }
-        }
-
-        private async void LoadLocalManifests()
+        private async void ParseManifests()
         {
             int _totalmanifestsCount = 0;
+
             if (Directory.Exists(Consts.ManifestPath))
             {
                 prgStatus.IsIndeterminate = false;
@@ -117,8 +74,11 @@ namespace HandyWinget.Views
                 await Task.Run(async () =>
                 {
                     var manifests = EnumerateManifest(Consts.ManifestPath);
+
                     _totalmanifestsCount = manifests.Count();
+
                     var _installedApps = GetInstalledApps();
+
                     foreach (var item in manifests.GetEnumeratorWithIndex())
                     {
                         try
@@ -139,11 +99,7 @@ namespace HandyWinget.Views
                                                         .IgnoreUnmatchedProperties()
                                                         .Build();
 
-                            var baseFolder = Path.GetDirectoryName(item.Value);
                             var result = deserializer.Deserialize<YamlPackageModel>(File.OpenText(item.Value));
-
-                            var installedVersion = string.Empty;
-                            var isInstalled = false;
 
                             PackageModel package = null;
                             List<Installer> installer = new List<Installer>();
@@ -155,9 +111,12 @@ namespace HandyWinget.Views
                             string licenseUrl = string.Empty;
                             string license = string.Empty;
                             string homePage = string.Empty;
+                            var installedVersion = string.Empty;
+                            var isInstalled = false;
 
                             if (result != null)
                             {
+                                // Identify programs installed on the system
                                 switch (Settings.IdentifyPackageMode)
                                 {
                                     case IdentifyPackageMode.Off:
@@ -170,7 +129,7 @@ namespace HandyWinget.Views
                                         installedVersion = isInstalled ? $"Installed Version: {installedStatus.FirstOrDefault()}" : string.Empty;
                                         break;
                                     case IdentifyPackageMode.Wingetcli:
-                                        isInstalled = await IsPackageInstalledWingetcliMode(result.PackageName);
+                                        isInstalled = await IsPackageExistWingetMode(result.PackageName);
                                         installedVersion = string.Empty;
                                         break;
                                 }
@@ -227,12 +186,19 @@ namespace HandyWinget.Views
                                     };
                                 }
 
+                                // Because different versions of an application are stored in separate manifests, we only save one of the manifests
                                 if (!_temoList.Contains(package, new GenericCompare<PackageModel>(x => x.PackageName)))
                                 {
                                     _temoList.Add(package);
                                 }
 
-                                _tempVersions.Add(new VersionModel { Id = package.PackageIdentifier, Version = packageVersion, Installers = installer });
+                                // We save different versions of a manifest in the temp list to later attach the versions to the relevant manifest
+                                _tempVersions.Add(new VersionModel
+                                {
+                                    Id = package.PackageIdentifier,
+                                    Version = packageVersion,
+                                    Installers = installer
+                                });
                             }
                         }
                         catch (Exception)
@@ -240,6 +206,8 @@ namespace HandyWinget.Views
                             continue;
                         }
                     }
+
+                    // Attach different versions of a manifest to the corresponding manifest
                     foreach (var item in _temoList)
                     {
                         try
@@ -268,111 +236,17 @@ namespace HandyWinget.Views
                     }
 
                 });
-                
+
                 tgBlock.IsChecked = true;
+
                 DataList.ShapeView().OrderBy(x => x.Publisher).ThenBy(x => x.PackageName).Apply();
+
                 MainWindow.Instance.txtStatus.Text = $"Available Packages: {DataList.Count} | Updated: {Settings.UpdatedDate}";
                 MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
             }
         }
 
-        private void Client_DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
-        {
-            var progress = (int)e.ProgressPercentage;
-            if (e.TotalBytesToReceive == -1 || e.TotalBytesToReceive == 0)
-            {
-                if (!prgStatus.IsIndeterminate)
-                {
-                    prgStatus.IsIndeterminate = true;
-                }
-
-                txtStatus.Text = $"Downloading Manifests... {ConvertBytesToMegabytes(e.BytesReceived)} MB";
-            }
-            else
-            {
-                if (prgStatus.IsIndeterminate)
-                {
-                    prgStatus.IsIndeterminate = false;
-                }
-                prgStatus.Value = progress;
-                txtStatus.Text = $"Downloading {ConvertBytesToMegabytes(e.BytesReceived)} MB of {ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {progress}%";
-            }
-        }
-
-        private async void Client_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            try
-            {
-                Settings.UpdatedDate = DateTime.Now;
-                var fileName = Consts.RootPath + @"\winget-pkgs-master.zip";
-                prgStatus.IsIndeterminate = true;
-                prgStatus.Value = 0;
-                txtStatus.Text = "Extracting Manifests...";
-                await Task.Run(() => ZipFile.ExtractToDirectory(fileName, Consts.RootPath, true));
-                txtStatus.Text = "Cleaning Directory...";
-                MoveManifestToCorrectLocation(fileName);
-                prgStatus.IsIndeterminate = false;
-            }
-            catch (Exception ex)
-            {
-                Growl.ErrorGlobal(ex.Message);
-            }
-        }
-
-        private async void MoveManifestToCorrectLocation(string FileName)
-        {
-           await Task.Run(async ()=> {
-                var rootDir = new DirectoryInfo(Consts.RootPath + @"\winget-pkgs-master");
-                var zipFile = new FileInfo(FileName);
-                var pkgDir = new DirectoryInfo(Consts.ManifestPath);
-                var moveDir = new DirectoryInfo(Consts.RootPath + @"\winget-pkgs-master\manifests");
-                await Task.Delay(3000);
-
-               try
-               {
-                   if (moveDir.Exists)
-                   {
-                       if (pkgDir.Exists)
-                       {
-                           pkgDir.Delete(true);
-                       }
-
-                       moveDir.MoveTo(pkgDir.FullName);
-                       rootDir.Delete(true);
-
-                       if (zipFile.Exists)
-                       {
-                           zipFile.Delete();
-                       }
-                   }
-               }
-               catch (IOException)
-               {
-                   Growl.ErrorGlobal("Something is wrong, please try again.");
-               }
-            });
-            LoadLocalManifests();
-        }
-
-        private async void tgCancelDownload_Checked(object sender, RoutedEventArgs e)
-        {
-            if (tgCancelDownload.IsChecked.Value)
-            {
-                _wingetProcess?.Close();
-                _wingetProcess?.Dispose();
-                downloaderService?.CancelAsync();
-
-                tgCancelDownload.IsEnabled = false;
-                prgStatus.IsIndeterminate = true;
-                prgStatus.ShowError = true;
-                txtStatus.Text = "Operation Canceled";
-                await Task.Delay(4000);
-                tgBlock.IsChecked = true;
-                MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
-            }
-        }
-
-        private async Task<bool> IsPackageInstalledWingetcliMode(string packageName)
+        private async Task<bool> IsPackageExistWingetMode(string packageName)
         {
             if (packageName.IsNullOrEmpty())
             {
@@ -408,13 +282,169 @@ namespace HandyWinget.Views
             return _wingetData.Contains(packageName);
         }
 
+        #endregion
+
+        #region Download Manifests
+        public async void DownloadManifests(bool IsRefresh = false)
+        {
+            DataList?.Clear();
+            _temoList?.Clear();
+            _tempVersions?.Clear();
+            prgStatus.Value = 0;
+            tgBlock.IsChecked = false;
+            prgStatus.IsIndeterminate = true;
+            tgCancelDownload.Visibility = Visibility.Collapsed;
+
+            MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
+
+            bool _isConnected = ApplicationHelper.IsConnectedToInternet();
+
+            // if (internet is connected and Manifest folder not exist) or internet is connected and user need refresh
+            // we should download manifest
+            if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true))
+            {
+                if (IsRefresh)
+                {
+                    txtStatus.Text = "Refreshing Packages...";
+                }
+
+                WebClient client = new WebClient();
+
+                client.DownloadFileCompleted += Client_DownloadFileCompleted;
+                client.DownloadProgressChanged += Client_DownloadProgressChanged;
+                await client.DownloadFileTaskAsync(new Uri(Consts.WingetPkgsRepository), Consts.RootPath + @"\winget-pkgs-master.zip");
+
+            }
+            else if (Directory.Exists(Consts.ManifestPath)) // if manifest folder exist and internet is not connected and user need a refresh we should parse local manifests
+            {
+                if (!_isConnected && IsRefresh)
+                {
+                    Growl.WarningGlobal("Unable to connect to the Internet, we Load local packages.");
+                }
+
+                ParseManifests();
+            }
+            else
+            {
+                Growl.ErrorGlobal("Unable to connect to the Internet");
+            }
+        }
+
+        private void Client_DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
+        {
+            var progress = (int)e.ProgressPercentage;
+            if (e.TotalBytesToReceive == -1 || e.TotalBytesToReceive == 0)
+            {
+                if (!prgStatus.IsIndeterminate)
+                {
+                    prgStatus.IsIndeterminate = true;
+                }
+
+                txtStatus.Text = $"Downloading Manifests... {ConvertBytesToMegabytes(e.BytesReceived)} MB";
+            }
+            else
+            {
+                if (prgStatus.IsIndeterminate)
+                {
+                    prgStatus.IsIndeterminate = false;
+                }
+                prgStatus.Value = progress;
+                txtStatus.Text = $"Downloading {ConvertBytesToMegabytes(e.BytesReceived)} MB of {ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -  {progress}%";
+            }
+        }
+
+        private async void Client_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                Growl.ErrorGlobal("Operation Canceled.");
+            }
+            else if (e.Error != null)
+            {
+                Growl.ErrorGlobal(e.Error.Message);
+            }
+            else
+            {
+                try
+                {
+                    Settings.UpdatedDate = DateTime.Now;
+                    var fileName = Consts.RootPath + @"\winget-pkgs-master.zip";
+                    prgStatus.IsIndeterminate = true;
+                    prgStatus.Value = 0;
+                    txtStatus.Text = "Extracting Manifests...";
+                    await Task.Run(() => ZipFile.ExtractToDirectory(fileName, Consts.RootPath, true));
+                    txtStatus.Text = "Cleaning Directory...";
+                    MoveManifestToCorrectLocation(fileName);
+                    prgStatus.IsIndeterminate = false;
+                }
+                catch (Exception ex)
+                {
+                    Growl.ErrorGlobal(ex.Message);
+                }
+            }
+        }
+
+        private async void MoveManifestToCorrectLocation(string FileName)
+        {
+            await Task.Run(async () => {
+                var rootDir = new DirectoryInfo(Consts.RootPath + @"\winget-pkgs-master");
+                var zipFile = new FileInfo(FileName);
+                var pkgDir = new DirectoryInfo(Consts.ManifestPath);
+                var moveDir = new DirectoryInfo(Consts.RootPath + @"\winget-pkgs-master\manifests");
+                await Task.Delay(3000);
+
+                try
+                {
+                    if (moveDir.Exists)
+                    {
+                        if (pkgDir.Exists)
+                        {
+                            pkgDir.Delete(true);
+                        }
+
+                        moveDir.MoveTo(pkgDir.FullName);
+                        rootDir.Delete(true);
+
+                        if (zipFile.Exists)
+                        {
+                            zipFile.Delete();
+                        }
+                    }
+                }
+                catch (IOException)
+                {
+                    Growl.ErrorGlobal("Something is wrong, please try again.");
+                }
+            });
+
+            ParseManifests();
+        }
+
+        #endregion
+
+        #region Filter and Search
+        private void SetDataListGrouping()
+        {
+            dataGrid.RowDetailsVisibilityMode = Settings.ShowExtraDetails;
+
+            // Set Group for DataGrid
+            if (Settings.GroupByPublisher)
+            {
+                DataList.ShapeView().GroupBy(x => x.Publisher).Apply();
+            }
+            else
+            {
+                DataList.ShapeView().ClearGrouping().Apply();
+            }
+        }
+
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (MainWindow.Instance.appBarIsInstalled.IsChecked.Value)
             {
                 DataList.ShapeView().Where(x =>
                         (x.IsInstalled && x.PackageName != null && x.PackageName.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
-                        (x.IsInstalled && x.Publisher != null && x.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) !=-1)).Apply();
+                        (x.IsInstalled && x.Publisher != null && x.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1)).Apply();
             }
             else
             {
@@ -429,10 +459,12 @@ namespace HandyWinget.Views
                 var matchingItems = DataList.Where(p =>
                           (p.PackageName != null && p.PackageName.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
                           (p.Publisher != null && p.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1));
+
                 foreach (var item in matchingItems)
                 {
                     suggestions.Add(item.PackageName);
                 }
+
                 if (suggestions.Count > 0)
                 {
                     for (int i = 0; i < suggestions.Count; i++)
@@ -459,6 +491,9 @@ namespace HandyWinget.Views
             }
         }
 
+        #endregion
+
+        #region ContextMenu
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is MenuItem button)
@@ -515,28 +550,6 @@ namespace HandyWinget.Views
             }
         }
 
-        private string CreatePowerShellScript(bool isExportScript)
-        {
-            StringBuilder builder = new StringBuilder();
-            if (isExportScript)
-            {
-                builder.Append(Helper.PowerShellScript);
-            }
-
-            foreach (var item in dataGrid.SelectedItems)
-            {
-                builder.Append($"winget install {((PackageModel)item).PackageIdentifier} -v {((PackageModel)item).PackageVersion.Version} -e ; ");
-            }
-
-            builder.Remove(builder.ToString().LastIndexOf(";"), 1);
-            if (isExportScript)
-            {
-                builder.AppendLine("}");
-            }
-
-            return builder.ToString().TrimEnd();
-        }
-
         private void ContextMenu_Loaded(object sender, RoutedEventArgs e)
         {
             var selectedRows = dataGrid.SelectedItems.Count;
@@ -587,28 +600,9 @@ namespace HandyWinget.Views
             }
         }
 
-        public async void ExportPowerShellScript()
-        {
-            if (dataGrid.SelectedItems.Count > 0)
-            {
-                var dialog = new SaveFileDialog
-                {
-                    Title = "Save Script",
-                    FileName = "winget-script.ps1",
-                    DefaultExt = "ps1",
-                    Filter = "Powershell Script (*.ps1)|*.ps1"
-                };
-                if (dialog.ShowDialog() == true)
-                {
-                    await File.WriteAllTextAsync(dialog.FileName, CreatePowerShellScript(true));
-                }
-            }
-            else
-            {
-                Growl.InfoGlobal("Please Select Packages");
-            }
-        }
+        #endregion
 
+        #region Download and Install Package
         public void InstallPackage()
         {
             tgCancelDownload.Visibility = Visibility.Visible;
@@ -617,6 +611,7 @@ namespace HandyWinget.Views
             prgStatus.ShowError = false;
             prgStatus.IsIndeterminate = true;
             prgStatus.Value = 0;
+
             if (ApplicationHelper.IsConnectedToInternet())
             {
                 switch (Settings.InstallMode)
@@ -719,7 +714,7 @@ namespace HandyWinget.Views
                 };
                 _wingetProcess.Exited += (o, _) =>
                 {
-                    Application.Current.Dispatcher.Invoke(async() =>
+                    Application.Current.Dispatcher.Invoke(async () =>
                     {
                         var installFailed = (o as Process).ExitCode != 0;
                         if (installFailed)
@@ -750,6 +745,7 @@ namespace HandyWinget.Views
             }
         }
 
+        #region Internal Install
         public async void InstallInternalMode()
         {
             try
@@ -793,15 +789,28 @@ namespace HandyWinget.Views
             }
         }
 
+        // Internal Mode, Download Package Completed
         private void DownloaderService_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            DispatcherHelper.RunOnMainThread(() => {
-                MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
-                tgBlock.IsChecked = true;
-            });
-            StartProcess(_TempSetupPath);
+            if (e.Cancelled)
+            {
+                Growl.ErrorGlobal("Operation Canceled.");
+            }
+            else if (e.Error != null)
+            {
+                Growl.ErrorGlobal(e.Error.Message);
+            }
+            else
+            {
+                DispatcherHelper.RunOnMainThread(() => {
+                    MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
+                    tgBlock.IsChecked = true;
+                });
+                StartProcess(_TempSetupPath);
+            }
         }
 
+        // Internal Mode, Download Package Progress Changed
         private void DownloaderService_DownloadProgressChanged(object sender, Downloader.DownloadProgressChangedEventArgs e)
         {
             DispatcherHelper.RunOnMainThread(() => {
@@ -810,6 +819,75 @@ namespace HandyWinget.Views
                 txtStatus.Text = $"Downloading {item.PackageIdentifier}-{item.Version} - {ConvertBytesToMegabytes(e.ReceivedBytesSize)} MB of {ConvertBytesToMegabytes(e.TotalBytesToReceive)} MB  -   {(int)e.ProgressPercentage}%";
             });
         }
+
+        private async void tgCancelDownload_Checked(object sender, RoutedEventArgs e)
+        {
+            if (tgCancelDownload.IsChecked.Value)
+            {
+                _wingetProcess?.Close();
+                _wingetProcess?.Dispose();
+                downloaderService?.CancelAsync();
+
+                tgCancelDownload.IsEnabled = false;
+                prgStatus.IsIndeterminate = true;
+                prgStatus.ShowError = true;
+                txtStatus.Text = "Operation Canceled";
+                await Task.Delay(4000);
+                tgBlock.IsChecked = true;
+                MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Powershell Script
+        public async void ExportPowerShellScript()
+        {
+            if (dataGrid.SelectedItems.Count > 0)
+            {
+                var dialog = new SaveFileDialog
+                {
+                    Title = "Save Script",
+                    FileName = "winget-script.ps1",
+                    DefaultExt = "ps1",
+                    Filter = "Powershell Script (*.ps1)|*.ps1"
+                };
+                if (dialog.ShowDialog() == true)
+                {
+                    await File.WriteAllTextAsync(dialog.FileName, CreatePowerShellScript(true));
+                }
+            }
+            else
+            {
+                Growl.InfoGlobal("Please Select Packages");
+            }
+        }
+
+        private string CreatePowerShellScript(bool isExportScript)
+        {
+            StringBuilder builder = new StringBuilder();
+            if (isExportScript)
+            {
+                builder.Append(Helper.PowerShellScript);
+            }
+
+            foreach (var item in dataGrid.SelectedItems)
+            {
+                builder.Append($"winget install {((PackageModel)item).PackageIdentifier} -v {((PackageModel)item).PackageVersion.Version} -e ; ");
+            }
+
+            builder.Remove(builder.ToString().LastIndexOf(";"), 1);
+            if (isExportScript)
+            {
+                builder.AppendLine("}");
+            }
+
+            return builder.ToString().TrimEnd();
+        }
+
+        #endregion
 
         public (string PackageIdentifier, string Version, string Architecture, string InstallerUrl, string PackageName, bool IsInstalled) GetSelectedPackage()
         {
@@ -829,7 +907,7 @@ namespace HandyWinget.Views
                 url = pkg.PackageArchitecture.InstallerUrl;
                 pName = pkg.PackageName;
                 isInstalled = pkg.IsInstalled;
-                
+
             }
             return (id, version, arch, url, pName, isInstalled);
         }

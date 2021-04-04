@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace HandyWinget.Assets
 {
-    public abstract class Helper
+    public static class Helper
     {
         public static ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
 
@@ -114,11 +114,14 @@ namespace HandyWinget.Assets
                 }
             }
         }
+
+        #region Find Installed App from Registry
         private static readonly List<string> _keys = new()
         {
             @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
             @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
         };
+
         private static List<InstalledAppModel> _installedApps = new();
 
         public static List<InstalledAppModel> GetInstalledApps()
@@ -160,6 +163,10 @@ namespace HandyWinget.Assets
                 }
             }
         }
+
+        #endregion
+
+        #region Uninstall Package
         public static bool UninstallPackage(string packageName)
         {
             var result = FindUninstallString(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64), packageName);
@@ -207,6 +214,7 @@ namespace HandyWinget.Assets
 
             return uninstallstring;
         }
+        
         private static (bool, string) FindUninstallString(RegistryKey regKey, string packageName)
         {
             foreach (var key in _keys)
@@ -236,6 +244,8 @@ namespace HandyWinget.Assets
             return (false, string.Empty);
         }
 
+        #endregion
+
         public static string RemoveComment(string url)
         {
             var index = url.IndexOf("#");
@@ -263,6 +273,7 @@ namespace HandyWinget.Assets
                 Growl.ErrorGlobal("Internet Download Manager (IDM) is not installed on your system, please download and install it first");
             }
         }
+
         public static string GetExtension(string url)
         {
             var ext = Path.GetExtension(url);
