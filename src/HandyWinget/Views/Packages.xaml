@@ -103,8 +103,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <ComboBox Name="cmbVersion" ItemsSource="{Binding Versions}" SelectedItem="{Binding PackageVersion, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Version" MinWidth="200"/>
-                                        <ComboBox Name="cmbArch" IsSynchronizedWithCurrentItem="True" Margin="10,0" DataContext="{Binding ElementName=cmbVersion, Path=SelectedItem}" ItemsSource="{Binding Installers}" SelectedItem="{Binding ElementName=cmbVersion, Path=DataContext.PackageArchitecture, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Architecture" MinWidth="200"/>
+                                        <ComboBox Name="cmbVersion" ItemsSource="{Binding Versions}" SelectedItem="{Binding PackageVersion, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Version" MinWidth="180"/>
+                                        <ComboBox Name="cmbArch" IsSynchronizedWithCurrentItem="True" Margin="10,0" DataContext="{Binding ElementName=cmbVersion, Path=SelectedItem}" ItemsSource="{Binding Installers}" SelectedItem="{Binding ElementName=cmbVersion, Path=DataContext.PackageArchitecture, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Architecture" MinWidth="100"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
