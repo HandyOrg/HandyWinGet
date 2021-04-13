@@ -101,52 +101,25 @@ namespace HandyWinget.Views
 
                             var result = deserializer.Deserialize<YamlPackageModel>(File.OpenText(item.Value));
 
-                            PackageModel package = null;
+                            PackageModel package = new PackageModel();
                             List<Installer> installer = new List<Installer>();
-                            string publisher = string.Empty;
-                            string packageName = string.Empty;
                             string packageVersion = string.Empty;
-                            string packageIdentifier = string.Empty;
-                            string description = string.Empty;
-                            string licenseUrl = string.Empty;
-                            string license = string.Empty;
-                            string homePage = string.Empty;
-                            var installedVersion = string.Empty;
-                            var isInstalled = false;
 
                             if (result != null)
                             {
-                                // Identify programs installed on the system
-                                switch (Settings.IdentifyPackageMode)
-                                {
-                                    case IdentifyPackageMode.Off:
-                                        isInstalled = false;
-                                        installedVersion = string.Empty;
-                                        break;
-                                    case IdentifyPackageMode.Internal:
-                                        var installedStatus = _installedApps.Where(x => x.DisplayName != null && result.PackageName != null && x.DisplayName.Contains(result.PackageName)).Select(x => x.Version);
-                                        isInstalled = installedStatus.Any();
-                                        installedVersion = isInstalled ? $"Installed Version: {installedStatus.FirstOrDefault()}" : string.Empty;
-                                        break;
-                                    case IdentifyPackageMode.Wingetcli:
-                                        isInstalled = await IsPackageExistWingetMode(result.PackageName);
-                                        installedVersion = string.Empty;
-                                        break;
-                                }
-
                                 if (result.ManifestType.Contains("singleton"))
                                 {
-                                    package = new PackageModel
-                                    {
-                                        Publisher = result.Publisher,
-                                        PackageName = result.PackageName,
-                                        IsInstalled = isInstalled,
-                                        PackageIdentifier = result.PackageIdentifier,
-                                        Description = result.ShortDescription,
-                                        LicenseUrl = result.LicenseUrl,
-                                        Homepage = result.PackageUrl,
-                                        InstalledVersion = installedVersion
-                                    };
+                                    var status = await CheckIfInstalled(_installedApps, result.PackageName);
+                                    package.Publisher = result.Publisher;
+                                    package.PackageName = result.PackageName;
+                                    package.PackageIdentifier = result.PackageIdentifier;
+                                    package.Description = result.ShortDescription;
+                                    package.LicenseUrl = result.LicenseUrl;
+                                    package.Homepage = result.PackageUrl;
+                                    package.LicenseUrl = result.LicenseUrl;
+                                    package.IsInstalled = status.IsInstalled;
+                                    package.InstalledVersion = status.InstalledVersion;
+                                    
                                     installer = result.Installers;
                                     packageVersion = result.PackageVersion;
                                 }
@@ -158,13 +131,17 @@ namespace HandyWinget.Views
                                     if (File.Exists(localPath))
                                     {
                                         var multiYamlResult = deserializer.Deserialize<YamlPackageModel>(File.OpenText(localPath));
-                                        packageIdentifier = multiYamlResult.PackageIdentifier;
+
+                                        var status = await CheckIfInstalled(_installedApps, multiYamlResult.PackageName);
+
+                                        package.PackageIdentifier = multiYamlResult.PackageIdentifier;
                                         packageVersion = multiYamlResult.PackageVersion;
-                                        publisher = multiYamlResult.Publisher;
-                                        packageName = multiYamlResult.PackageName;
-                                        licenseUrl = multiYamlResult.LicenseUrl;
-                                        license = multiYamlResult.License;
-                                        description = multiYamlResult.ShortDescription;
+                                        package.Publisher = multiYamlResult.Publisher;
+                                        package.PackageName = multiYamlResult.PackageName;
+                                        package.LicenseUrl = multiYamlResult.LicenseUrl;
+                                        package.Description = multiYamlResult.ShortDescription;
+                                        package.IsInstalled = status.IsInstalled;
+                                        package.InstalledVersion = status.InstalledVersion;
                                     }
 
                                     if (File.Exists(installerPath))
@@ -172,18 +149,6 @@ namespace HandyWinget.Views
                                         var multiYamlResult = deserializer.Deserialize<YamlPackageModel>(File.OpenText(installerPath));
                                         installer = multiYamlResult.Installers;
                                     }
-
-                                    package = new PackageModel
-                                    {
-                                        Publisher = publisher,
-                                        PackageName = packageName,
-                                        IsInstalled = isInstalled,
-                                        PackageIdentifier = packageIdentifier,
-                                        Description = description,
-                                        LicenseUrl = licenseUrl,
-                                        Homepage = homePage,
-                                        InstalledVersion = installedVersion
-                                    };
                                 }
 
                                 // Because different versions of an application are stored in separate manifests, we only save one of the manifests
@@ -246,6 +211,28 @@ namespace HandyWinget.Views
             }
         }
 
+        private async Task<(bool IsInstalled, string InstalledVersion)> CheckIfInstalled(List<InstalledAppModel> InstalledApp, string PackageName)
+        {
+            bool isInstalled = false;
+            string installedVersion = string.Empty;
+
+            switch (Settings.IdentifyPackageMode)
+            {
+                case IdentifyPackageMode.Off:
+                    return (false, string.Empty);
+                case IdentifyPackageMode.Internal:
+                    var installedStatus = InstalledApp.Where(x => x.DisplayName != null && PackageName != null && x.DisplayName.Contains(PackageName, StringComparison.OrdinalIgnoreCase)).Select(x => x.Version);
+                    isInstalled = installedStatus.Any();
+                    installedVersion = isInstalled ? $"Installed Version: {installedStatus.FirstOrDefault()}" : string.Empty;
+                    return (isInstalled, installedVersion);
+                case IdentifyPackageMode.Wingetcli:
+                    isInstalled = await IsPackageExistWingetMode(PackageName);
+                    installedVersion = string.Empty;
+                    return (isInstalled, installedVersion);
+            }
+            return (false, string.Empty);
+        }
+
         private async Task<bool> IsPackageExistWingetMode(string packageName)
         {
             if (packageName.IsNullOrEmpty())
@@ -279,7 +266,7 @@ namespace HandyWinget.Views
                 return false;
             }
 
-            return _wingetData.Contains(packageName);
+            return _wingetData.Contains(packageName, StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion
