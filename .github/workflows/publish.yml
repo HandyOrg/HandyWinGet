@@ -1,9 +1,6 @@
 name: "Publish"
 
-on:
-  push:
-    tags:
-      - "v*"
+on: workflow_dispatch
 
 env:
   PROJECT_PATH: src/HandyWinget/HandyWinget.csproj
