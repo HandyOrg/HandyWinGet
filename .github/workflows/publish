@@ -1,0 +1,53 @@
+name: "Publish"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  PROJECT_PATH: src/HandyWinget/HandyWinget.csproj
+  ZIP_PATH: src/HandyWinget/bin/Release/net5.0-windows/win-x86/publish/HandyWinget-Portable.zip
+  EXE_PATH: src/HandyWinget/bin/Release/net5.0-windows/win-x86/publish/HandyWinget.exe
+  
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - name: Initialize Actions
+        uses: actions/checkout@v2
+
+      - name: Initialize .Net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      
+      - name: Restore Project
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Publish Project
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x86 --no-restore
+
+      - name: Create Zip File
+        uses: papeloto/action-zip@v1
+        with:
+          files: ${{ env.EXE_PATH }}
+          dest: ${{ env.ZIP_PATH }}
+          
+      - name: Initialize Release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+      
+      - name: Create Release    
+        uses: csexton/release-asset-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.ZIP_PATH }}
+          release-url: ${{ steps.create_release.outputs.upload_url }}
+          
