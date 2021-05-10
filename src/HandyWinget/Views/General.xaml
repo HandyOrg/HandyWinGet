@@ -32,7 +32,7 @@
                 
                 <ToggleButton x:Name="tgSaveDGColumnWidth" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Save and Restore DataGrid Columns Width" Checked="tgSaveDGColumnWidth_Checked" Unchecked="tgSaveDGColumnWidth_Checked" />
                 
-                <ToggleButton x:Name="tgIsBackEnabled" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Show Back Button for Navigation" Checked="tgIsBackEnabled_Checked" Unchecked="tgIsBackEnabled_Checked" />
+                <ToggleButton x:Name="tgIsBackEnabled" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Show Back Button for Navigation" Checked="tgIsBackEnabled_Checked" Unchecked="tgIsBackEnabled_Checked" />
 
                 <Button Click="ResetAccent_Click" Style="{StaticResource DefaultButtonStyle}" Content="Reset Accent Color" Margin="0,20"/>
             </StackPanel>

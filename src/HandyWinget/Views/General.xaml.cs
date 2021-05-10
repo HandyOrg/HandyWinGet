@@ -44,6 +44,7 @@ namespace HandyWinget.Views
             tgGroup.IsChecked = Settings.GroupByPublisher;
             tgSaveDGColumnWidth.IsChecked = Settings.IsStoreDataGridColumnWidth;
             tgAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
+            tgIsBackEnabled.IsChecked = Settings.IsBackEnabled;
             cmbDetails.SelectedItem = Settings.ShowExtraDetails;
             currentVersion.Text = $"Current Version {Version}";
         }
