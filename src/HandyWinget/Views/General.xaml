@@ -1,8 +1,9 @@
-﻿<UserControl x:Class="HandyWinget.Views.General"
+﻿<ui:Page x:Class="HandyWinget.Views.General"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:enum="clr-namespace:HandyWinget.Assets"
+             KeepAlive="True"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <hc:ScrollViewer>
         <Grid>
@@ -30,7 +31,8 @@
                 <ToggleButton x:Name="tgAutoRefresh" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Auto Refresh Packages When Application Startup" Checked="tgAutoRefresh_Checked" Unchecked="tgAutoRefresh_Checked" />
                 
                 <ToggleButton x:Name="tgSaveDGColumnWidth" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Save and Restore DataGrid Columns Width" Checked="tgSaveDGColumnWidth_Checked" Unchecked="tgSaveDGColumnWidth_Checked" />
-
+                
+                <ToggleButton x:Name="tgIsBackEnabled" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Show Back Button for Navigation" Checked="tgIsBackEnabled_Checked" Unchecked="tgIsBackEnabled_Checked" />
 
                 <Button Click="ResetAccent_Click" Style="{StaticResource DefaultButtonStyle}" Content="Reset Accent Color" Margin="0,20"/>
             </StackPanel>
@@ -69,4 +71,4 @@
         </Grid>
     </hc:ScrollViewer>
 
-</UserControl>
+</ui:Page>

@@ -1,8 +1,9 @@
-﻿<UserControl x:Class="HandyWinget.Views.Packages"
+﻿<ui:Page x:Class="HandyWinget.Views.Packages"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
+             KeepAlive="True"
              KeyDown="UserControl_KeyDown">
     <hc:ToggleBlock Name="tgBlock" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <hc:ToggleBlock.UnCheckedContent>
@@ -161,4 +162,4 @@
             </Grid>
         </hc:ToggleBlock.CheckedContent>
     </hc:ToggleBlock>
-</UserControl>
+</ui:Page>

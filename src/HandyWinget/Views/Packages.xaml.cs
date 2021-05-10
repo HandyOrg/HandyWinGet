@@ -25,7 +25,7 @@ using YamlDotNet.Serialization.NamingConventions;
 using static HandyWinget.Assets.Helper;
 namespace HandyWinget.Views
 {
-    public partial class Packages : UserControl
+    public partial class Packages : ModernWpf.Controls.Page
     {
         internal static Packages Instance;
 
@@ -59,7 +59,6 @@ namespace HandyWinget.Views
             BindingOperations.EnableCollectionSynchronization(DataList, Lock);
             BindingOperations.EnableCollectionSynchronization(_temoList, Lock);
             BindingOperations.EnableCollectionSynchronization(_tempVersions, Lock);
-
             DownloadManifests();
             SetDataListGrouping();
         }

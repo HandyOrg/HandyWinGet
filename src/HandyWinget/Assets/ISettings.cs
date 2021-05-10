@@ -28,6 +28,7 @@ namespace HandyWinget
         public virtual Brush Accent { get; set; }
         public virtual bool AutoRefreshInStartup { get; set; } = false;
         public virtual bool IsStoreDataGridColumnWidth { get; set; } = false;
+        public virtual bool IsBackEnabled { get; set; } = true;
         public virtual Version Version { get; set; }
 
         private ObservableCollection<DataGridLength> _DataGridColumnWidth = new ObservableCollection<DataGridLength>();

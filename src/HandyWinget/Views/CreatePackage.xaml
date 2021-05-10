@@ -1,7 +1,8 @@
-﻿<UserControl x:Class="HandyWinget.Views.CreatePackage"
+﻿<ui:Page x:Class="HandyWinget.Views.CreatePackage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             KeepAlive="True"
              xmlns:ui="http://schemas.modernwpf.com/2019">
     <hc:ScrollViewer>
         <StackPanel>
@@ -60,4 +61,4 @@
             </StackPanel>
         </StackPanel>
     </hc:ScrollViewer>
-</UserControl>
+</ui:Page>

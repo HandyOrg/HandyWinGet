@@ -4,9 +4,11 @@ using HandyControl.Tools;
 using HandyWinget.Views;
 using ModernWpf.Controls;
 using ModernWpf.Controls.Primitives;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Navigation;
 using static HandyWinget.Assets.Helper;
 namespace HandyWinget
 {
@@ -31,6 +33,7 @@ namespace HandyWinget
             }
 
             navView.PaneDisplayMode = Settings.PaneDisplayMode;
+            navView.IsBackButtonVisible = Settings.IsBackEnabled ? NavigationViewBackButtonVisible.Visible : NavigationViewBackButtonVisible.Collapsed;
         }
 
         public void CommandButtonsVisibility(Visibility visibility)
@@ -180,6 +183,44 @@ namespace HandyWinget
         private void nvOpenTerminal_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             OpenFlyout("TerminalCommandBar", nvOpenTerminal);
+        }
+
+        private void navView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+        {
+            if (contentFrame.CanGoBack)
+            {
+                contentFrame.GoBack();
+            }
+        }
+
+        private void contentFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+            var pageName = contentFrame.Content.GetType().Name;
+            var menuItem = navView.MenuItems
+                                     .OfType<NavigationViewItem>()
+                                     .Where(item => item.Tag.ToString() == pageName)
+                                     .FirstOrDefault();
+            if (menuItem != null)
+            {
+                navView.SelectedItem = menuItem;
+            }
+
+            if (contentFrame.CanGoBack)
+            {
+                navView.IsBackEnabled = true;
+            }
+            else
+            {
+                navView.IsBackEnabled = false;
+            }
+        }
+
+        private void contentFrame_Navigating(object sender, NavigatingCancelEventArgs e)
+        {
+            if (e.NavigationMode == NavigationMode.Back)
+            {
+                contentFrame.RemoveBackEntry();
+            }
         }
     }
 }

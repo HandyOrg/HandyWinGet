@@ -20,7 +20,7 @@ namespace HandyWinget.Views
     /// <summary>
     /// Interaction logic for CreatePackage.xaml
     /// </summary>
-    public partial class CreatePackage : UserControl, INotifyPropertyChanged
+    public partial class CreatePackage : ModernWpf.Controls.Page, INotifyPropertyChanged
     {
         #region INotify
         public event PropertyChangedEventHandler PropertyChanged;

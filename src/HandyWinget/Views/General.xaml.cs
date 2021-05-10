@@ -12,7 +12,7 @@ namespace HandyWinget.Views
     /// <summary>
     /// Interaction logic for General
     /// </summary>
-    public partial class General : UserControl
+    public partial class General : ModernWpf.Controls.Page
     {
         string Version = string.Empty;
         public General()
@@ -182,6 +182,16 @@ namespace HandyWinget.Views
             if (state != Settings.IsStoreDataGridColumnWidth)
             {
                 Settings.IsStoreDataGridColumnWidth = state;
+            }
+        }
+
+        private void tgIsBackEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            var state = tgIsBackEnabled.IsChecked.Value;
+            if (state != Settings.IsBackEnabled)
+            {
+                Settings.IsBackEnabled = state;
+                MainWindow.Instance.navView.IsBackButtonVisible = state ? NavigationViewBackButtonVisible.Visible : NavigationViewBackButtonVisible.Collapsed;
             }
         }
     }
