@@ -32,6 +32,7 @@ namespace HandyWinget.Views
         private string _wingetData = string.Empty;
         private static readonly object Lock = new();
         private string _TempSetupPath = string.Empty;
+        private bool hasLoaded = false;
 
         //Final List that contain Packages
         public ObservableCollection<PackageModel> DataList { get; set; } = new ObservableCollection<PackageModel>();
@@ -52,6 +53,8 @@ namespace HandyWinget.Views
             Instance = this;
             DataContext = this;
 
+            Loaded += OnLoaded;
+
             //Task protection
             BindingOperations.EnableCollectionSynchronization(DataList, Lock);
             BindingOperations.EnableCollectionSynchronization(_temoList, Lock);
@@ -59,6 +62,22 @@ namespace HandyWinget.Views
 
             DownloadManifests();
             SetDataListGrouping();
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (Settings.IsStoreDataGridColumnWidth)
+            {
+                if (Settings.DataGridColumnWidth.Count > 0)
+                {
+                    for (var i = 0; i < dataGrid.Columns.Count; i++)
+                    {
+                        dataGrid.Columns[i].Width = Settings.DataGridColumnWidth[i];
+                    }
+                }
+
+                hasLoaded = true;
+            }
         }
 
         #region Parse Manifests
@@ -288,7 +307,7 @@ namespace HandyWinget.Views
 
             // if (internet is connected and Manifest folder not exist) or internet is connected and user need refresh
             // we should download manifest
-            if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true))
+            if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true) || Settings.AutoRefreshInStartup)
             {
                 if (IsRefresh)
                 {
@@ -897,6 +916,26 @@ namespace HandyWinget.Views
 
             }
             return (id, version, arch, url, pName, isInstalled);
+        }
+
+        private void dataGrid_LayoutUpdated(object sender, EventArgs e)
+        {
+            if (!hasLoaded)
+                return;
+            if (Settings.IsStoreDataGridColumnWidth)
+            {
+                for (int i = Settings.DataGridColumnWidth.Count; i < dataGrid.Columns.Count; i++)
+                {
+                    Settings.DataGridColumnWidth.Add(default);
+                }
+
+                for (int index = 0; index < dataGrid.Columns.Count; index++)
+                {
+                    if (dataGrid.Columns == null)
+                        return;
+                    Settings.DataGridColumnWidth[index] = new DataGridLength(dataGrid.Columns[index].ActualWidth);
+                }
+            }
         }
     }
 }

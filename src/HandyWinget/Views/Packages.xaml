@@ -37,7 +37,7 @@
                 <DataGrid x:Name="dataGrid" ScrollViewer.CanContentScroll="True" hc:DataGridAttach.ComboBoxColumnStyle="{StaticResource ComboBoxBaseStyle}"
                               hc:DataGridAttach.EditingComboBoxColumnStyle="{StaticResource ComboBoxBaseStyle}" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                               Grid.Row="1" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel"
-                              ItemsSource="{Binding DataList}" hc:DataGridAttach.ShowRowNumber="True" hc:Empty.ShowEmpty="True">
+                              ItemsSource="{Binding DataList}" hc:DataGridAttach.ShowRowNumber="True" hc:Empty.ShowEmpty="True" LayoutUpdated="dataGrid_LayoutUpdated">
                     <DataGrid.RowHeaderTemplate>
                         <DataTemplate>
                             <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>

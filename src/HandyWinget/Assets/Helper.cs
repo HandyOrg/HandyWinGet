@@ -4,6 +4,9 @@ using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using Nucs.JsonSettings;
 using Nucs.JsonSettings.Autosave;
+using Nucs.JsonSettings.Fluent;
+using Nucs.JsonSettings.Modulation;
+using Nucs.JsonSettings.Modulation.Recovery;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,7 +18,11 @@ namespace HandyWinget.Assets
 {
     public static class Helper
     {
-        public static ISettings Settings = JsonSettings.Load<ISettings>().EnableAutosave();
+        public static ISettings Settings = JsonSettings.Configure<ISettings>()
+                                   .WithRecovery(RecoveryAction.RenameAndLoadDefault)
+                                   .WithVersioning(new Version(1,0,0,0), VersioningResultAction.RenameAndLoadDefault)
+                                   .LoadNow()
+                                   .EnableAutosave();
 
         public static string ConvertBytesToMegabytes(long bytes)
         {

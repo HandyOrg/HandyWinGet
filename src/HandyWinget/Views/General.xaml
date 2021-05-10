@@ -26,6 +26,10 @@
                 <ToggleButton x:Name="tgIDM" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,10,10,0" Content="Download with Internet Download Manager (IDM)" Checked="tgIDM_Checked" Unchecked="tgIDM_Checked"/>
 
                 <ToggleButton x:Name="tgGroup" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Group packages by publisher" Checked="tgGroup_Checked" Unchecked="tgGroup_Checked" />
+                
+                <ToggleButton x:Name="tgAutoRefresh" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Auto Refresh Packages When Application Startup" Checked="tgAutoRefresh_Checked" Unchecked="tgAutoRefresh_Checked" />
+                
+                <ToggleButton x:Name="tgSaveDGColumnWidth" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10" Content="Save and Restore DataGrid Columns Width" Checked="tgSaveDGColumnWidth_Checked" Unchecked="tgSaveDGColumnWidth_Checked" />
 
 
                 <Button Click="ResetAccent_Click" Style="{StaticResource DefaultButtonStyle}" Content="Reset Accent Color" Margin="0,20"/>

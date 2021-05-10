@@ -33,8 +33,8 @@
     <PackageReference Include="ModernWpfUis" Version="1.2.0" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.2.0" />
 	<PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.2.0" />
-	<PackageReference Include="nucs.JsonSettings" Version="2.0.0-alpha2" />
-	<PackageReference Include="nucs.JsonSettings.Autosave" Version="2.0.0-alpha2" />
+	<PackageReference Include="nucs.JsonSettings" Version="2.0.0-alpha5" />
+	<PackageReference Include="nucs.JsonSettings.Autosave" Version="2.0.0-alpha5" />
 	<PackageReference Include="YamlDotNet" Version="11.1.1" />
   </ItemGroup>
   <ItemGroup>

@@ -4,9 +4,6 @@ using HandyWinget.Assets;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
-using Nucs.JsonSettings;
-using Nucs.JsonSettings.Autosave;
-using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using static HandyWinget.Assets.Helper;
@@ -22,16 +19,6 @@ namespace HandyWinget
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            if (!Settings.Version.Equals(RegistryHelper.GetValue<int>(Consts.VersionKey, Consts.AppName)))
-            {
-                if (File.Exists(Consts.ConfigPath))
-                {
-                    File.Delete(Consts.ConfigPath);
-                }
-                RegistryHelper.AddOrUpdateKey(Consts.VersionKey, Consts.AppName, Settings.Version);
-                Settings = JsonSettings.Load<ISettings>().EnableAutosave();
-            }
 
             UpdateTheme(Settings.Theme);
             UpdateAccent(Settings.Accent);

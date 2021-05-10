@@ -42,6 +42,8 @@ namespace HandyWinget.Views
 
             tgIDM.IsChecked = Settings.IsIDMEnabled;
             tgGroup.IsChecked = Settings.GroupByPublisher;
+            tgSaveDGColumnWidth.IsChecked = Settings.IsStoreDataGridColumnWidth;
+            tgAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
             cmbDetails.SelectedItem = Settings.ShowExtraDetails;
             currentVersion.Text = $"Current Version {Version}";
         }
@@ -162,6 +164,24 @@ namespace HandyWinget.Views
             if (mode != Settings.ShowExtraDetails)
             {
                 Settings.ShowExtraDetails = mode;
+            }
+        }
+
+        private void tgAutoRefresh_Checked(object sender, RoutedEventArgs e)
+        {
+            var state = tgAutoRefresh.IsChecked.Value;
+            if (state != Settings.AutoRefreshInStartup)
+            {
+                Settings.AutoRefreshInStartup = state;
+            }
+        }
+
+        private void tgSaveDGColumnWidth_Checked(object sender, RoutedEventArgs e)
+        {
+            var state = tgSaveDGColumnWidth.IsChecked.Value;
+            if (state != Settings.IsStoreDataGridColumnWidth)
+            {
+                Settings.IsStoreDataGridColumnWidth = state;
             }
         }
     }
