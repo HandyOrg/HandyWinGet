@@ -5,11 +5,11 @@
 	<UseWPF>true</UseWPF>
     <AssemblyName>HandyWinget</AssemblyName>
     <RootNamespace>HandyWinget</RootNamespace>
-    <Version>3.3.0.0</Version>
+    <Version>3.4.0.0</Version>
     <Configurations>Debug;Release</Configurations>
     <Copyright>Copyright © Mahdi 2018-2021</Copyright>
-    <FileVersion>3.3.0.0</FileVersion>
-    <AssemblyVersion>3.3.0.0</AssemblyVersion>
+    <FileVersion>3.4.0.0</FileVersion>
+    <AssemblyVersion>3.4.0.0</AssemblyVersion>
     <LangVersion>latest</LangVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
