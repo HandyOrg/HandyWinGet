@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:ui="http://schemas.modernwpf.com/2019"
-        mc:Ignorable="d" Background="{DynamicResource SecondaryRegionBrush}"
-        Title="HandyWinGet" 
+        mc:Ignorable="d" Background="{DynamicResource MainBackground}"
+        Title="HandyWinGet" FontFamily="{StaticResource CascadiaCode}"
         WindowStartupLocation="CenterScreen"
         ui:WindowHelper.UseModernWindowStyle="True"
         ui:TitleBar.ExtendViewIntoTitleBar="True"
@@ -16,18 +16,18 @@
     <Window.Resources>
         <ui:CommandBarFlyout x:Key="ThemeCommandBar" ShowMode="Standard">
             <ui:CommandBarFlyout.SecondaryCommands>
-                <ui:AppBarButton Label="Light" Click="ApplicationTheme_Click" Tag="{x:Static hc:ApplicationTheme.Light}">
+                <ui:AppBarButton FontFamily="{StaticResource CascadiaCode}" Label="Light" Click="ApplicationTheme_Click" Tag="{x:Static hc:ApplicationTheme.Light}">
                     <ui:AppBarButton.Icon>
                         <ui:PathIcon Data="{DynamicResource LightGeometry}"/>
                     </ui:AppBarButton.Icon>
                 </ui:AppBarButton>
-                <ui:AppBarButton Label="Dark" Click="ApplicationTheme_Click" Tag="{x:Static hc:ApplicationTheme.Dark}">
+                <ui:AppBarButton FontFamily="{StaticResource CascadiaCode}" Label="Dark" Click="ApplicationTheme_Click" Tag="{x:Static hc:ApplicationTheme.Dark}">
                     <ui:AppBarButton.Icon>
                         <ui:PathIcon Data="{DynamicResource NightGeometry}"/>
                     </ui:AppBarButton.Icon>
                 </ui:AppBarButton>
                 <ui:AppBarSeparator/>
-                <ui:AppBarButton Label="Accent Color" Click="ApplicationTheme_Click" Tag="Accent">
+                <ui:AppBarButton FontFamily="{StaticResource CascadiaCode}" Label="Accent Color" Click="ApplicationTheme_Click" Tag="Accent">
                     <ui:AppBarButton.Icon>
                         <ui:PathIcon Data="M3,38V10h42v28H3z" Opacity="0.75" Foreground="{DynamicResource PrimaryBrush}"/>
                     </ui:AppBarButton.Icon>
@@ -37,12 +37,12 @@
 
         <ui:CommandBarFlyout x:Key="TerminalCommandBar" ShowMode="Standard">
             <ui:CommandBarFlyout.SecondaryCommands>
-                <ui:AppBarButton Label="Powershell" Click="OpenTerminal_Click" InputGestureText="Ctrl+P">
+                <ui:AppBarButton FontFamily="{StaticResource CascadiaCode}" Label="Powershell" Click="OpenTerminal_Click" InputGestureText="Ctrl+P">
                     <ui:AppBarButton.Icon>
                         <ui:PathIcon Data="{DynamicResource PowerShellGeometry}"/>
                     </ui:AppBarButton.Icon>
                 </ui:AppBarButton>
-                <ui:AppBarButton Label="CMD" Click="OpenTerminal_Click" InputGestureText="Ctrl+W">
+                <ui:AppBarButton FontFamily="{StaticResource CascadiaCode}" Label="CMD" Click="OpenTerminal_Click" InputGestureText="Ctrl+W">
                     <ui:AppBarButton.Icon>
                         <ui:PathIcon Data="{DynamicResource ConsoleGeometry}"/>
                     </ui:AppBarButton.Icon>
@@ -78,7 +78,7 @@
             </ui:CommandBar.Content>
         </ui:CommandBar>
         <ui:NavigationView Name="navView" SelectionChanged="NavigationView_SelectionChanged" PaneTitle="HandyWinGet" AlwaysShowHeader="True" 
-                       Header="{Binding SelectedItem.Content, RelativeSource={RelativeSource Mode=Self}}" IsSettingsVisible="False"
+                       Header="{Binding SelectedItem.Content, RelativeSource={RelativeSource Mode=Self}}" IsSettingsVisible="False" FontFamily="{StaticResource CascadiaCode}"
                        IsBackButtonVisible="Visible" BackRequested="navView_BackRequested" IsBackEnabled="True">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Tag="General" Content="General">

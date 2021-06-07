@@ -86,7 +86,8 @@ namespace HandyWinget
                     WindowStyle = WindowStyle.None,
                     MinWidth = 0,
                     MinHeight = 0,
-                    Title = "Accent Color"
+                    Title = "Accent Color",
+                    FontFamily = ResourceHelper.GetResource<FontFamily>("CascadiaCode")
                 };
 
                 if (Settings.Accent !=null)

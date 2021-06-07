@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
-             KeepAlive="True"
              KeyDown="UserControl_KeyDown">
     <hc:ToggleBlock Name="tgBlock" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <hc:ToggleBlock.UnCheckedContent>

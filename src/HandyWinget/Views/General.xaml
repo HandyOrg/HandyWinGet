@@ -3,7 +3,6 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:enum="clr-namespace:HandyWinget.Assets"
-             KeepAlive="True"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <hc:ScrollViewer>
         <Grid>
