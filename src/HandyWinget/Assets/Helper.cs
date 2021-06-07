@@ -1,7 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Tools;
 using Microsoft.VisualBasic;
-using Microsoft.Win32;
 using Nucs.JsonSettings;
 using Nucs.JsonSettings.Autosave;
 using Nucs.JsonSettings.Fluent;
@@ -12,7 +11,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 
 namespace HandyWinget.Assets
 {
@@ -122,135 +120,20 @@ namespace HandyWinget.Assets
             }
         }
 
-        #region Find Installed App from Registry
-        private static readonly List<string> _keys = new()
-        {
-            @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
-            @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-        };
-
-        private static List<InstalledAppModel> _installedApps = new();
-
-        public static List<InstalledAppModel> GetInstalledApps()
-        {
-            FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64), _keys, _installedApps);
-            FindInstalledApps(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64), _keys, _installedApps);
-            return _installedApps.Distinct().ToList();
-        }
-
-        private static void FindInstalledApps(RegistryKey regKey, List<string> keys, List<InstalledAppModel> installed)
-        {
-            foreach (var key in keys)
-            {
-                using var rk = regKey.OpenSubKey(key);
-                if (rk == null)
-                {
-                    continue;
-                }
-
-                foreach (var skName in rk.GetSubKeyNames())
-                {
-                    using var sk = rk.OpenSubKey(skName);
-                    if (sk?.GetValue("DisplayName") != null)
-                    {
-                        try
-                        {
-                            installed.Add(new InstalledAppModel
-                            {
-                                DisplayName = (string)sk.GetValue("DisplayName"),
-                                Version = (string)sk.GetValue("DisplayVersion"),
-                                Publisher = (string)sk.GetValue("Publisher")
-                            });
-                        }
-                        catch (Exception)
-                        {
-                            // ignored
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
         #region Uninstall Package
-        public static bool UninstallPackage(string packageName)
+        public static bool UninstallPackage(string uninstallString)
         {
-            var result = FindUninstallString(RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64), packageName);
             try
             {
-                if (result.Item1)
-                {
-                    Interaction.Shell(MakeUninstallString(result.Item2), AppWinStyle.NormalFocus);
-                    return true;
-                }
-                else
-                {
-                    result = FindUninstallString(RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64), packageName);
-                    if (result.Item1)
-                    {
-                        Interaction.Shell(MakeUninstallString(result.Item2), AppWinStyle.NormalFocus);
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                Interaction.Shell(uninstallString, AppWinStyle.NormalFocus);
+                return true;
             }
             catch (FileNotFoundException)
             {
             }
             return false;
         }
-
-        private static string MakeUninstallString(string uninstallstring)
-        {
-            if (uninstallstring.Substring(0, 1).Equals("\"") | uninstallstring.ToLower().Contains("msiexec") | uninstallstring.Contains("~"))
-            {
-                //ignore
-            }
-            else if (uninstallstring.ToLower().IndexOf(".exe") > 0)
-            {
-                uninstallstring = "\"" + uninstallstring.Insert(uninstallstring.ToLower().IndexOf(".exe") + 4, "\"");
-            }
-            else
-            {
-                uninstallstring = "\"" + uninstallstring + "\"";
-            }
-
-            return uninstallstring;
-        }
         
-        private static (bool, string) FindUninstallString(RegistryKey regKey, string packageName)
-        {
-            foreach (var key in _keys)
-            {
-                using var rk = regKey.OpenSubKey(key);
-                if (rk == null)
-                {
-                    continue;
-                }
-
-                foreach (var skName in rk.GetSubKeyNames())
-                {
-                    using var sk = rk.OpenSubKey(skName);
-                    if (sk?.GetValue("DisplayName") != null)
-                    {
-                        string displayName = (string)sk.GetValue("DisplayName");
-                        if (displayName.Contains(packageName))
-                        {
-                            string uninstall = (string)sk.GetValue("UninstallString");
-
-                            return (true, uninstall);
-                        }
-                    }
-                }
-            }
-
-            return (false, string.Empty);
-        }
-
         #endregion
 
         public static string RemoveComment(string url)

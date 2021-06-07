@@ -9,9 +9,6 @@ namespace HandyWinget.Assets
         [Description("Off (Fast)")] 
         Off,
 
-        [Description("Internal Method")]
-        Internal,
-
         [Description("Winget-cli Method")]
         Wingetcli
     }

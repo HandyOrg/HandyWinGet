@@ -95,8 +95,6 @@ namespace HandyWinget.Views
 
                     _totalmanifestsCount = manifests.Count();
 
-                    var _installedApps = GetInstalledApps();
-
                     foreach (var item in manifests.GetEnumeratorWithIndex())
                     {
                         try
@@ -127,7 +125,7 @@ namespace HandyWinget.Views
                             {
                                 if (result.ManifestType.Contains("singleton"))
                                 {
-                                    var status = await CheckIfInstalled(_installedApps, result.PackageName);
+                                    var status = await CheckIfInstalled(result.PackageName);
                                     package.Publisher = result.Publisher;
                                     package.PackageName = result.PackageName;
                                     package.PackageIdentifier = result.PackageIdentifier;
@@ -150,7 +148,7 @@ namespace HandyWinget.Views
                                     {
                                         var multiYamlResult = deserializer.Deserialize<YamlPackageModel>(File.OpenText(localPath));
 
-                                        var status = await CheckIfInstalled(_installedApps, multiYamlResult.PackageName);
+                                        var status = await CheckIfInstalled(multiYamlResult.PackageName);
 
                                         package.PackageIdentifier = multiYamlResult.PackageIdentifier;
                                         packageVersion = multiYamlResult.PackageVersion;
@@ -229,7 +227,7 @@ namespace HandyWinget.Views
             }
         }
 
-        private async Task<(bool IsInstalled, string InstalledVersion)> CheckIfInstalled(List<InstalledAppModel> InstalledApp, string PackageName)
+        private async Task<(bool IsInstalled, string InstalledVersion)> CheckIfInstalled(string PackageName)
         {
             bool isInstalled = false;
             string installedVersion = string.Empty;
@@ -238,11 +236,6 @@ namespace HandyWinget.Views
             {
                 case IdentifyPackageMode.Off:
                     return (false, string.Empty);
-                case IdentifyPackageMode.Internal:
-                    var installedStatus = InstalledApp.Where(x => x.DisplayName != null && PackageName != null && x.DisplayName.Contains(PackageName, StringComparison.OrdinalIgnoreCase)).Select(x => x.Version);
-                    isInstalled = installedStatus.Any();
-                    installedVersion = isInstalled ? $"Installed Version: {installedStatus.FirstOrDefault()}" : string.Empty;
-                    return (isInstalled, installedVersion);
                 case IdentifyPackageMode.Wingetcli:
                     isInstalled = await IsPackageExistWingetMode(PackageName);
                     installedVersion = string.Empty;
@@ -540,14 +533,14 @@ namespace HandyWinget.Views
                     }
                     break;
                 case "Uninstall":
-                    if (selectedRows == 1 && !string.IsNullOrEmpty(item.PackageName) && item.IsInstalled)
-                    {
-                        var result = UninstallPackage(item.PackageName);
-                        if (!result)
-                        {
-                            Growl.InfoGlobal("Sorry, we were unable to uninstall your package");
-                        }
-                    }
+                    //if (selectedRows == 1 && !string.IsNullOrEmpty(item.PackageName) && item.IsInstalled)
+                    //{
+                    //    var result = UninstallPackage(item.PackageName);
+                    //    if (!result)
+                    //    {
+                    //        Growl.InfoGlobal("Sorry, we were unable to uninstall your package");
+                    //    }
+                    //}
                     break;
                 case "Export":
                     ExportPowerShellScript();
