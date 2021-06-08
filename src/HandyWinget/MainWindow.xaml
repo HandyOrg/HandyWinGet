@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:prism="http://prismlibrary.com/"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         mc:Ignorable="d" Background="{DynamicResource AcrylicBackgroundFillColorBaseBrush}"
         Title="HandyWinGet" FontFamily="{StaticResource CascadiaCode}"
@@ -33,23 +34,23 @@
                        Header="{Binding SelectedItem.Content, RelativeSource={RelativeSource Mode=Self}}" IsSettingsVisible="False" FontFamily="{StaticResource CascadiaCode}"
                        IsBackButtonVisible="Visible" BackRequested="navView_BackRequested" IsBackEnabled="True">
         <ui:NavigationView.MenuItems>
-            <ui:NavigationViewItem Tag="General" Content="General">
+            <ui:NavigationViewItem Tag="GeneralView" Content="General">
                 <ui:NavigationViewItem.Icon>
                     <ui:PathIcon Data="{DynamicResource GeneralGeometry}"/>
                 </ui:NavigationViewItem.Icon>
             </ui:NavigationViewItem>
-            <ui:NavigationViewItem IsSelected="True" Tag="Packages" Content="Packages">
+            <ui:NavigationViewItem IsSelected="True" Tag="PackageView" Content="Packages">
                 <ui:NavigationViewItem.Icon>
                     <ui:PathIcon Data="{DynamicResource PackageGeometry}"/>
                 </ui:NavigationViewItem.Icon>
             </ui:NavigationViewItem>
-            <ui:NavigationViewItem Tag="CreatePackage" Content="Create New Package">
+            <ui:NavigationViewItem Tag="CreatePackageView" Content="Create New Package">
                 <ui:NavigationViewItem.Icon>
                     <ui:PathIcon Data="{DynamicResource CreateGeometry}"/>
                 </ui:NavigationViewItem.Icon>
             </ui:NavigationViewItem>
         </ui:NavigationView.MenuItems>
-        <ui:Frame x:Name="contentFrame" Navigated="contentFrame_Navigated" Navigating="contentFrame_Navigating"/>
+        <ContentControl prism:RegionManager.RegionName="ContentRegion" />
         <ui:NavigationView.PaneFooter>
             <StackPanel>
                 <ui:NavigationViewItem Name="nvOpenTerminal" Content="Open Terminal" MouseLeftButtonDown="nvOpenTerminal_MouseLeftButtonDown">

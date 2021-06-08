@@ -19,7 +19,8 @@ namespace HandyWinget
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
+            var boot = new Bootstrapper();
+            boot.Run();
             UpdateTheme(Settings.Theme);
             UpdateAccent(Settings.Accent);
             AppCenter.Start(Consts.AppSecret, typeof(Analytics), typeof(Crashes));

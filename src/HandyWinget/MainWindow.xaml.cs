@@ -1,9 +1,8 @@
 ﻿using HandyWinget.Views;
 using ModernWpf.Controls;
-using System.Linq;
+using Prism.Regions;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Navigation;
 using static HandyWinget.Common.Helper;
 namespace HandyWinget
 {
@@ -11,9 +10,11 @@ namespace HandyWinget
     {
         internal static MainWindow Instance;
 
-        public MainWindow()
+        IRegionManager _regionManager;
+        public MainWindow(IRegionManager regionManager)
         {
             InitializeComponent();
+            _regionManager = regionManager;
             Instance = this;
 
             LoadSettings();
@@ -40,22 +41,21 @@ namespace HandyWinget
         }
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            var selectedItem = (NavigationViewItem)args.SelectedItem;
+            var selectedItem = (NavigationViewItem) args.SelectedItem;
             if (selectedItem != null)
             {
+                Navigate(selectedItem.Tag.ToString());
+
                 switch (selectedItem.Tag)
                 {
-                    case "CreatePackage":
+                    case "CreatePackageView":
                         CommandButtonsVisibility(Visibility.Collapsed);
-                        contentFrame?.Navigate(typeof(CreatePackageView));
                         break;
-                    case "Packages":
+                    case "PackageView":
                         CommandButtonsVisibility(Visibility.Visible);
-                        contentFrame?.Navigate(typeof(PackageView));
                         break;
-                    case "General":
+                    case "GeneralView":
                         CommandButtonsVisibility(Visibility.Collapsed);
-                        contentFrame?.Navigate(typeof(GeneralView));
                         break;
                 }
             }
@@ -127,7 +127,7 @@ namespace HandyWinget
             //        cmdBarFlyout.Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft;
             //        break;
             //}
-            
+
             //cmdBarFlyout.ShowAt(element);
         }
 
@@ -138,40 +138,12 @@ namespace HandyWinget
 
         private void navView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
         {
-            if (contentFrame.CanGoBack)
-            {
-                contentFrame.GoBack();
-            }
+            
         }
 
-        private void contentFrame_Navigated(object sender, NavigationEventArgs e)
+        private void Navigate(string view)
         {
-            var pageName = contentFrame.Content.GetType().Name;
-            var menuItem = navView.MenuItems
-                                     .OfType<NavigationViewItem>()
-                                     .Where(item => item.Tag.ToString() == pageName)
-                                     .FirstOrDefault();
-            if (menuItem != null)
-            {
-                navView.SelectedItem = menuItem;
-            }
-
-            if (contentFrame.CanGoBack)
-            {
-                navView.IsBackEnabled = true;
-            }
-            else
-            {
-                navView.IsBackEnabled = false;
-            }
-        }
-
-        private void contentFrame_Navigating(object sender, NavigatingCancelEventArgs e)
-        {
-            if (e.NavigationMode == NavigationMode.Back)
-            {
-                contentFrame.RemoveBackEntry();
-            }
+            _regionManager.RequestNavigate("ContentRegion", view);
         }
     }
 }
