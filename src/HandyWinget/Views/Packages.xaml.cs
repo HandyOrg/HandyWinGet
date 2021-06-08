@@ -2,7 +2,7 @@
 using HandyControl.Controls;
 using HandyControl.Tools;
 using HandyControl.Tools.Extension;
-using HandyWinget.Assets;
+using HandyWinget.Common;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using ModernWpf.Controls;
@@ -22,7 +22,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using static HandyWinget.Assets.Helper;
+using static HandyWinget.Common.Helper;
 namespace HandyWinget.Views
 {
     public partial class Packages : ModernWpf.Controls.Page
@@ -65,18 +65,18 @@ namespace HandyWinget.Views
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (Settings.IsStoreDataGridColumnWidth)
-            {
-                if (Settings.DataGridColumnWidth.Count > 0)
-                {
-                    for (var i = 0; i < dataGrid.Columns.Count; i++)
-                    {
-                        dataGrid.Columns[i].Width = Settings.DataGridColumnWidth[i];
-                    }
-                }
+            //if (Settings.IsStoreDataGridColumnWidth)
+            //{
+            //    if (Settings.DataGridColumnWidth.Count > 0)
+            //    {
+            //        for (var i = 0; i < dataGrid.Columns.Count; i++)
+            //        {
+            //            dataGrid.Columns[i].Width = Settings.DataGridColumnWidth[i];
+            //        }
+            //    }
 
-                hasLoaded = true;
-            }
+            //    hasLoaded = true;
+            //}
         }
 
         #region Parse Manifests
@@ -222,7 +222,7 @@ namespace HandyWinget.Views
 
                 DataList.ShapeView().OrderBy(x => x.Publisher).ThenBy(x => x.PackageName).Apply();
 
-                MainWindow.Instance.txtStatus.Text = $"Available Packages: {DataList.Count} | Updated: {Settings.UpdatedDate}";
+                //MainWindow.Instance.txtStatus.Text = $"Available Packages: {DataList.Count} | Updated: {Settings.UpdatedDate}";
                 MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
             }
         }
@@ -232,15 +232,15 @@ namespace HandyWinget.Views
             bool isInstalled = false;
             string installedVersion = string.Empty;
 
-            switch (Settings.IdentifyPackageMode)
-            {
-                case IdentifyPackageMode.Off:
-                    return (false, string.Empty);
-                case IdentifyPackageMode.Wingetcli:
-                    isInstalled = await IsPackageExistWingetMode(PackageName);
-                    installedVersion = string.Empty;
-                    return (isInstalled, installedVersion);
-            }
+            //switch (Settings.IdentifyPackageMode)
+            //{
+            //    case IdentifyPackageMode.Off:
+            //        return (false, string.Empty);
+            //    case IdentifyPackageMode.Wingetcli:
+            //        isInstalled = await IsPackageExistWingetMode(PackageName);
+            //        installedVersion = string.Empty;
+            //        return (isInstalled, installedVersion);
+            //}
             return (false, string.Empty);
         }
 
@@ -273,7 +273,7 @@ namespace HandyWinget.Views
             if (_wingetData.Contains("Unrecognized command"))
             {
                 Growl.ErrorGlobal("your Winget-cli is not supported please Update your winget-cli.");
-                Helper.StartProcess(Consts.WingetRepository);
+                //Helper.StartProcess(Consts.WingetRepository);
                 return false;
             }
 
@@ -299,33 +299,33 @@ namespace HandyWinget.Views
 
             // if (internet is connected and Manifest folder not exist) or internet is connected and user need refresh
             // we should download manifest
-            if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true) || Settings.AutoRefreshInStartup)
-            {
-                if (IsRefresh)
-                {
-                    txtStatus.Text = "Refreshing Packages...";
-                }
+            //if ((_isConnected && !Directory.Exists(Consts.ManifestPath)) || (_isConnected && IsRefresh is true) || Settings.AutoRefreshInStartup)
+            //{
+            //    if (IsRefresh)
+            //    {
+            //        txtStatus.Text = "Refreshing Packages...";
+            //    }
 
-                WebClient client = new WebClient();
+            //    WebClient client = new WebClient();
 
-                client.DownloadFileCompleted += Client_DownloadFileCompleted;
-                client.DownloadProgressChanged += Client_DownloadProgressChanged;
-                await client.DownloadFileTaskAsync(new Uri(Consts.WingetPkgsRepository), Consts.RootPath + @"\winget-pkgs-master.zip");
+            //    client.DownloadFileCompleted += Client_DownloadFileCompleted;
+            //    client.DownloadProgressChanged += Client_DownloadProgressChanged;
+            //    //await client.DownloadFileTaskAsync(new Uri(Consts.WingetPkgsRepository), Consts.RootPath + @"\winget-pkgs-master.zip");
 
-            }
-            else if (Directory.Exists(Consts.ManifestPath)) // if manifest folder exist and internet is not connected and user need a refresh we should parse local manifests
-            {
-                if (!_isConnected && IsRefresh)
-                {
-                    Growl.WarningGlobal("Unable to connect to the Internet, we Load local packages.");
-                }
+            //}
+            //else if (Directory.Exists(Consts.ManifestPath)) // if manifest folder exist and internet is not connected and user need a refresh we should parse local manifests
+            //{
+            //    if (!_isConnected && IsRefresh)
+            //    {
+            //        Growl.WarningGlobal("Unable to connect to the Internet, we Load local packages.");
+            //    }
 
-                ParseManifests();
-            }
-            else
-            {
-                Growl.ErrorGlobal("Unable to connect to the Internet");
-            }
+            //    ParseManifests();
+            //}
+            //else
+            //{
+            //    Growl.ErrorGlobal("Unable to connect to the Internet");
+            //}
         }
 
         private void Client_DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
@@ -365,7 +365,7 @@ namespace HandyWinget.Views
             {
                 try
                 {
-                    Settings.UpdatedDate = DateTime.Now;
+                    //Settings.UpdatedDate = DateTime.Now;
                     var fileName = Consts.RootPath + @"\winget-pkgs-master.zip";
                     prgStatus.IsIndeterminate = true;
                     prgStatus.Value = 0;
@@ -423,33 +423,33 @@ namespace HandyWinget.Views
         #region Filter and Search
         private void SetDataListGrouping()
         {
-            dataGrid.RowDetailsVisibilityMode = Settings.ShowExtraDetails;
+            //dataGrid.RowDetailsVisibilityMode = Settings.ShowExtraDetails;
 
-            // Set Group for DataGrid
-            if (Settings.GroupByPublisher)
-            {
-                DataList.ShapeView().GroupBy(x => x.Publisher).Apply();
-            }
-            else
-            {
-                DataList.ShapeView().ClearGrouping().Apply();
-            }
+            //// Set Group for DataGrid
+            //if (Settings.GroupByPublisher)
+            //{
+            //    DataList.ShapeView().GroupBy(x => x.Publisher).Apply();
+            //}
+            //else
+            //{
+            //    DataList.ShapeView().ClearGrouping().Apply();
+            //}
         }
 
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            if (MainWindow.Instance.appBarIsInstalled.IsChecked.Value)
-            {
-                DataList.ShapeView().Where(x =>
-                        (x.IsInstalled && x.PackageName != null && x.PackageName.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
-                        (x.IsInstalled && x.Publisher != null && x.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1)).Apply();
-            }
-            else
-            {
-                DataList.ShapeView().Where(p =>
-                         (p.PackageName != null && p.PackageName.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
-                         (p.Publisher != null && p.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1)).Apply();
-            }
+            //if (MainWindow.Instance.appBarIsInstalled.IsChecked.Value)
+            //{
+            //    DataList.ShapeView().Where(x =>
+            //            (x.IsInstalled && x.PackageName != null && x.PackageName.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
+            //            (x.IsInstalled && x.Publisher != null && x.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1)).Apply();
+            //}
+            //else
+            //{
+            //    DataList.ShapeView().Where(p =>
+            //             (p.PackageName != null && p.PackageName.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1) ||
+            //             (p.Publisher != null && p.Publisher.IndexOf(autoBox.Text, StringComparison.OrdinalIgnoreCase) != -1)).Apply();
+            //}
 
             var suggestions = new List<string>();
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
@@ -612,25 +612,25 @@ namespace HandyWinget.Views
 
             if (ApplicationHelper.IsConnectedToInternet())
             {
-                switch (Settings.InstallMode)
-                {
-                    case InstallMode.Wingetcli:
-                        if (Helper.IsWingetInstalled())
-                        {
-                            InstallWingetMode();
-                        }
-                        break;
-                    case InstallMode.Internal:
-                        if (dataGrid.SelectedItems.Count > 1)
-                        {
-                            Growl.ErrorGlobal("you can not install more than 1 package in Internal Mode, for doing this please go to General and switch Install Mode from Internal to Winget-cli Mode.");
-                        }
-                        else
-                        {
-                            InstallInternalMode();
-                        }
-                        break;
-                }
+                //switch (Settings.InstallMode)
+                //{
+                //    case InstallMode.Wingetcli:
+                //        if (Helper.IsWingetInstalled())
+                //        {
+                //            InstallWingetMode();
+                //        }
+                //        break;
+                //    case InstallMode.Internal:
+                //        if (dataGrid.SelectedItems.Count > 1)
+                //        {
+                //            Growl.ErrorGlobal("you can not install more than 1 package in Internal Mode, for doing this please go to General and switch Install Mode from Internal to Winget-cli Mode.");
+                //        }
+                //        else
+                //        {
+                //            InstallInternalMode();
+                //        }
+                //        break;
+                //}
             }
             else
             {
@@ -756,29 +756,29 @@ namespace HandyWinget.Views
 
                     var url = RemoveComment(item.InstallerUrl);
 
-                    if (Settings.IsIDMEnabled)
-                    {
-                        DownloadWithIDM(url);
-                    }
-                    else
-                    {
-                        txtStatus.Text = $"Preparing to download {item.PackageIdentifier}";
-                        tgBlock.IsChecked = false;
-                        prgStatus.IsIndeterminate = false;
-                        _TempSetupPath = $@"{Consts.TempSetupPath}\{item.PackageIdentifier}-{item.Version}{GetExtension(url)}".Trim();
-                        if (!File.Exists(_TempSetupPath))
-                        {
-                            downloaderService = new DownloadService();
-                            downloaderService.DownloadProgressChanged += DownloaderService_DownloadProgressChanged;
-                            downloaderService.DownloadFileCompleted += DownloaderService_DownloadFileCompleted;
-                            await downloaderService.DownloadFileTaskAsync(url, _TempSetupPath);
-                        }
-                        else
-                        {
-                            tgBlock.IsChecked = true;
-                            StartProcess(_TempSetupPath);
-                        }
-                    }
+                    //if (Settings.IsIDMEnabled)
+                    //{
+                    //    DownloadWithIDM(url);
+                    //}
+                    //else
+                    //{
+                    //    txtStatus.Text = $"Preparing to download {item.PackageIdentifier}";
+                    //    tgBlock.IsChecked = false;
+                    //    prgStatus.IsIndeterminate = false;
+                    //    _TempSetupPath = $@"{Consts.TempPath}\{item.PackageIdentifier}-{item.Version}{GetExtension(url)}".Trim();
+                    //    if (!File.Exists(_TempSetupPath))
+                    //    {
+                    //        downloaderService = new DownloadService();
+                    //        downloaderService.DownloadProgressChanged += DownloaderService_DownloadProgressChanged;
+                    //        downloaderService.DownloadFileCompleted += DownloaderService_DownloadFileCompleted;
+                    //        await downloaderService.DownloadFileTaskAsync(url, _TempSetupPath);
+                    //    }
+                    //    else
+                    //    {
+                    //        tgBlock.IsChecked = true;
+                    //        StartProcess(_TempSetupPath);
+                    //    }
+                    //}
                 }
             }
             catch (Exception ex)
@@ -914,20 +914,20 @@ namespace HandyWinget.Views
         {
             if (!hasLoaded)
                 return;
-            if (Settings.IsStoreDataGridColumnWidth)
-            {
-                for (int i = Settings.DataGridColumnWidth.Count; i < dataGrid.Columns.Count; i++)
-                {
-                    Settings.DataGridColumnWidth.Add(default);
-                }
+            //if (Settings.IsStoreDataGridColumnWidth)
+            //{
+            //    for (int i = Settings.DataGridColumnWidth.Count; i < dataGrid.Columns.Count; i++)
+            //    {
+            //        Settings.DataGridColumnWidth.Add(default);
+            //    }
 
-                for (int index = 0; index < dataGrid.Columns.Count; index++)
-                {
-                    if (dataGrid.Columns == null)
-                        return;
-                    Settings.DataGridColumnWidth[index] = new DataGridLength(dataGrid.Columns[index].ActualWidth);
-                }
-            }
+            //    for (int index = 0; index < dataGrid.Columns.Count; index++)
+            //    {
+            //        if (dataGrid.Columns == null)
+            //            return;
+            //        Settings.DataGridColumnWidth[index] = new DataGridLength(dataGrid.Columns[index].ActualWidth);
+            //    }
+            //}
         }
     }
 }

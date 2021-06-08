@@ -1,7 +1,7 @@
 ﻿using HandyControl.Tools.Converter;
 using System.ComponentModel;
 
-namespace HandyWinget.Assets
+namespace HandyWinget.Common
 {
     [TypeConverter(typeof(EnumDescriptionTypeConverter))]
     public enum IdentifyPackageMode

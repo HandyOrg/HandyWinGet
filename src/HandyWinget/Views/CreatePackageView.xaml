@@ -1,0 +1,73 @@
+﻿<UserControl x:Class="HandyWinget.Views.CreatePackageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:ui="http://schemas.modernwpf.com/2019">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <hc:ScrollViewer Margin="10">
+            <StackPanel x:Name="panel"/>
+        </hc:ScrollViewer>
+        <hc:ScrollViewer Grid.Row="1">
+            <StackPanel>
+                <TextBlock Margin="10" HorizontalAlignment="Left" Text="General" Style="{StaticResource TextBlockTitleBold}" />
+                <TextBox Name="txtAppName" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="Excel" ui:ControlHelper.Header="Package Name"/>
+                <TextBox Name="txtPublisher" TextChanged="txtPublisher_TextChanged" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="Microsoft" ui:ControlHelper.Header="Publisher" />
+                <TextBox Name="txtId" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="Publisher.PackageName: Microsoft.Excel" ui:ControlHelper.Header="Package Identifier" />
+                <TextBox Name="txtVersion" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="1.0 OR 1.0.0.0" ui:ControlHelper.Header="Package Version" />
+                <TextBox Name="txtDescription" VerticalContentAlignment="Top" Margin="10,0,10,10" Height="100" TextWrapping="Wrap" ui:ControlHelper.Header="Short Description" />
+                <Separator Margin="0,10"/>
+
+                <TextBlock Margin="10" HorizontalAlignment="Left" Text="License" Style="{StaticResource TextBlockTitleBold}" />
+
+                <TextBox Name="txtHomePage" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="https://github.com/microsoft/winget-pkgs" ui:ControlHelper.Header="Package Url" />
+                <TextBox Name="txtLicense" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="MIT" ui:ControlHelper.Header="License" />
+                <TextBox Name="txtLicenseUrl" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="https://github.com/microsoft/winget-pkgs/blob/master/LICENSE" ui:ControlHelper.Header="License Url" />
+                <Separator Margin="0,10"/>
+
+                <TextBlock Margin="10" HorizontalAlignment="Left" Text="Url" Style="{StaticResource TextBlockTitleBold}" />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox x:Name="lstInstaller" hc:Empty.ShowEmpty="True" DisplayMemberPath="Architecture" ItemsSource="{Binding Installers}" Margin="10,10,0,0"/>
+
+                    <StackPanel Grid.Column="1">
+                        <ComboBox Name="cmbArchitecture" SelectedIndex="1" Margin="10,0,10,10" ui:ControlHelper.PlaceholderText="x86, x64, arm, arm64, Neutral" ui:ControlHelper.Header="Architecture" HorizontalAlignment="Stretch">
+                            <ComboBoxItem Content="x86" />
+                            <ComboBoxItem Content="x64" />
+                            <ComboBoxItem Content="arm" />
+                            <ComboBoxItem Content="arm64" />
+                            <ComboBoxItem Content="Neutral" />
+                        </ComboBox>
+                        <TextBox Name="txtUrl" Margin="10,0,10,10" ui:ControlHelper.Header="Installer Url" ui:ControlHelper.PlaceholderText="Installer Url"/>
+                        <TextBox Name="txtHash" Margin="10,0" ui:ControlHelper.Header="Installer Sha256" ui:ControlHelper.PlaceholderText="1017c8ff310e4cb4fb843de26c93baa170fe5a4764065d9faa25a45a6d724514" />
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="btnGetHashWeb" Click="btnGetHashWeb_Click" Content="Get Hash From Installer Url" MinWidth="270" Margin="10,20,10,0"/>
+                            <Button x:Name="btnGetHashLocal" Click="btnGetHashLocal_Click" Content="Get Hash From Local Installer" MinWidth="270" Margin="0,20,10,0"/>
+                        </StackPanel>
+                        <Separator Margin="0,10"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
+                            <Button x:Name="btnAddInstaller" Click="btnAddInstaller_Click" Content="Add Installer" Width="200"/>
+                            <Button x:Name="btnRemoveInstaller" Click="btnRemoveInstaller_Click" Margin="10,0" Content="Remove Installer" Width="200"/>
+
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <ui:ProgressBar Name="prgStatus" Margin="10"/>
+                <Separator Margin="0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="btnCreate" Click="btnCreate_Click" Margin="10,10,0,10" Width="150" HorizontalAlignment="Right" Content="Create Package" />
+                    <Button x:Name="btnValidate" IsEnabled="False" Click="btnValidate_Click" Margin="10" Width="150" HorizontalAlignment="Right" Content="Validate Package" />
+                    <Button x:Name="btnCopy" Click="btnCopy_Click" Margin="0,10,10,10" Width="150" HorizontalAlignment="Right" Content="Copy to clipboard" />
+                </StackPanel>
+            </StackPanel>
+        </hc:ScrollViewer>
+    </Grid>
+</UserControl>

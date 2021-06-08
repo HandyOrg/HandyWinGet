@@ -1,4 +1,4 @@
-﻿namespace HandyWinget.Assets
+﻿namespace HandyWinget.Common
 {
     public enum GenerateScriptMode
     {

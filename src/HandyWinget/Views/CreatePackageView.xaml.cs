@@ -1,10 +1,4 @@
-﻿using Downloader;
-using HandyControl.Controls;
-using HandyControl.Tools;
-using HandyWinget.Assets;
-using HandyWinget.Assets.Models.Export;
-using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,14 +7,21 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using Downloader;
+using HandyControl.Tools;
+using HandyWinget.Common;
+using HandyWinget.Common.Models.Export;
+using HandyWinget.Control;
+using Microsoft.Win32;
 using YamlDotNet.Serialization;
+using Path = System.IO.Path;
 
 namespace HandyWinget.Views
 {
     /// <summary>
-    /// Interaction logic for CreatePackage.xaml
+    /// Interaction logic for CreatePackageView.xaml
     /// </summary>
-    public partial class CreatePackage : ModernWpf.Controls.Page, INotifyPropertyChanged
+    public partial class CreatePackageView : UserControl, INotifyPropertyChanged
     {
         #region INotify
         public event PropertyChangedEventHandler PropertyChanged;
@@ -35,18 +36,18 @@ namespace HandyWinget.Views
         public ObservableCollection<Installer> Installers
         {
             get { return installers; }
-            set 
-            { 
+            set
+            {
                 installers = value;
-                RaisePropertyChanged(nameof(installers));
+                RaisePropertyChanged();
             }
         }
-
-        public CreatePackage()
+        public CreatePackageView()
         {
             InitializeComponent();
+
             DataContext = this;
-            
+
             if (Helper.IsWingetInstalled())
             {
                 btnValidate.IsEnabled = true;
@@ -69,7 +70,7 @@ namespace HandyWinget.Views
         {
             if (Installers.Count > 1)
             {
-                Growl.ErrorGlobal("You have Multiple installer We do not support this scenario yet.");
+                Helper.SetInfoBar("Not Supported", "You have Multiple installer We do not support this scenario yet.", panel, Severity.Warning);
             }
             else
             {
@@ -98,7 +99,7 @@ namespace HandyWinget.Views
             try
             {
                 if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) &&
-                    !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text) && 
+                    !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text) &&
                     !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
                     var versionBuilder = new ExportVersionModel
@@ -147,20 +148,20 @@ namespace HandyWinget.Views
                 }
                 else
                 {
-                    Growl.ErrorGlobal("Required fields must be filled");
+                    Helper.SetInfoBar("Fill Inputs", "Required fields must be filled", panel, Severity.Error);
                 }
             }
             catch (Exception ex)
             {
-                Growl.ErrorGlobal(ex.Message);
+                Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
             }
         }
         public void GenerateScript(GenerateScriptMode mode)
         {
             try
             {
-                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) && 
-                    !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text) && 
+                if (!string.IsNullOrEmpty(txtAppName.Text) && !string.IsNullOrEmpty(txtPublisher.Text) &&
+                    !string.IsNullOrEmpty(txtId.Text) && !string.IsNullOrEmpty(txtVersion.Text) &&
                     !string.IsNullOrEmpty(txtLicense.Text) && !string.IsNullOrEmpty(txtUrl.Text) && txtUrl.Text.IsUrl())
                 {
                     var builder = new YamlPackageModel
@@ -185,7 +186,7 @@ namespace HandyWinget.Views
                     {
                         case GenerateScriptMode.CopyToClipboard:
                             Clipboard.SetText(yaml);
-                            Growl.SuccessGlobal("Script Copied to clipboard.");
+                            Helper.SetInfoBar("Script Copied", "Script Copied to clipboard.", panel, Severity.Success);
                             ClearInputs();
                             break;
                         case GenerateScriptMode.SaveToFile:
@@ -205,12 +206,12 @@ namespace HandyWinget.Views
                 }
                 else
                 {
-                    Growl.ErrorGlobal("Required fields must be filled");
+                    Helper.SetInfoBar("Fill Inputs", "Required fields must be filled", panel, Severity.Error);
                 }
             }
             catch (Exception ex)
             {
-                Growl.ErrorGlobal(ex.Message);
+                Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
             }
         }
 
@@ -229,30 +230,31 @@ namespace HandyWinget.Views
                         var downloader = new DownloadService();
                         downloader.DownloadProgressChanged += OnDownloadProgressChanged;
                         downloader.DownloadFileCompleted += OnDownloadFileCompleted;
-                        await downloader.DownloadFileTaskAsync(txtUrl.Text, new DirectoryInfo(Consts.TempSetupPath));
+                        await downloader.DownloadFileTaskAsync(txtUrl.Text, new DirectoryInfo(Consts.TempPath));
                     }
                     catch (Exception ex)
                     {
                         prgStatus.IsIndeterminate = true;
                         prgStatus.ShowError = true;
-                        Growl.ErrorGlobal(ex.Message);
+                        Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
                     }
                 }
                 else
                 {
-                    Growl.ErrorGlobal("Url field is Empty or Invalid");
+                    Helper.SetInfoBar("Invalid", "Url field is Empty or Invalid", panel, Severity.Error);
+
                 }
             }
             catch (Exception ex)
             {
-                Growl.ErrorGlobal(ex.Message);
+                Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
             }
         }
 
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             DispatcherHelper.RunOnMainThread(() => {
-                string fileName = ((DownloadPackage)e.UserState).FileName;
+                string fileName = ((DownloadPackage) e.UserState).FileName;
                 prgStatus.Value = 0;
                 txtHash.Text = CryptographyHelper.GenerateSHA256FromFile(fileName);
                 btnGetHashWeb.IsEnabled = true;
@@ -266,7 +268,7 @@ namespace HandyWinget.Views
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             DispatcherHelper.RunOnMainThread(() => {
-                prgStatus.Value = (int)e.ProgressPercentage;
+                prgStatus.Value = (int) e.ProgressPercentage;
             });
         }
 
@@ -316,12 +318,12 @@ namespace HandyWinget.Views
                 }
                 else
                 {
-                    Growl.ErrorGlobal($"{arch} Architecture already exist.");
+                    Helper.SetInfoBar("Error", $"{arch} Architecture already exist.", panel, Severity.Error);
                 }
             }
             else
             {
-                Growl.ErrorGlobal("Installer Url and Installer Sha256 must be filled");
+                Helper.SetInfoBar("Error", "Installer Url and Installer Sha256 must be filled", panel, Severity.Error);
             }
         }
 
@@ -334,7 +336,7 @@ namespace HandyWinget.Views
             }
             else
             {
-                Growl.ErrorGlobal("Please Select Installer from list");
+                Helper.SetInfoBar("Error", "Please Select Installer from list", panel, Severity.Error);
             }
         }
     }

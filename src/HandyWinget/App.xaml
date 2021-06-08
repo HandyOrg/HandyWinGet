@@ -2,45 +2,69 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:HandyWinget.Control"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources/>
                 <ui:XamlControlsResources/>
-                <hc:ThemeResources/>
+                <hc:ThemeResources>
+                    <hc:ThemeResources.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Light" hc:ThemeDictionary.Key="Light">
+                            <SolidColorBrush x:Key="InfoBarInformationalSeverityBackgroundBrush" Color="#F2F2F2" />
+                            <SolidColorBrush x:Key="ErrorSeverity" Color="#FDE7E9" />
+                            <SolidColorBrush x:Key="InformationSeverity" Color="#F4F4F4" />
+                            <SolidColorBrush x:Key="WarningSeverity" Color="#FFF4CE" />
+                            <SolidColorBrush x:Key="SuccessSeverity" Color="#DFF6DD" />
+                           </ResourceDictionary>
+
+                        <ResourceDictionary x:Key="Dark" hc:ThemeDictionary.Key="Dark">
+                            <SolidColorBrush x:Key="InfoBarInformationalSeverityBackgroundBrush" Color="#2B2B2B" />
+                            <SolidColorBrush x:Key="ErrorSeverity" Color="#442726" />
+                            <SolidColorBrush x:Key="InformationSeverity" Color="#272727" />
+                            <SolidColorBrush x:Key="WarningSeverity" Color="#433519" />
+                            <SolidColorBrush x:Key="SuccessSeverity" Color="#393D1B" />
+                        </ResourceDictionary>
+                    </hc:ThemeResources.ThemeDictionaries>
+                </hc:ThemeResources>
                 <hc:Theme/>
                 <ResourceDictionary Source="/Resources/Geometries.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <FontFamily x:Key="CascadiaCode">Resources/Font/CascadiaCode.ttf#Cascadia Code</FontFamily>
+            <FontFamily x:Key="CascadiaCodeBold">Resources/Font/CascadiaCode.ttf#Cascadia Code Bold</FontFamily>
+            <FontFamily x:Key="CascadiaCodeLight">Resources/Font/CascadiaCode.ttf#Cascadia Code Light</FontFamily>
+            <FontFamily x:Key="CascadiaCodeSemiLight">Resources/Font/CascadiaCode.ttf#Cascadia Code SemiLight</FontFamily>
+            <FontFamily x:Key="ContentControlThemeFontFamily">Resources/Font/CascadiaCode.ttf#Cascadia Code</FontFamily>
+            <conv:EnumToBrushConverter x:Key="EnumToBrushConverter"/>
 
             <Style TargetType="ui:AutoSuggestBox">
-                <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
                 <Style.Resources>
                     <Style TargetType="ListView" BasedOn="{StaticResource DefaultListViewStyle}"/>
                 </Style.Resources>
             </Style>
 
-            <Style TargetType="ui:AppBarButton">
-                <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
-            </Style>
-
-            <Style TargetType="ui:AppBarToggleButton">
-                <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
-            </Style>
-
             <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
+                <Setter Property="MinWidth" Value="200"/>
             </Style>
 
             <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
-                <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
+                <Setter Property="MinWidth" Value="200"/>
             </Style>
 
-            <Style TargetType="ui:NavigationViewItem">
-                <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource DefaultComboBoxStyle}"/>
+
+            <Style x:Key="InfoBarCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="Width" Value="28"/>
+                <Setter Property="Height" Value="28"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="Margin" Value="5"/>
             </Style>
+
+            <Style TargetType="RadioButton" BasedOn="{StaticResource DefaultRadioButtonStyle}"/>
+
+            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

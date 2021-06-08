@@ -1,15 +1,10 @@
-﻿using HandyControl.Controls;
-using HandyControl.Themes;
-using HandyControl.Tools;
-using HandyWinget.Views;
+﻿using HandyWinget.Views;
 using ModernWpf.Controls;
-using ModernWpf.Controls.Primitives;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Navigation;
-using static HandyWinget.Assets.Helper;
+using static HandyWinget.Common.Helper;
 namespace HandyWinget
 {
     public partial class MainWindow
@@ -38,10 +33,10 @@ namespace HandyWinget
 
         public void CommandButtonsVisibility(Visibility visibility)
         {
-            appBarInstall.Visibility = visibility;
-            appBarRefresh.Visibility = visibility;
-            appBarIsInstalled.Visibility = visibility;
-            appBarSeperator.Visibility = visibility;
+            //appBarInstall.Visibility = visibility;
+            //appBarRefresh.Visibility = visibility;
+            //appBarIsInstalled.Visibility = visibility;
+            //appBarSeperator.Visibility = visibility;
         }
         private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
@@ -52,57 +47,17 @@ namespace HandyWinget
                 {
                     case "CreatePackage":
                         CommandButtonsVisibility(Visibility.Collapsed);
-                        contentFrame?.Navigate(typeof(CreatePackage));
+                        contentFrame?.Navigate(typeof(CreatePackageView));
                         break;
                     case "Packages":
                         CommandButtonsVisibility(Visibility.Visible);
-                        contentFrame?.Navigate(typeof(Packages));
+                        contentFrame?.Navigate(typeof(PackageView));
                         break;
                     case "General":
                         CommandButtonsVisibility(Visibility.Collapsed);
-                        contentFrame?.Navigate(typeof(General));
+                        contentFrame?.Navigate(typeof(GeneralView));
                         break;
                 }
-            }
-        }
-
-        private void ApplicationTheme_Click(object sender, RoutedEventArgs e)
-        {
-            if (e.OriginalSource is AppBarButton button && button.Tag is ApplicationTheme tag)
-            {
-                if (tag.Equals(Settings.Theme)) return;
-
-                Settings.Theme = tag;
-                ((App)Application.Current).UpdateTheme(tag);
-            }
-            else if (e.OriginalSource is AppBarButton btn && (string)btn.Tag is "Accent")
-            {
-                var picker = SingleOpenHelper.CreateControl<ColorPicker>();
-                var window = new PopupWindow
-                {
-                    PopupElement = picker,
-                    WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                    AllowsTransparency = true,
-                    WindowStyle = WindowStyle.None,
-                    MinWidth = 0,
-                    MinHeight = 0,
-                    Title = "Accent Color",
-                    FontFamily = ResourceHelper.GetResource<FontFamily>("CascadiaCode")
-                };
-
-                if (Settings.Accent !=null)
-                {
-                    picker.SelectedBrush = new SolidColorBrush(ColorHelper.GetColorFromBrush(Settings.Accent));
-                }
-
-                picker.SelectedColorChanged += delegate
-                {
-                    ((App)Application.Current).UpdateAccent(picker.SelectedBrush);
-                    Settings.Accent = picker.SelectedBrush;
-                    window.Close();
-                };
-                picker.Canceled += delegate { window.Close(); };
-                window.Show();
             }
         }
 
@@ -153,32 +108,27 @@ namespace HandyWinget
 
         private void appBarIsInstalled_Checked(object sender, RoutedEventArgs e)
         {
-            Packages.Instance.FilterInstalledApps(appBarIsInstalled.IsChecked.Value);
+            //Packages.Instance.FilterInstalledApps(appBarIsInstalled.IsChecked.Value);
         }
 
         private void OpenFlyout(string resourceKey, FrameworkElement element)
         {
-            var cmdBarFlyout = (CommandBarFlyout)Resources[resourceKey];
-            var paneMode = Settings.PaneDisplayMode;
-            switch (paneMode)
-            {
-                case NavigationViewPaneDisplayMode.Auto:
-                case NavigationViewPaneDisplayMode.Left:
-                case NavigationViewPaneDisplayMode.LeftCompact:
-                case NavigationViewPaneDisplayMode.LeftMinimal:
-                    cmdBarFlyout.Placement = FlyoutPlacementMode.RightEdgeAlignedTop;
-                    break;
-                case NavigationViewPaneDisplayMode.Top:
-                    cmdBarFlyout.Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft;
-                    break;
-            }
+            //var cmdBarFlyout = (CommandBarFlyout)Resources[resourceKey];
+            //var paneMode = Settings.PaneDisplayMode;
+            //switch (paneMode)
+            //{
+            //    case NavigationViewPaneDisplayMode.Auto:
+            //    case NavigationViewPaneDisplayMode.Left:
+            //    case NavigationViewPaneDisplayMode.LeftCompact:
+            //    case NavigationViewPaneDisplayMode.LeftMinimal:
+            //        cmdBarFlyout.Placement = FlyoutPlacementMode.RightEdgeAlignedTop;
+            //        break;
+            //    case NavigationViewPaneDisplayMode.Top:
+            //        cmdBarFlyout.Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft;
+            //        break;
+            //}
             
-            cmdBarFlyout.ShowAt(element);
-        }
-
-        private void nvChangeTheme_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            OpenFlyout("ThemeCommandBar", nvChangeTheme);
+            //cmdBarFlyout.ShowAt(element);
         }
 
         private void nvOpenTerminal_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

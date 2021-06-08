@@ -1,12 +1,12 @@
 ﻿using HandyControl.Themes;
 using HandyControl.Tools;
-using HandyWinget.Assets;
+using HandyWinget.Common;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using System.Windows;
 using System.Windows.Media;
-using static HandyWinget.Assets.Helper;
+using static HandyWinget.Common.Helper;
 namespace HandyWinget
 {
     public partial class App : Application

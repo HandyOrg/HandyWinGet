@@ -1,27 +1,101 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Tools;
 using Microsoft.VisualBasic;
-using Nucs.JsonSettings;
-using Nucs.JsonSettings.Autosave;
-using Nucs.JsonSettings.Fluent;
-using Nucs.JsonSettings.Modulation;
 using Nucs.JsonSettings.Modulation.Recovery;
-using System;
+using Nucs.JsonSettings.Modulation;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using Nucs.JsonSettings;
+using Nucs.JsonSettings.Fluent;
+using Nucs.JsonSettings.Autosave;
+using HandyWinget.Control;
+using System.Windows.Controls;
+using System;
+using System.Windows.Media;
+using System.Windows;
 
-namespace HandyWinget.Assets
+namespace HandyWinget.Common
 {
     public static class Helper
     {
-        public static ISettings Settings = JsonSettings.Configure<ISettings>()
+        public static HWGSettings Settings = JsonSettings.Configure<HWGSettings>()
                                    .WithRecovery(RecoveryAction.RenameAndLoadDefault)
-                                   .WithVersioning(new Version(1,0,0,0), VersioningResultAction.RenameAndLoadDefault)
+                                   .WithVersioning(VersioningResultAction.RenameAndLoadDefault)
                                    .LoadNow()
                                    .EnableAutosave();
 
+        public static void CreateColorPicker()
+        {
+            SolidColorBrush tempAccent = null;
+            var picker = SingleOpenHelper.CreateControl<ColorPicker>();
+            var window = new PopupWindow
+            {
+                PopupElement = picker,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                AllowsTransparency = true,
+                WindowStyle = WindowStyle.None,
+                MinWidth = 0,
+                MinHeight = 0,
+                Title = "Accent Color",
+                FontFamily = ResourceHelper.GetResource<FontFamily>("CascadiaCode")
+            };
+            Style style = new Style(typeof(Button));
+            style.BasedOn = ResourceHelper.GetResource<Style>("ButtonDefault");
+            window.Resources.Add(typeof(Button), style);
+
+            if (Settings.Accent != null)
+            {
+                picker.SelectedBrush = new SolidColorBrush(ColorHelper.GetColorFromBrush(Settings.Accent));
+                tempAccent = picker.SelectedBrush;
+            }
+
+            picker.SelectedColorChanged += delegate
+            {
+                ((App) Application.Current).UpdateAccent(picker.SelectedBrush);
+                Settings.Accent = picker.SelectedBrush;
+            };
+
+            picker.Confirmed += delegate
+            {
+                window.Close();
+            };
+
+            picker.Canceled += delegate
+            {
+                window.Close();
+            };
+            window.Show();
+        }
+        public static T ParseEnum<T>(string value)
+        {
+            return (T) Enum.Parse(typeof(T), value, true);
+        }
+        public static void SetInfoBar(string title, string message, StackPanel panel, Severity severity)
+        {
+            var bar = new InfoBar();
+            bar.Severity = severity;
+            bar.Title = title;
+            bar.Message = message;
+
+            panel.Children.Add(bar);
+        }
+
+        public static void SetInfoBarWithAction(string title, string message, StackPanel panel, Severity severity, string buttonContent, Action action)
+        {
+            var bar = new InfoBar();
+            bar.Severity = severity;
+            bar.Title = title;
+            bar.Message = message;
+
+            var btnAction = new Button();
+            btnAction.Content = buttonContent;
+            btnAction.Click += (e, s) => { action(); };
+
+            bar.ActionButton = btnAction;
+            panel.Children.Add(bar);
+        }
         public static string ConvertBytesToMegabytes(long bytes)
         {
             return ((bytes / 1024f) / 1024f).ToString("0.00");
@@ -41,7 +115,7 @@ namespace HandyWinget.Assets
                     {
                         return true;
                     }
-                    StartProcess(Consts.WingetRepository);
+                    //StartProcess(Consts.WingetRepository);
                     return true;
                 });
 
@@ -216,7 +290,7 @@ Catch{
       Write-Host ""Determining latest release""
       $json = Invoke-WebRequest $releases
       $tag = ($json | ConvertFrom-Json)[0].tag_name
-      $file = ($json | ConvertFrom-Json)[0].assets[0].name
+      $file = ($json | ConvertFrom-Json)[0].Common[0].name
 	
       $download = ""https://github.com/$repo/releases/download/$tag/$file""
       $output = $PSScriptRoot + ""\winget-latest.appxbundle""

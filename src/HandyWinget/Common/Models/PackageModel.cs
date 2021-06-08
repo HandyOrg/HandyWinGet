@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HandyWinget.Assets
+namespace HandyWinget.Common
 {
     public class PackageModel
     {
