@@ -9,16 +9,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources/>
                 <ui:XamlControlsResources/>
-                <hc:ThemeResources>
-                    <hc:ThemeResources.ThemeDictionaries>
-                        <ResourceDictionary x:Key="Light" hc:ThemeDictionary.Key="Light">
-                            <SolidColorBrush x:Key="MainBackground" Color="#F3F3F3" />
-                        </ResourceDictionary>
-                        <ResourceDictionary x:Key="Dark" hc:ThemeDictionary.Key="Dark">
-                            <SolidColorBrush x:Key="MainBackground" Color="#202020" />
-                        </ResourceDictionary>
-                    </hc:ThemeResources.ThemeDictionaries>
-                </hc:ThemeResources>
+                <hc:ThemeResources/>
                 <hc:Theme/>
                 <ResourceDictionary Source="/Resources/Geometries.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -39,11 +30,11 @@
                 <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
             </Style>
 
-            <Style x:Key="DefaultButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                 <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
             </Style>
 
-            <Style x:Key="AccentButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+            <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
                 <Setter Property="FontFamily" Value="{StaticResource CascadiaCode}"/>
             </Style>
 

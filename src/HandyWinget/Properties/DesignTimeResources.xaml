@@ -2,5 +2,6 @@
                     xmlns:hc="https://handyorg.github.io/handycontrol">
     <ResourceDictionary.MergedDictionaries>
         <hc:IntellisenseResources Source="/HandyControl;Component/DesignTime/DesignTimeResources.xaml" />
+        <hc:IntellisenseResources Source="/ModernWpf;Component/DesignTime/DesignTimeResources.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

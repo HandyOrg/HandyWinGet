@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:ui="http://schemas.modernwpf.com/2019"
-        mc:Ignorable="d" Background="{DynamicResource MainBackground}"
+        mc:Ignorable="d" Background="{DynamicResource AcrylicBackgroundFillColorBaseBrush}"
         Title="HandyWinGet" FontFamily="{StaticResource CascadiaCode}"
         WindowStartupLocation="CenterScreen"
         ui:WindowHelper.UseModernWindowStyle="True"

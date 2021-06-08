@@ -33,7 +33,7 @@
                 
                 <ToggleButton x:Name="tgIsBackEnabled" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Margin="10,0" Content="Show Back Button for Navigation" Checked="tgIsBackEnabled_Checked" Unchecked="tgIsBackEnabled_Checked" />
 
-                <Button Click="ResetAccent_Click" Style="{StaticResource DefaultButtonStyle}" Content="Reset Accent Color" Margin="0,20"/>
+                <Button Click="ResetAccent_Click" Content="Reset Accent Color" Margin="0,20"/>
             </StackPanel>
 
             <StackPanel Margin="10,0,50,20" Grid.Column="1">
@@ -65,7 +65,7 @@
                 <TextBlock Margin="0,10" HorizontalAlignment="Left" Text="Update" Style="{StaticResource TextBlockTitleBold}" />
 
                 <TextBlock x:Name="currentVersion" HorizontalAlignment="Left" Style="{StaticResource TextBlockSubTitle}" FontSize="14" />
-                <Button x:Name="btnCheck" Click="CheckUpdate_Click" HorizontalAlignment="Left" Margin="0,10" Content="Check For Update" FontSize="14" Style="{StaticResource AccentButtonStyle}" />
+                <Button x:Name="btnCheck" Click="CheckUpdate_Click" HorizontalAlignment="Left" Margin="0,10" Content="Check For Update" FontSize="14" Style="{StaticResource AccentButton}"/>
             </StackPanel>
         </Grid>
     </hc:ScrollViewer>

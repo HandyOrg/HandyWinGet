@@ -40,13 +40,13 @@
                     <hc:TextBox Name="txtUrl" Margin="10,0,10,10" TextType="Url" hc:TitleElement.Title="Installer Url" hc:InfoElement.Necessary="True" />
                     <StackPanel Orientation="Horizontal">
                         <hc:TextBox Name="txtHash" hc:InfoElement.Necessary="True" Width="300" Margin="10,0" hc:TitleElement.Title="Installer Sha256" hc:InfoElement.Placeholder="1017c8ff310e4cb4fb843de26c93baa170fe5a4764065d9faa25a45a6d724514" />
-                        <Button x:Name="btnGetHashWeb" Click="btnGetHashWeb_Click" Content="Get Hash From Installer Url" Width="200" Margin="10,30,10,0" Style="{StaticResource DefaultButtonStyle}"/>
-                        <Button x:Name="btnGetHashLocal" Click="btnGetHashLocal_Click" Content="Get Hash From Local Installer" Width="200" Margin="0,30,10,0" Style="{StaticResource DefaultButtonStyle}"/>
+                        <Button x:Name="btnGetHashWeb" Click="btnGetHashWeb_Click" Content="Get Hash From Installer Url" Width="200" Margin="10,30,10,0"/>
+                        <Button x:Name="btnGetHashLocal" Click="btnGetHashLocal_Click" Content="Get Hash From Local Installer" Width="200" Margin="0,30,10,0"/>
                     </StackPanel>
                     <Separator Margin="0,10"/>
                     <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
-                        <Button x:Name="btnAddInstaller" Click="btnAddInstaller_Click" Content="Add Installer" Width="200" Style="{StaticResource DefaultButtonStyle}"/>
-                        <Button x:Name="btnRemoveInstaller" Click="btnRemoveInstaller_Click" Margin="10,0" Content="Remove Installer" Width="200" Style="{StaticResource DefaultButtonStyle}"/>
+                        <Button x:Name="btnAddInstaller" Click="btnAddInstaller_Click" Content="Add Installer" Width="200"/>
+                        <Button x:Name="btnRemoveInstaller" Click="btnRemoveInstaller_Click" Margin="10,0" Content="Remove Installer" Width="200"/>
 
                     </StackPanel>
                 </StackPanel>
@@ -54,9 +54,9 @@
             <ui:ProgressBar Name="prgStatus" Margin="10"/>
             <Separator Margin="0,10"/>
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="btnCreate" Click="btnCreate_Click" Margin="10,10,0,10" Width="150" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Right" Content="Create Package" />
-                <Button x:Name="btnValidate" IsEnabled="False" Click="btnValidate_Click" Margin="10" Width="150" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Right" Content="Validate Package" />
-                <Button x:Name="btnCopy" Click="btnCopy_Click" Margin="0,10,10,10" Width="150" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Right" Content="Copy to clipboard" />
+                <Button x:Name="btnCreate" Click="btnCreate_Click" Margin="10,10,0,10" Width="150" HorizontalAlignment="Right" Content="Create Package" />
+                <Button x:Name="btnValidate" IsEnabled="False" Click="btnValidate_Click" Margin="10" Width="150" HorizontalAlignment="Right" Content="Validate Package" />
+                <Button x:Name="btnCopy" Click="btnCopy_Click" Margin="0,10,10,10" Width="150" HorizontalAlignment="Right" Content="Copy to clipboard" />
             </StackPanel>
         </StackPanel>
     </hc:ScrollViewer>
