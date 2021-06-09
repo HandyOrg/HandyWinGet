@@ -12,9 +12,6 @@ using ModernWpf.Controls;
 using static HandyWinget.Common.Helper;
 namespace HandyWinget.Views
 {
-    /// <summary>
-    /// Interaction logic for GeneralView.xaml
-    /// </summary>
     public partial class GeneralView : UserControl
     {
         private readonly List<string> _colorPresetList = new List<string>
@@ -59,10 +56,10 @@ namespace HandyWinget.Views
             switch (Settings.InstallMode)
             {
                 case InstallMode.Wingetcli:
-                    tgIDM.Visibility = Visibility.Collapsed;
+                    stkIDM.Visibility = Visibility.Collapsed;
                     break;
                 case InstallMode.Internal:
-                    tgIDM.Visibility = Visibility.Visible;
+                    stkIDM.Visibility = Visibility.Visible;
                     break;
             }
 
@@ -70,7 +67,6 @@ namespace HandyWinget.Views
             tgGroup.IsChecked = Settings.GroupByPublisher;
             tgSaveDGColumnWidth.IsChecked = Settings.IsStoreDataGridColumnWidth;
             tgAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
-            tgIsBackEnabled.IsChecked = Settings.IsBackEnabled;
             cmbDetails.SelectedItem = Settings.ShowExtraDetails;
 
             if (Settings.Theme == ApplicationTheme.Light)
@@ -106,7 +102,7 @@ namespace HandyWinget.Views
             switch (mode)
             {
                 case InstallMode.Wingetcli:
-                    tgIDM.Visibility = Visibility.Collapsed;
+                    stkIDM.Visibility = Visibility.Collapsed;
                     if (!IsOsSupported())
                     {
                         cmbInstall.SelectedIndex = 1;
@@ -118,7 +114,7 @@ namespace HandyWinget.Views
                     }
                     break;
                 case InstallMode.Internal:
-                    tgIDM.Visibility = Visibility.Visible;
+                    stkIDM.Visibility = Visibility.Visible;
                     break;
             }
 
@@ -173,15 +169,6 @@ namespace HandyWinget.Views
             }
         }
 
-        private void tgIsBackEnabled_Checked(object sender, RoutedEventArgs e)
-        {
-            var state = tgIsBackEnabled.IsChecked.Value;
-            if (state != Settings.IsBackEnabled)
-            {
-                Settings.IsBackEnabled = state;
-                MainWindow.Instance.navView.IsBackButtonVisible = state ? NavigationViewBackButtonVisible.Visible : NavigationViewBackButtonVisible.Collapsed;
-            }
-        }
         #endregion
         #endregion
 

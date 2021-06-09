@@ -223,7 +223,7 @@ namespace HandyWinget.Views
                 DataList.ShapeView().OrderBy(x => x.Publisher).ThenBy(x => x.PackageName).Apply();
 
                 //MainWindow.Instance.txtStatus.Text = $"Available Packages: {DataList.Count} | Updated: {Settings.UpdatedDate}";
-                MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
+                //MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
             }
         }
 
@@ -293,7 +293,7 @@ namespace HandyWinget.Views
             prgStatus.IsIndeterminate = true;
             tgCancelDownload.Visibility = Visibility.Collapsed;
 
-            MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
+           // MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
 
             bool _isConnected = ApplicationHelper.IsConnectedToInternet();
 
@@ -643,7 +643,7 @@ namespace HandyWinget.Views
             var item = GetSelectedPackage();
             if (item.PackageIdentifier != null)
             {
-                MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
+               // MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
 
                 tgBlock.IsChecked = false;
                 prgStatus.IsIndeterminate = true;
@@ -730,7 +730,7 @@ namespace HandyWinget.Views
                         prgStatus.ShowError = false;
                         prgStatus.IsIndeterminate = false;
 
-                        MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
+                       // MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
                     });
                 };
 
@@ -752,7 +752,7 @@ namespace HandyWinget.Views
 
                 if (item.PackageIdentifier != null)
                 {
-                    MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
+                   // MainWindow.Instance.CommandButtonsVisibility(Visibility.Collapsed);
 
                     var url = RemoveComment(item.InstallerUrl);
 
@@ -801,7 +801,7 @@ namespace HandyWinget.Views
             else
             {
                 DispatcherHelper.RunOnMainThread(() => {
-                    MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
+                   // MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
                     tgBlock.IsChecked = true;
                 });
                 StartProcess(_TempSetupPath);
@@ -832,7 +832,7 @@ namespace HandyWinget.Views
                 txtStatus.Text = "Operation Canceled";
                 await Task.Delay(4000);
                 tgBlock.IsChecked = true;
-                MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
+               // MainWindow.Instance.CommandButtonsVisibility(Visibility.Visible);
             }
         }
 

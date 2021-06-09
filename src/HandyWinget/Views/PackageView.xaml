@@ -4,9 +4,54 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:HandyWinget.Views"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <TabControl Style="{StaticResource TabControlPivotStyle}">
+        <TabItem Header="List">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <hc:ScrollViewer Margin="10">
+                    <StackPanel x:Name="panel"/>
+                </hc:ScrollViewer>
+
+                <DataGrid Grid.Row="1" hc:Empty.ShowEmpty="True"/>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
+                    <ui:ProgressBar Value="65" MinWidth="200"/>
+                </StackPanel>
+                <ui:CommandBar Grid.Row="3">
+                    <ui:AppBarButton Name="appBarInstall" Click="appBarInstall_Click" Label="Install Selected Packages">
+                        <ui:AppBarButton.Icon>
+                            <ui:PathIcon Data="{DynamicResource InstalledGeometry}"/>
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
+                    <ui:AppBarButton Name="appBarRefresh" Click="appBarRefresh_Click" Label="Refresh Packages">
+                        <ui:AppBarButton.Icon>
+                            <ui:PathIcon Data="{DynamicResource RefreshGeometry}"/>
+                        </ui:AppBarButton.Icon>
+                    </ui:AppBarButton>
+
+                    <ui:AppBarSeparator Name="appBarSeperator"/>
+                    <ui:AppBarToggleButton Name="appBarIsInstalled" Checked="appBarIsInstalled_Checked" Unchecked="appBarIsInstalled_Checked" Label="Show Only Installed">
+                        <ui:AppBarToggleButton.Icon>
+                            <ui:PathIcon Data="{DynamicResource InstalledGeometry}"/>
+                        </ui:AppBarToggleButton.Icon>
+                    </ui:AppBarToggleButton>
+                    <ui:CommandBar.Content>
+                        <TextBlock x:Name="txtStatus" Margin="10"/>
+                    </ui:CommandBar.Content>
+                </ui:CommandBar>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Download History">
             
-    </Grid>
+        </TabItem>
+    </TabControl>
 </UserControl>

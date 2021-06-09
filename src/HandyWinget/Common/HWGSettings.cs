@@ -23,7 +23,6 @@ namespace HandyWinget
         public virtual bool GroupByPublisher { get; set; } = false;
         public virtual bool AutoRefreshInStartup { get; set; } = false;
         public virtual bool IsStoreDataGridColumnWidth { get; set; } = false;
-        public virtual bool IsBackEnabled { get; set; } = true;
         public virtual DateTime UpdatedDate { get; set; } = DateTime.Now;
         public virtual DataGridRowDetailsVisibilityMode ShowExtraDetails { get; set; } = DataGridRowDetailsVisibilityMode.Collapsed;
         public virtual NavigationViewPaneDisplayMode PaneDisplayMode { get; set; } = NavigationViewPaneDisplayMode.Top;

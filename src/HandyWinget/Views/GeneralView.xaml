@@ -5,10 +5,7 @@
              xmlns:ui="http://schemas.modernwpf.com/2019"
              xmlns:enum="clr-namespace:HandyWinget.Common">
     <TabControl Style="{StaticResource TabControlPivotStyle}">
-        <TabItem>
-            <TabItem.Header>
-                <TextBlock Text="Settings" FontSize="24" FontFamily="{StaticResource CascadiaCodeLight}"/>
-            </TabItem.Header>
+        <TabItem Header="Settings">
             <hc:ScrollViewer>
                 <StackPanel Margin="10">
                     <ComboBox Name="cmbIdentify" SelectionChanged="cmbIdentify_SelectionChanged" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type enum:IdentifyPackageMode}}}"
@@ -20,7 +17,7 @@
                     <ComboBox Name="cmbDetails" SelectionChanged="cmbDetails_SelectionChanged" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type DataGridRowDetailsVisibilityMode}}}"
                           ui:ControlHelper.Header="Show extra package details (by clicking on the row)" MinWidth="450" Margin="0,10,50,10" HorizontalAlignment="Left"/>
 
-                    <StackPanel Margin="0,10" Orientation="Horizontal">
+                    <StackPanel x:Name="stkIDM" Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="tgIDM" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="tgIDM_Checked" Unchecked="tgIDM_Checked"/>
                         <TextBlock VerticalAlignment="Center" Text="Download with Internet Download Manager (IDM)"/>
                     </StackPanel>
@@ -40,18 +37,10 @@
                         <TextBlock VerticalAlignment="Center" Text="Save and Restore DataGrid Columns Width"/>
                     </StackPanel>
 
-                    <StackPanel Margin="0,10" Orientation="Horizontal">
-                        <ToggleButton x:Name="tgIsBackEnabled" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="tgIsBackEnabled_Checked" Unchecked="tgIsBackEnabled_Checked" />
-                        <TextBlock VerticalAlignment="Center" Text="Show Back Button for Navigation"/>
-                    </StackPanel>
-
                 </StackPanel>
             </hc:ScrollViewer>
         </TabItem>
-        <TabItem>
-            <TabItem.Header>
-                <TextBlock Text="Appearance" FontSize="24" FontFamily="{StaticResource CascadiaCodeLight}"/>
-            </TabItem.Header>
+        <TabItem Header="Appearance">
             <hc:ScrollViewer>
                 <StackPanel Margin="10">
                     <ui:RadioButtons Name="radioButtons" Margin="0,10" ui:ControlHelper.Header="Application Theme">
@@ -71,10 +60,7 @@
                 </StackPanel>
             </hc:ScrollViewer>
         </TabItem>
-        <TabItem>
-            <TabItem.Header>
-                <TextBlock Text="About" FontSize="24" FontFamily="{StaticResource CascadiaCodeLight}"/>
-            </TabItem.Header>
+        <TabItem Header="About">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" MaxHeight="500"/>
