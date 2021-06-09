@@ -21,8 +21,9 @@
                     <StackPanel x:Name="panel"/>
                 </hc:ScrollViewer>
 
-                <DataGrid Grid.Row="1" hc:Empty.ShowEmpty="True"/>
-
+                <StackPanel Grid.Row="1">
+                    <Button Content="Create" Click="Button_Click" Grid.Row="1"/>
+                </StackPanel>
                 <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
                     <ui:ProgressBar Value="65" MinWidth="200"/>
                 </StackPanel>
