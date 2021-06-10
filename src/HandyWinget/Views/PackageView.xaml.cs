@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -14,6 +15,8 @@ using HandyControl.Tools.Extension;
 using HandyWinget.Common;
 using HandyWinget.Database;
 using HandyWinget.Database.Tables;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HandyWinget.Views
@@ -76,38 +79,62 @@ namespace HandyWinget.Views
         {
             
         }
+
         private async void GenerateDatabaseAsync()
         {
-            var hwgDB = new HWGContext();
-            using (var mydb = new HWGContext())
-            {
-                await mydb.Database.EnsureDeletedAsync();
-                await mydb.Database.EnsureCreatedAsync();
-                using (var msixDB = new MSIXContext())
-                {
-                    var query =
-                        from item in msixDB.IdsMSIXTable
-                        from manifest in msixDB.Set<ManifestMSIXTable>().Where(e => e.id == item.rowid)
-                        from productMap in msixDB.ProductCodesMapMSIXTable.Where(e => e.manifest == manifest.rowid).Take(1).DefaultIfEmpty()
-                        from prdCode in msixDB.ProductCodesMSIXTable.Where(e => e.rowid == productMap.productcode).Take(1).DefaultIfEmpty()
-                        from yml in msixDB.PathPartsMSIXTable.Where(e => e.rowid == manifest.pathpart).Take(1).DefaultIfEmpty()
-                        from pathPartVersion in msixDB.PathPartsMSIXTable.Where(e => e.rowid == yml.parent).Take(1).DefaultIfEmpty()
-                        from pathPartAppName in msixDB.PathPartsMSIXTable.Where(e => e.rowid == pathPartVersion.parent).Take(1).DefaultIfEmpty()
-                        from pathPartPublisher in msixDB.PathPartsMSIXTable.Where(e => e.rowid == pathPartAppName.parent).Take(1).DefaultIfEmpty()
-                        from pathPart in msixDB.PathPartsMSIXTable.Where(e => e.rowid == pathPartPublisher.parent).Take(1).DefaultIfEmpty()
-                        from version in msixDB.VersionsMSIXTable.Where(e => e.rowid == manifest.version).Take(1).DefaultIfEmpty()
-                        select new ManifestTable
-                        {
-                            PackageId = item.id,
-                            ProductCode = prdCode.productcode,
-                            YamlName = $@"{pathPart.pathpart}\{pathPartPublisher.pathpart}\{pathPartAppName.pathpart}\{pathPartVersion.pathpart}\{yml.pathpart}",
-                            Version = version.version
-                        };
+            using var msixDB = new MSIXContext();
 
-                    mydb.ManifestTable.AddRange(await query.ToListAsync());
-                    await mydb.SaveChangesAsync();
-                }
-            }
+            var mydb = new HWGContext();
+
+            await mydb.Database.EnsureDeletedAsync();
+            await mydb.Database.EnsureCreatedAsync();
+
+            using var db = msixDB.CreateLinqToDbConnection();
+
+            var pathCte = db.GetCte<PathPartCte>(cte => (
+                    from pathPart in msixDB.PathPartsMSIXTable
+                    select new PathPartCte
+                    {
+                        rowid = pathPart.rowid,
+                        parent = pathPart.parent,
+                        path = pathPart.pathpart
+                    }
+                )
+                .Concat(
+                    from pathPart in msixDB.PathPartsMSIXTable
+                    from child in cte.Where(child => child.parent == pathPart.rowid)
+                    select new PathPartCte
+                    {
+                        rowid = child.rowid,
+                        parent = pathPart.parent,
+                        path = pathPart.pathpart + "\\" + child.path
+                    }
+                )
+            );
+
+            var query =
+                from item in msixDB.IdsMSIXTable
+                from manifest in msixDB.Set<ManifestMSIXTable>().Where(e => e.id == item.rowid)
+
+                from yml in msixDB.PathPartsMSIXTable.Where(e => e.rowid == manifest.pathpart)
+                from pathPartVersion in msixDB.PathPartsMSIXTable.Where(e => e.rowid == yml.parent)
+                from pathPartAppName in msixDB.PathPartsMSIXTable.Where(e => e.rowid == pathPartVersion.parent)
+                from pathPartPublisher in msixDB.PathPartsMSIXTable.Where(e => e.rowid == pathPartAppName.parent)
+                from pathPart in pathCte.Where(e => e.rowid == pathPartPublisher.parent && e.parent == null)
+                from productMap in msixDB.ProductCodesMapMSIXTable.Where(e => e.manifest == manifest.rowid).DefaultIfEmpty()
+                from prdCode in msixDB.ProductCodesMSIXTable.Where(e => e.rowid == productMap.productcode).DefaultIfEmpty()
+                from version in msixDB.VersionsMSIXTable.Where(e => e.rowid == manifest.version)
+                select new ManifestTable
+                {
+                    PackageId = item.id,
+                    ProductCode = prdCode.productcode,
+                    YamlName = $@"{pathPart.path}\{pathPartPublisher.pathpart}\{pathPartAppName.pathpart}\{pathPartVersion.pathpart}\{yml.pathpart}",
+                    Version = version.version
+                };
+
+            var data = await query.ToArrayAsyncLinqToDB();
+            mydb.AddRange(data);
+            await mydb.SaveChangesAsync();
         }
         private readonly HttpClient client = new HttpClient();
 
@@ -115,13 +142,13 @@ namespace HandyWinget.Views
         {
             using (var db = new HWGContext())
             {
-                var list = await db.ManifestTable.ToListAsync();
-                foreach (var item in list)
-                {
-                    var responseString = await client.GetStringAsync($"https://winget.azureedge.net/cache/manifests/{item.YamlName}");
-                    Debug.WriteLine(responseString);
+               // var list = await db.ManifestTable.ToListAsync();
+                //foreach (var item in list)
+                //{
+                //    var responseString = await client.GetStringAsync($"https://winget.azureedge.net/cache/manifests/{item.YamlName}");
+                //    Debug.WriteLine(responseString);
 
-                }
+                //}
             }
 
         }
