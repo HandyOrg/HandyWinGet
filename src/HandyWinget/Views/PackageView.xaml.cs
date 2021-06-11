@@ -5,6 +5,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
+using System.Security.Policy;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,52 +18,76 @@ using HandyControl.Tools.Extension;
 using HandyWinget.Common;
 using HandyWinget.Database;
 using HandyWinget.Database.Tables;
-using LinqToDB;
-using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using ModernWpf.Controls;
+using static HandyWinget.Common.Helper;
+using static HandyControl.Tools.DispatcherHelper;
+using HandyWinget.Control;
+using Microsoft.VisualBasic;
 
 namespace HandyWinget.Views
 {
     public partial class PackageView : UserControl
     {
+        private bool hasLoaded = false;
+
         public PackageView()
         {
             InitializeComponent();
+            Loaded += PackageView_Loaded;
+            initSettings();
         }
 
-        private void appBarRefresh_Click(object sender, RoutedEventArgs e)
+        private void initSettings()
         {
-            //DownloadManifests(true);
+            txtUpdateDate.Text = $"Last Update: {Settings.UpdatedDate}";
         }
 
-        private void appBarInstall_Click(object sender, RoutedEventArgs e)
+        private void PackageView_Loaded(object sender, RoutedEventArgs e)
         {
-            //InstallPackage();
-        }
-
-        private void appBarIsInstalled_Checked(object sender, RoutedEventArgs e)
-        {
-            //FilterInstalledApps(appBarIsInstalled.IsChecked.Value);
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Task.Run(() =>
+            if (!File.Exists(Consts.HWGDatabasePath) || Settings.AutoRefreshInStartup)
             {
-                GenerateDatabaseAsync();
-
-            }).ContinueWith(x =>
+                btnUpdate_Click(null, null);
+            }
+            else
             {
-                DownloadManifests();
-            });
+                //LoadDatabaseAsync();
+            }
+
+            if (Settings.IsStoreDataGridColumnWidth)
+            {
+                if (Settings.DataGridColumnWidth.Count > 0)
+                {
+                    for (var i = 0; i < dataGrid.Columns.Count; i++)
+                    {
+                        dataGrid.Columns[i].Width = Settings.DataGridColumnWidth[i];
+                    }
+                }
+
+                hasLoaded = true;
+            }
         }
 
-        private async void downloadSource()
+        private async void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
-            var downloader = new DownloadService();
-            downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
-            downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
-            await downloader.DownloadFileTaskAsync(Consts.MSIXSourceUrl, new DirectoryInfo(Consts.MSIXPath));
+            bool _isConnected = ApplicationHelper.IsConnectedToInternet();
+            if (_isConnected)
+            {
+                txtStatus.Text = "Downloading Database...";
+                txtPrgStatus.Text = string.Empty;
+                prgMSIX.Value = 0;
+                prgMSIX.Visibility = Visibility.Visible;
+                prgMSIX.IsIndeterminate = false;
+                var downloader = new DownloadService();
+                downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
+                downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
+                await downloader.DownloadFileTaskAsync(Consts.MSIXSourceUrl, new DirectoryInfo(Consts.MSIXPath));
+            }
+            else
+            {
+                CreateInfoBar("Network UnAvailable", "Unable to connect to the Internet", panel, Severity.Error);
+            }
         }
 
         private void Downloader_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -68,88 +95,94 @@ namespace HandyWinget.Views
             var downloadInfo = e.UserState as DownloadPackage;
             if (downloadInfo != null && downloadInfo.FileName != null)
             {
-                DispatcherHelper.RunOnMainThread(() => {
+                RunOnMainThread(() => {
+                    txtStatus.Text = "Extracting...";
+                    prgMSIX.IsIndeterminate = true;
                     ZipFile.ExtractToDirectory(downloadInfo.FileName, Consts.MSIXPath, true);
                 });
-                GenerateDatabaseAsync();
+                Task.Run(() =>
+                {
+                    DatabaseOperation.GenerateDatabaseAsync();
+
+                }).ContinueWith( x =>
+                {
+                    RunOnMainThread(async() =>
+                    {
+                        prgMSIX.IsIndeterminate = false;
+                        prgMSIX.Visibility = Visibility.Collapsed;
+                        Settings.UpdatedDate = DateTime.Now;
+                        txtUpdateDate.Text = $"Last Update: {DateTime.Now}";
+                        LoadDatabaseAsync();
+                    });
+                });
             }
         }
 
         private void Downloader_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            var progress = (int) e.ProgressPercentage;
+            RunOnMainThread(() =>
+            {
+                prgMSIX.Value = progress;
+                txtPrgStatus.Text = $"Downloading {BytesToMegabytes(e.ReceivedBytesSize)} MB of {BytesToMegabytes(e.TotalBytesToReceive)} MB  -  {progress}%";
+            });
+        }
+
+        private async void LoadDatabaseAsync()
+        {
+            using var db = new HWGContext();
+            dataGrid.ItemsSource = await db.ManifestTable.ToListAsync();
+        }
+
+        private async void GetManifestAsync()
+        {
+            using var db = new HWGContext();
+            using var client = new HttpClient();
+
+            var list = await db.ManifestTable.ToListAsync();
+
+
+            //var link = $"{Consts.AzureBaseUrl}{item.YamlName}";
+            //var responseString = await client.GetStringAsync(link).ConfigureAwait(false);
+        }
+
+        private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+
+        }
+
+        private void dataGrid_LayoutUpdated(object sender, EventArgs e)
+        {
+            if (!hasLoaded)
+                return;
+            if (Settings.IsStoreDataGridColumnWidth)
+            {
+                for (int i = Settings.DataGridColumnWidth.Count; i < dataGrid.Columns.Count; i++)
+                {
+                    Settings.DataGridColumnWidth.Add(default);
+                }
+
+                for (int index = 0; index < dataGrid.Columns.Count; index++)
+                {
+                    if (dataGrid.Columns == null)
+                        return;
+                    Settings.DataGridColumnWidth[index] = new DataGridLength(dataGrid.Columns[index].ActualWidth);
+                }
+            }
+        }
+        private void ContextMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is MenuItem button)
+            {
+                ContextMenuActions(button.Tag.ToString());
+            }
+        }
+        private void ContextMenuActions(string tag)
+        {
             
         }
-
-        private async void GenerateDatabaseAsync()
+        private void ContextMenu_Loaded(object sender, RoutedEventArgs e)
         {
-            using var msixDB = new MSIXContext();
-
-            var mydb = new HWGContext();
-
-            await mydb.Database.EnsureDeletedAsync();
-            await mydb.Database.EnsureCreatedAsync();
-
-            using var db = msixDB.CreateLinqToDbConnection();
-
-            var pathCte = db.GetCte<PathPartCte>(cte => (
-                    from pathPart in msixDB.PathPartsMSIXTable
-                    select new PathPartCte
-                    {
-                        rowid = pathPart.rowid,
-                        parent = pathPart.parent,
-                        path = pathPart.pathpart
-                    }
-                )
-                .Concat(
-                    from pathPart in msixDB.PathPartsMSIXTable
-                    from child in cte.Where(child => child.parent == pathPart.rowid)
-                    select new PathPartCte
-                    {
-                        rowid = child.rowid,
-                        parent = pathPart.parent,
-                        path = pathPart.pathpart + "\\" + child.path
-                    }
-                )
-            );
-
-            var query =
-                from item in msixDB.IdsMSIXTable
-                from manifest in msixDB.Set<ManifestMSIXTable>().Where(e => e.id == item.rowid)
-
-                from yml in msixDB.PathPartsMSIXTable.Where(e => e.rowid == manifest.pathpart)
-                from pathPartVersion in msixDB.PathPartsMSIXTable.Where(e => e.rowid == yml.parent)
-                from pathPartAppName in msixDB.PathPartsMSIXTable.Where(e => e.rowid == pathPartVersion.parent)
-                from pathPartPublisher in msixDB.PathPartsMSIXTable.Where(e => e.rowid == pathPartAppName.parent)
-                from pathPart in pathCte.Where(e => e.rowid == pathPartPublisher.parent && e.parent == null)
-                from productMap in msixDB.ProductCodesMapMSIXTable.Where(e => e.manifest == manifest.rowid).DefaultIfEmpty()
-                from prdCode in msixDB.ProductCodesMSIXTable.Where(e => e.rowid == productMap.productcode).DefaultIfEmpty()
-                from version in msixDB.VersionsMSIXTable.Where(e => e.rowid == manifest.version)
-                select new ManifestTable
-                {
-                    PackageId = item.id,
-                    ProductCode = prdCode.productcode,
-                    YamlName = $@"{pathPart.path}\{pathPartPublisher.pathpart}\{pathPartAppName.pathpart}\{pathPartVersion.pathpart}\{yml.pathpart}",
-                    Version = version.version
-                };
-
-            var data = await query.ToArrayAsyncLinqToDB();
-            mydb.AddRange(data);
-            await mydb.SaveChangesAsync();
-        }
-        private readonly HttpClient client = new HttpClient();
-
-        private async void DownloadManifests()
-        {
-            using (var db = new HWGContext())
-            {
-               // var list = await db.ManifestTable.ToListAsync();
-                //foreach (var item in list)
-                //{
-                //    var responseString = await client.GetStringAsync($"https://winget.azureedge.net/cache/manifests/{item.YamlName}");
-                //    Debug.WriteLine(responseString);
-
-                //}
-            }
 
         }
     }

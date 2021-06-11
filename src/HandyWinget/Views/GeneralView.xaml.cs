@@ -252,14 +252,14 @@ namespace HandyWinget.Views
 
                 if (version.IsExistNewVersion)
                 {
-                    SetInfoBarWithAction("New Update Available", $"we found a new Version {version.TagName}, do you want to download?", panel, Severity.Success, "Download New Version", () =>
+                    CreateInfoBarWithAction("New Update Available", $"we found a new Version {version.TagName}, do you want to download?", panel, Severity.Success, "Download New Version", () =>
                     {
                         StartProcess(version.Assets[0].Url);
                     });
                 }
                 else
                 {
-                    SetInfoBar("Latest Version", "you are using Latest Version.", panel, Severity.Error);
+                    CreateInfoBar("Latest Version", "you are using Latest Version.", panel, Severity.Error);
                 }
 
                 btnCheck.IsEnabled = true;
@@ -267,7 +267,7 @@ namespace HandyWinget.Views
             }
             catch (Exception ex)
             {
-                SetInfoBar("Error", ex.Message, panel, Severity.Error);
+                CreateInfoBar("Error", ex.Message, panel, Severity.Error);
             }
         }
         #endregion

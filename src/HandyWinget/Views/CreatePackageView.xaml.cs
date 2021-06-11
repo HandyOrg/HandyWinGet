@@ -70,7 +70,7 @@ namespace HandyWinget.Views
         {
             if (Installers.Count > 1)
             {
-                Helper.SetInfoBar("Not Supported", "You have Multiple installer We do not support this scenario yet.", panel, Severity.Warning);
+                Helper.CreateInfoBar("Not Supported", "You have Multiple installer We do not support this scenario yet.", panel, Severity.Warning);
             }
             else
             {
@@ -148,12 +148,12 @@ namespace HandyWinget.Views
                 }
                 else
                 {
-                    Helper.SetInfoBar("Fill Inputs", "Required fields must be filled", panel, Severity.Error);
+                    Helper.CreateInfoBar("Fill Inputs", "Required fields must be filled", panel, Severity.Error);
                 }
             }
             catch (Exception ex)
             {
-                Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
+                Helper.CreateInfoBar("Error", ex.Message, panel, Severity.Error);
             }
         }
         public void GenerateScript(GenerateScriptMode mode)
@@ -186,7 +186,7 @@ namespace HandyWinget.Views
                     {
                         case GenerateScriptMode.CopyToClipboard:
                             Clipboard.SetText(yaml);
-                            Helper.SetInfoBar("Script Copied", "Script Copied to clipboard.", panel, Severity.Success);
+                            Helper.CreateInfoBar("Script Copied", "Script Copied to clipboard.", panel, Severity.Success);
                             ClearInputs();
                             break;
                         case GenerateScriptMode.SaveToFile:
@@ -206,12 +206,12 @@ namespace HandyWinget.Views
                 }
                 else
                 {
-                    Helper.SetInfoBar("Fill Inputs", "Required fields must be filled", panel, Severity.Error);
+                    Helper.CreateInfoBar("Fill Inputs", "Required fields must be filled", panel, Severity.Error);
                 }
             }
             catch (Exception ex)
             {
-                Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
+                Helper.CreateInfoBar("Error", ex.Message, panel, Severity.Error);
             }
         }
 
@@ -236,18 +236,18 @@ namespace HandyWinget.Views
                     {
                         prgStatus.IsIndeterminate = true;
                         prgStatus.ShowError = true;
-                        Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
+                        Helper.CreateInfoBar("Error", ex.Message, panel, Severity.Error);
                     }
                 }
                 else
                 {
-                    Helper.SetInfoBar("Invalid", "Url field is Empty or Invalid", panel, Severity.Error);
+                    Helper.CreateInfoBar("Invalid", "Url field is Empty or Invalid", panel, Severity.Error);
 
                 }
             }
             catch (Exception ex)
             {
-                Helper.SetInfoBar("Error", ex.Message, panel, Severity.Error);
+                Helper.CreateInfoBar("Error", ex.Message, panel, Severity.Error);
             }
         }
 
@@ -318,12 +318,12 @@ namespace HandyWinget.Views
                 }
                 else
                 {
-                    Helper.SetInfoBar("Error", $"{arch} Architecture already exist.", panel, Severity.Error);
+                    Helper.CreateInfoBar("Error", $"{arch} Architecture already exist.", panel, Severity.Error);
                 }
             }
             else
             {
-                Helper.SetInfoBar("Error", "Installer Url and Installer Sha256 must be filled", panel, Severity.Error);
+                Helper.CreateInfoBar("Error", "Installer Url and Installer Sha256 must be filled", panel, Severity.Error);
             }
         }
 
@@ -336,7 +336,7 @@ namespace HandyWinget.Views
             }
             else
             {
-                Helper.SetInfoBar("Error", "Please Select Installer from list", panel, Severity.Error);
+                Helper.CreateInfoBar("Error", "Please Select Installer from list", panel, Severity.Error);
             }
         }
     }

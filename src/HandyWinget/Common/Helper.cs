@@ -15,6 +15,7 @@ using System.Windows.Controls;
 using System;
 using System.Windows.Media;
 using System.Windows;
+using System.Text;
 
 namespace HandyWinget.Common
 {
@@ -72,7 +73,7 @@ namespace HandyWinget.Common
         {
             return (T) Enum.Parse(typeof(T), value, true);
         }
-        public static void SetInfoBar(string title, string message, StackPanel panel, Severity severity)
+        public static void CreateInfoBar(string title, string message, StackPanel panel, Severity severity)
         {
             var bar = new InfoBar();
             bar.Severity = severity;
@@ -81,8 +82,7 @@ namespace HandyWinget.Common
 
             panel.Children.Add(bar);
         }
-
-        public static void SetInfoBarWithAction(string title, string message, StackPanel panel, Severity severity, string buttonContent, Action action)
+        public static void CreateInfoBarWithAction(string title, string message, StackPanel panel, Severity severity, string buttonContent, Action action)
         {
             var bar = new InfoBar();
             bar.Severity = severity;
@@ -96,9 +96,42 @@ namespace HandyWinget.Common
             bar.ActionButton = btnAction;
             panel.Children.Add(bar);
         }
-        public static string ConvertBytesToMegabytes(long bytes)
+        public static string BytesToMegabytes(long bytes)
         {
             return ((bytes / 1024f) / 1024f).ToString("0.00");
+        }
+
+        /// <summary>
+        /// Get Publisher and Application Name from YamlUri eg: manifests/e/microsoft/visualstudio/...
+        /// </summary>
+        /// <param name="ymlUri"></param>
+        /// <returns></returns>
+        public static (string publisher, string name) GetPublisherAndName(string ymlUri)
+        {
+            String[] breakApart = ymlUri.Split('/');
+            return (publisher: breakApart[2], name: breakApart[3]);
+        }
+
+        /// <summary>
+        /// Add spaces before Capital Letters
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string AddSpacesToString(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return "";
+            StringBuilder newCaption = new StringBuilder(text.Length * 2);
+            newCaption.Append(text[0]);
+            int pos = 1;
+            for (pos = 1; pos < text.Length - 1; pos++)
+            {
+                if (char.IsUpper(text[pos]) && !(char.IsUpper(text[pos - 1]) && char.IsUpper(text[pos + 1])))
+                    newCaption.Append(' ');
+                newCaption.Append(text[pos]);
+            }
+            newCaption.Append(text[pos]);
+            return newCaption.ToString();
         }
 
         public static bool IsWingetInstalled()

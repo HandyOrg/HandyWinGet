@@ -10,7 +10,7 @@ namespace HandyWinget.Database.Tables
         public long Id { get; set; }
         public string PackageId { get; set; }
         public string Version { get; set; }
-        public string YamlName { get; set; }
+        public string YamlUri { get; set; }
         public string ProductCode { get; set; }
     }
 }
