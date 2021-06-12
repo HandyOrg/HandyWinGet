@@ -1,30 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Mime;
-using System.Security.Policy;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Downloader;
-using HandyControl.Controls;
 using HandyControl.Tools;
-using HandyControl.Tools.Extension;
 using HandyWinget.Common;
 using HandyWinget.Database;
-using HandyWinget.Database.Tables;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ModernWpf.Controls;
 using static HandyWinget.Common.Helper;
 using static HandyControl.Tools.DispatcherHelper;
+using static HandyWinget.Common.DatabaseOperation;
 using HandyWinget.Control;
-using Microsoft.VisualBasic;
+using System.ComponentModel;
+using System.Windows.Data;
+using HandyWinget.Common.Models;
 
 namespace HandyWinget.Views
 {
@@ -52,7 +45,7 @@ namespace HandyWinget.Views
             }
             else
             {
-                //LoadDatabaseAsync();
+                LoadDatabaseAsync();
             }
 
             if (Settings.IsStoreDataGridColumnWidth)
@@ -66,6 +59,28 @@ namespace HandyWinget.Views
                 }
 
                 hasLoaded = true;
+            }
+
+        }
+
+        private void SetGroupDataGrid()
+        {
+            ICollectionView view = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+
+            if (Settings.GroupByPublisher)
+            {
+                if (view != null)
+                {
+                    view.GroupDescriptions.Clear();
+                    view.GroupDescriptions.Add(new PropertyGroupDescription("Publisher"));
+                }
+            }
+            else
+            {
+                if (view != null)
+                {
+                    view.GroupDescriptions.Clear();
+                }
             }
         }
 
@@ -102,7 +117,7 @@ namespace HandyWinget.Views
                 });
                 Task.Run(() =>
                 {
-                    DatabaseOperation.GenerateDatabaseAsync();
+                    GenerateDatabaseAsync();
 
                 }).ContinueWith( x =>
                 {
@@ -130,8 +145,8 @@ namespace HandyWinget.Views
 
         private async void LoadDatabaseAsync()
         {
-            using var db = new HWGContext();
-            dataGrid.ItemsSource = await db.ManifestTable.ToListAsync();
+            dataGrid.ItemsSource = await GetAllPackageAsync();
+            SetGroupDataGrid();
         }
 
         private async void GetManifestAsync()
@@ -148,9 +163,23 @@ namespace HandyWinget.Views
 
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-
+            if (!string.IsNullOrEmpty(autoBox.Text))
+            {
+                ICollectionView view = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+                view.Filter = new Predicate<object>(filterPackages);
+            }
         }
+        private bool filterPackages(object item)
+        {
+            var search = item as HWGPackageModel;
+            if (search.PackageId.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
+                search.Name.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
+                search.Publisher.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase)) { 
 
+                return true;
+            }
+            return false;
+        }
         private void dataGrid_LayoutUpdated(object sender, EventArgs e)
         {
             if (!hasLoaded)

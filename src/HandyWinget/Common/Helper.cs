@@ -119,19 +119,30 @@ namespace HandyWinget.Common
         /// <returns></returns>
         public static string AddSpacesToString(string text)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                return "";
-            StringBuilder newCaption = new StringBuilder(text.Length * 2);
-            newCaption.Append(text[0]);
-            int pos = 1;
-            for (pos = 1; pos < text.Length - 1; pos++)
+            try
             {
-                if (char.IsUpper(text[pos]) && !(char.IsUpper(text[pos - 1]) && char.IsUpper(text[pos + 1])))
-                    newCaption.Append(' ');
+                if (string.IsNullOrWhiteSpace(text))
+                    return text;
+
+                if (text.Length <= 3)
+                    return text;
+
+                StringBuilder newCaption = new StringBuilder(text.Length * 2);
+                newCaption.Append(text[0]);
+                int pos = 1;
+                for (pos = 1; pos < text.Length - 1; pos++)
+                {
+                    if (char.IsUpper(text[pos]) && !(char.IsUpper(text[pos - 1]) && char.IsUpper(text[pos + 1])))
+                        newCaption.Append(' ');
+                    newCaption.Append(text[pos]);
+                }
                 newCaption.Append(text[pos]);
+                return newCaption.ToString();
             }
-            newCaption.Append(text[pos]);
-            return newCaption.ToString();
+            catch (IndexOutOfRangeException)
+            {
+                return text;
+            }
         }
 
         public static bool IsWingetInstalled()

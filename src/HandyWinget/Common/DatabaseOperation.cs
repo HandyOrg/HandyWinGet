@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using HandyWinget.Database.Tables;
 using HandyWinget.Database;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
+using HandyWinget.Common.Models;
+
 namespace HandyWinget.Common
 {
     public class DatabaseOperation
@@ -18,7 +18,7 @@ namespace HandyWinget.Common
         {
             using var msixDB = new MSIXContext();
 
-            var hwgDB = new HWGContext();
+            using var hwgDB = new HWGContext();
 
             await hwgDB.Database.EnsureDeletedAsync();
             await hwgDB.Database.EnsureCreatedAsync();
@@ -69,6 +69,34 @@ namespace HandyWinget.Common
             var data = await query.ToArrayAsyncLinqToDB();
             hwgDB.AddRange(data);
             await hwgDB.SaveChangesAsync();
+        }
+
+        public async static Task<IEnumerable<HWGPackageModel>> GetAllPackageAsync()
+        {
+            using var hwgDB = new HWGContext();
+
+            var dbQuery = hwgDB.ManifestTable.Select(x => new
+            {
+                x.PackageId,
+                x.YamlUri,
+                x.ProductCode,
+                x.Version,
+            });
+            var data = await dbQuery.ToListAsync();
+
+            return data
+                .GroupBy(x => x.PackageId)
+                .OrderBy(x => x.Key)
+                .Select(g => new HWGPackageModel
+                {
+                    PackageId = g.Key,
+                    Name = g.Select(x => Helper.AddSpacesToString(Helper.GetPublisherAndName(x.YamlUri).name)).First(),
+                    Publisher = g.Select(x => Helper.GetPublisherAndName(x.YamlUri).publisher).First(),
+                    YamlUri = g.Select(x => x.YamlUri).First(),
+                    ProductCode = g.Select(x => x.ProductCode).First(),
+                    PackageVersion = g.Select(x => new PackageVersion { Version = x.Version, YamlUri = x.YamlUri }).OrderByDescending(x => x.Version).First(),
+                    Versions = g.Select(x => new PackageVersion { Version = x.Version, YamlUri = x.YamlUri }).OrderByDescending(x => x.Version).ToList(),
+                });
         }
     }
 }
