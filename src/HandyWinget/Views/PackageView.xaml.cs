@@ -20,7 +20,6 @@ using System.Windows.Data;
 using HandyWinget.Common.Models;
 using System.Linq;
 using HandyControl.Controls;
-using YamlDotNet.Core.Tokens;
 
 namespace HandyWinget.Views
 {

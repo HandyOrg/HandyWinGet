@@ -23,6 +23,7 @@ namespace HandyWinget
             boot.Run();
             UpdateTheme(Settings.Theme);
             UpdateAccent(Settings.Accent);
+            ConfigHelper.Instance.SetLang("en");
             AppCenter.Start(Consts.AppSecret, typeof(Analytics), typeof(Crashes));
         }
 
