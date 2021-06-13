@@ -16,6 +16,12 @@ using System;
 using System.Windows.Media;
 using System.Windows;
 using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
+using System.IO.Packaging;
+using System.Windows.Shapes;
+using Path = System.IO.Path;
+using System.Text.RegularExpressions;
 
 namespace HandyWinget.Common
 {
@@ -147,29 +153,6 @@ namespace HandyWinget.Common
 
         public static bool IsWingetInstalled()
         {
-            if (IsWingetExist())
-            {
-                return true;
-            }
-            else
-            {
-                Growl.AskGlobal("Winget-cli is not installed, please download and install latest version.", b =>
-                {
-                    if (!b)
-                    {
-                        return true;
-                    }
-                    //StartProcess(Consts.WingetRepository);
-                    return true;
-                });
-
-                return false;
-            }
-            
-        }
-
-        private static bool IsWingetExist()
-        {
             try
             {
                 var proc = new Process
@@ -224,20 +207,70 @@ namespace HandyWinget.Common
                 }
             }
         }
-        public static IEnumerable<string> EnumerateManifest(string rootDirectory)
+        public static IEnumerable<string> GetInstalledScript()
         {
-            foreach (var directory in Directory.GetDirectories(
-                rootDirectory,
-                "*",
-                SearchOption.AllDirectories))
+            var p = new Process
             {
-                foreach (var file in Directory.GetFiles(directory))
-                {
-                    yield return file;
-                }
+                StartInfo =
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true,
+                        FileName = "winget",
+                        Arguments = $"list"
+                    }
+            };
+            p.Start();
+            var _wingetData = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+
+            if (_wingetData.Contains("Unrecognized command"))
+            {
+                return null;
             }
+
+            string input = _wingetData.Substring(_wingetData.IndexOf("Name"));
+            var lines = input.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Skip(2);
+            return lines;
         }
 
+        public static (string packageId, string version, string availableVersion) ParseInstallScriptLine(string line, string packageId)
+        {
+            line = Regex.Replace(line, "[ ]{2,}", " ", RegexOptions.IgnoreCase);
+            line = Regex.Replace(line, $@".*(?=({Regex.Escape(packageId)}))", "", RegexOptions.IgnoreCase);
+            var lines = line.Split(" ");
+            if (lines.Count() >= 3)
+            {
+                return (packageId: lines[0], version: lines[1], availableVersion: lines[2]);
+            }
+            else if (lines.Count() == 2)
+            {
+                return (packageId: lines[0], version: lines[1], availableVersion: null);
+            }
+            return (packageId: null, version: null, availableVersion: null);
+        }
+        public static test ParseInstallScriptLineT(string line, string packageId)
+        {
+            line = Regex.Replace(line, "[ ]{2,}", " ", RegexOptions.IgnoreCase);
+            line = Regex.Replace(line, $@".*(?=({Regex.Escape(packageId)}))", "", RegexOptions.IgnoreCase);
+            var lines = line.Split(" ");
+            if (lines.Count() >= 3)
+            {
+                return new test { packageId = lines[0], version = lines[1], availableVersion = lines[2] };
+            }
+            else if (lines.Count() == 2)
+            {
+                return new test { packageId = lines[0], version = lines[1], availableVersion = null };
+            }
+            return new test { packageId = null, version = null, availableVersion = null };
+        }
+
+        public class test
+        {
+            public string packageId { get; set; }
+            public string version { get; set; }
+            public string availableVersion { get; set; }
+        }
         #region Uninstall Package
         public static bool UninstallPackage(string uninstallString)
         {

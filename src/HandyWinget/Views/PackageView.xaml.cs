@@ -18,13 +18,16 @@ using HandyWinget.Control;
 using System.ComponentModel;
 using System.Windows.Data;
 using HandyWinget.Common.Models;
+using System.Linq;
+using HandyControl.Controls;
+using YamlDotNet.Core.Tokens;
 
 namespace HandyWinget.Views
 {
     public partial class PackageView : UserControl
     {
         private bool hasLoaded = false;
-
+        private bool hasViewLoaded = false;
         public PackageView()
         {
             InitializeComponent();
@@ -35,34 +38,49 @@ namespace HandyWinget.Views
         private void initSettings()
         {
             txtUpdateDate.Text = $"Last Update: {Settings.UpdatedDate}";
+            ((App) Application.Current).UpdateAccent(Settings.Accent);
         }
 
         private void PackageView_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!File.Exists(Consts.HWGDatabasePath) || Settings.AutoRefreshInStartup)
+            if (!hasViewLoaded)
             {
-                btnUpdate_Click(null, null);
-            }
-            else
-            {
-                LoadDatabaseAsync();
-            }
-
-            if (Settings.IsStoreDataGridColumnWidth)
-            {
-                if (Settings.DataGridColumnWidth.Count > 0)
+                hasViewLoaded = true;
+                if (!File.Exists(Consts.HWGDatabasePath) || Settings.AutoRefreshInStartup)
                 {
-                    for (var i = 0; i < dataGrid.Columns.Count; i++)
-                    {
-                        dataGrid.Columns[i].Width = Settings.DataGridColumnWidth[i];
-                    }
+                    btnUpdate_Click(null, null);
+                }
+                else
+                {
+                    LoadDatabaseAsync();
                 }
 
-                hasLoaded = true;
-            }
+                if (Settings.IsStoreDataGridColumnWidth)
+                {
+                    if (Settings.DataGridColumnWidth.Count > 0)
+                    {
+                        for (var i = 0; i < dataGrid.Columns.Count; i++)
+                        {
+                            dataGrid.Columns[i].Width = Settings.DataGridColumnWidth[i];
+                        }
+                    }
 
+                    if (Settings.DataGridInstalledColumnWidth.Count > 0)
+                    {
+                        for (var i = 0; i < dataGridInstalled.Columns.Count; i++)
+                        {
+                            dataGridInstalled.Columns[i].Width = Settings.DataGridInstalledColumnWidth[i];
+                        }
+                    }
+
+                    hasLoaded = true;
+                }
+            }
         }
 
+        /// <summary>
+        /// Group DataGrid based on Publisher
+        /// </summary>
         private void SetGroupDataGrid()
         {
             ICollectionView view = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
@@ -84,6 +102,11 @@ namespace HandyWinget.Views
             }
         }
 
+        /// <summary>
+        /// Download MSIX from Azure
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
             bool _isConnected = ApplicationHelper.IsConnectedToInternet();
@@ -105,7 +128,12 @@ namespace HandyWinget.Views
             }
         }
 
-        private void Downloader_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        /// <summary>
+        /// Extract MSIX into indexV4.db
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Downloader_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             var downloadInfo = e.UserState as DownloadPackage;
             if (downloadInfo != null && downloadInfo.FileName != null)
@@ -115,7 +143,7 @@ namespace HandyWinget.Views
                     prgMSIX.IsIndeterminate = true;
                     ZipFile.ExtractToDirectory(downloadInfo.FileName, Consts.MSIXPath, true);
                 });
-                Task.Run(() =>
+               await Task.Run(() =>
                 {
                     GenerateDatabaseAsync();
 
@@ -127,8 +155,8 @@ namespace HandyWinget.Views
                         prgMSIX.Visibility = Visibility.Collapsed;
                         Settings.UpdatedDate = DateTime.Now;
                         txtUpdateDate.Text = $"Last Update: {DateTime.Now}";
-                        LoadDatabaseAsync();
                     });
+                    LoadDatabaseAsync();
                 });
             }
         }
@@ -143,11 +171,124 @@ namespace HandyWinget.Views
             });
         }
 
+        /// <summary>
+        /// Load Packages to DataGrid and Identify Installed packages
+        /// </summary>
         private async void LoadDatabaseAsync()
         {
             dataGrid.ItemsSource = await GetAllPackageAsync();
             SetGroupDataGrid();
+
+            IdentifyPackages();
         }
+
+        #region Identify Installed Packages
+
+        /// <summary>
+        /// Identify Installed Packages
+        /// </summary>
+        private async void IdentifyPackages()
+        {
+            if (Settings.IdentifyInstalledPackage)
+            {
+                if (!IsOsSupported())
+                {
+                    CreateInfoBar("OS Not Supported", "Your operating system does not support this feature", panelInstalled, Severity.Error);
+                }
+                else
+                {
+                    prgInstalled.Visibility = Visibility.Visible;
+                    var progressIndicator = new Progress<int>(ReportProgress);
+                    await Task.Run(() =>
+                    {
+                        LoadInstalledListAsync(progressIndicator);
+                    });
+                }
+            }
+            else
+            {
+                CreateInfoBarWithAction("Note", "You have disabled package identification in settings, go to Settings and enable it (To be effective, you must restart HandyWinget). Note that activating this feature will reduce the loading speed.", panelInstalled, Severity.Warning, "Settings", () =>
+                {
+                    MainWindow.Instance.navView.SelectedItem = MainWindow.Instance.navView.MenuItems[0] as NavigationViewItem;
+                });
+            }
+        }
+
+        void ReportProgress(int value)
+        {
+            prgInstalled.Value = value;
+        }
+
+        /// <summary>
+        /// Load Installed Packages into Datagrid 
+        /// </summary>
+        /// <param name="progress"></param>
+        private async void LoadInstalledListAsync(IProgress<int> progress)
+        {
+            if (!IsWingetInstalled())
+            {
+                RunOnMainThread(() =>
+                {
+                    CreateInfoBarWithAction("Winget-Cli", "We need Winget-cli version 1.0 or higher to identify packages, Please download and install it first then restart HandyWinget.", panelInstalled, Severity.Error, "Download", () =>
+                    {
+                        StartProcess(Consts.WingetRepository);
+                    });
+                });
+
+                return;
+            }
+
+            var installedData = new ThreadSafeObservableCollection<HWGInstalledPackageModel>();
+            var lines = GetInstalledScript();
+
+            if (lines == null)
+            {
+                RunOnMainThread(() =>
+                {
+                    CreateInfoBarWithAction("Update Winget-Cli", "your Winget-cli is not supported please Update your winget-cli to version 1.0 or higher.", panelInstalled, Severity.Error, "Update", () =>
+                    {
+                        StartProcess(Consts.WingetRepository);
+                    });
+                });
+                return;
+            }
+            var query = await GetAllPackageAsync();
+            var queryCount = query.Count();
+            int currentItemIndex = 0;
+            foreach (var packageItem in query)
+            {
+                currentItemIndex += 1;
+                progress.Report((currentItemIndex * 100 / queryCount));
+                foreach (var installedItem in lines)
+                {
+                    var item = ParseInstallScriptLine(installedItem, packageItem.PackageId);
+                    if (item.packageId != null && item.version != null)
+                    {
+                        if (packageItem.PackageId.Equals(item.packageId, StringComparison.OrdinalIgnoreCase))
+                        {
+                            installedData.Add(new HWGInstalledPackageModel
+                            {
+                                Name = packageItem.Name,
+                                PackageId = packageItem.PackageId,
+                                Publisher = packageItem.Publisher,
+                                ProductCode = packageItem.ProductCode,
+                                YamlUri = packageItem.YamlUri,
+                                Version = item.version,
+                                AvailableVersion = item.availableVersion
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+
+            RunOnMainThread(() =>
+            {
+                prgInstalled.Visibility = Visibility.Collapsed;
+                dataGridInstalled.ItemsSource = installedData;
+            });
+        }
+        #endregion
 
         private async void GetManifestAsync()
         {
@@ -161,6 +302,7 @@ namespace HandyWinget.Views
             //var responseString = await client.GetStringAsync(link).ConfigureAwait(false);
         }
 
+        #region Filter DataGrid
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!string.IsNullOrEmpty(autoBox.Text))
@@ -180,6 +322,10 @@ namespace HandyWinget.Views
             }
             return false;
         }
+
+        #endregion
+
+        #region DataGrid Layout Updated
         private void dataGrid_LayoutUpdated(object sender, EventArgs e)
         {
             if (!hasLoaded)
@@ -199,6 +345,30 @@ namespace HandyWinget.Views
                 }
             }
         }
+
+        private void dataGridInstalled_LayoutUpdated(object sender, EventArgs e)
+        {
+            if (!hasLoaded)
+                return;
+            if (Settings.IsStoreDataGridColumnWidth)
+            {
+                for (int i = Settings.DataGridInstalledColumnWidth.Count; i < dataGridInstalled.Columns.Count; i++)
+                {
+                    Settings.DataGridInstalledColumnWidth.Add(default);
+                }
+
+                for (int index = 0; index < dataGridInstalled.Columns.Count; index++)
+                {
+                    if (dataGridInstalled.Columns == null)
+                        return;
+                    Settings.DataGridInstalledColumnWidth[index] = new DataGridLength(dataGridInstalled.Columns[index].ActualWidth);
+                }
+            }
+        }
+
+        #endregion
+
+        #region ContextMenu
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is MenuItem button)
@@ -214,5 +384,8 @@ namespace HandyWinget.Views
         {
 
         }
+
+        #endregion
+
     }
 }

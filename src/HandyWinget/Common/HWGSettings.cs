@@ -24,10 +24,9 @@ namespace HandyWinget
         public virtual bool AutoRefreshInStartup { get; set; } = false;
         public virtual bool IsStoreDataGridColumnWidth { get; set; } = false;
         public virtual DateTime UpdatedDate { get; set; } = DateTime.Now;
-        public virtual DataGridRowDetailsVisibilityMode ShowExtraDetails { get; set; } = DataGridRowDetailsVisibilityMode.Collapsed;
         public virtual NavigationViewPaneDisplayMode PaneDisplayMode { get; set; } = NavigationViewPaneDisplayMode.Top;
         public virtual InstallMode InstallMode { get; set; } = InstallMode.Internal;
-        public virtual IdentifyPackageMode IdentifyPackageMode { get; set; } = IdentifyPackageMode.Off;
+        public virtual bool IdentifyInstalledPackage { get; set; } = false;
         public virtual ApplicationTheme Theme { get; set; } = ApplicationTheme.Light;
         public virtual Brush Accent { get; set; }
        
@@ -39,6 +38,18 @@ namespace HandyWinget
             {
                 if (Equals(value, _DataGridColumnWidth)) return;
                 _DataGridColumnWidth = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<DataGridLength> _DataGridInstalledColumnWidth = new ObservableCollection<DataGridLength>();
+        public virtual ObservableCollection<DataGridLength> DataGridInstalledColumnWidth
+        {
+            get => _DataGridInstalledColumnWidth;
+            set
+            {
+                if (Equals(value, _DataGridInstalledColumnWidth)) return;
+                _DataGridInstalledColumnWidth = value;
                 OnPropertyChanged();
             }
         }

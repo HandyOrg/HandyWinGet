@@ -8,14 +8,8 @@
         <TabItem Header="Settings">
             <hc:ScrollViewer>
                 <StackPanel Margin="10">
-                    <ComboBox Name="cmbIdentify" SelectionChanged="cmbIdentify_SelectionChanged" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type enum:IdentifyPackageMode}}}"
-                          ui:ControlHelper.Header="Show Installed Package" MinWidth="450" Margin="0,10,50,10" HorizontalAlignment="Left"/>
-
                     <ComboBox Name="cmbInstall" SelectionChanged="cmbInstall_SelectionChanged" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type enum:InstallMode}}}"
                           ui:ControlHelper.Header="Package Install Mode" MinWidth="450" Margin="0,10,50,10" HorizontalAlignment="Left"/>
-
-                    <ComboBox Name="cmbDetails" SelectionChanged="cmbDetails_SelectionChanged" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type DataGridRowDetailsVisibilityMode}}}"
-                          ui:ControlHelper.Header="Show extra package details (by clicking on the row)" MinWidth="450" Margin="0,10,50,10" HorizontalAlignment="Left"/>
 
                     <StackPanel x:Name="stkIDM" Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="tgIDM" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="tgIDM_Checked" Unchecked="tgIDM_Checked"/>
@@ -23,16 +17,21 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
+                        <ToggleButton x:Name="tgIdentify" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="tgIdentify_Checked" Unchecked="tgIdentify_Checked"/>
+                        <TextBlock VerticalAlignment="Center" Text="Show Installed Package"/>
+                    </StackPanel>
+                    
+                    <StackPanel Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="tgGroup" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="tgGroup_Checked" Unchecked="tgGroup_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Group packages by publisher"/>
                     </StackPanel>
 
-                    <StackPanel Margin="0,10" Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                         <ToggleButton x:Name="tgAutoRefresh" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="tgAutoRefresh_Checked" Unchecked="tgAutoRefresh_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Auto Refresh Packages When Application Startup"/>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="tgSaveDGColumnWidth" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="tgSaveDGColumnWidth_Checked" Unchecked="tgSaveDGColumnWidth_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Save and Restore DataGrid Columns Width"/>
                     </StackPanel>

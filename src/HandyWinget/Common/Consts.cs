@@ -35,6 +35,11 @@ namespace HandyWinget.Common
         public const string IDManX64Location = @"C:\Program Files (x86)\Internet Download Manager\IDMan.exe";
         public const string IDManX86Location = @"C:\Program Files\Internet Download Manager\IDMan.exe";
 
+        /// <summary>
+        /// https://github.com/microsoft/winget-cli/releases
+        /// </summary>
+        public const string WingetRepository = "https://github.com/microsoft/winget-cli/releases";
+
         #region Database
 
         /// <summary>

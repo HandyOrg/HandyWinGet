@@ -9,7 +9,6 @@ namespace HandyWinget.Common.Models
         public string Publisher { get; set; }
         public string YamlUri { get; set; }
         public string ProductCode { get; set; }
-
         public PackageVersion PackageVersion { get; set; }
         public List<PackageVersion> Versions { get; set; }
     }

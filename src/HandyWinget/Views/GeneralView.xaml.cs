@@ -50,7 +50,6 @@ namespace HandyWinget.Views
             currentVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
             txtCurrentVersion.Text = $"Current Version {currentVersion}";
             cmbPaneDisplay.SelectedItem = Settings.PaneDisplayMode;
-            cmbIdentify.SelectedItem = Settings.IdentifyPackageMode;
             cmbInstall.SelectedItem = Settings.InstallMode;
 
             switch (Settings.InstallMode)
@@ -67,7 +66,7 @@ namespace HandyWinget.Views
             tgGroup.IsChecked = Settings.GroupByPublisher;
             tgSaveDGColumnWidth.IsChecked = Settings.IsStoreDataGridColumnWidth;
             tgAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
-            cmbDetails.SelectedItem = Settings.ShowExtraDetails;
+            tgIdentify.IsChecked = Settings.IdentifyInstalledPackage;
 
             if (Settings.Theme == ApplicationTheme.Light)
             {
@@ -81,21 +80,6 @@ namespace HandyWinget.Views
 
         #region Settings
         #region ComboBox
-        private void cmbIdentify_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var mode = (IdentifyPackageMode) cmbIdentify.SelectedItem;
-
-            if (!IsOsSupported())
-            {
-                cmbIdentify.SelectedIndex = 0;
-            }
-
-            if (mode != Settings.IdentifyPackageMode)
-            {
-                Settings.IdentifyPackageMode = mode;
-            }
-        }
-
         private void cmbInstall_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var mode = (InstallMode) cmbInstall.SelectedItem;
@@ -124,14 +108,6 @@ namespace HandyWinget.Views
             }
         }
 
-        private void cmbDetails_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var mode = (DataGridRowDetailsVisibilityMode) cmbDetails.SelectedItem;
-            if (mode != Settings.ShowExtraDetails)
-            {
-                Settings.ShowExtraDetails = mode;
-            }
-        }
         #endregion
 
         #region ToggleButtons
@@ -143,6 +119,21 @@ namespace HandyWinget.Views
                 Settings.IsIDMEnabled = state;
             }
         }
+
+        private void tgIdentify_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!IsOsSupported())
+            {
+                tgIdentify.IsChecked = false;
+                CreateInfoBar("OS Not Supported", "Your operating system does not support this feature", panel, Severity.Error);
+            }
+            var state = tgIdentify.IsChecked.Value;
+            if (state != Settings.IdentifyInstalledPackage)
+            {
+                Settings.IdentifyInstalledPackage = state;
+            }
+        }
+
         private void tgGroup_Checked(object sender, RoutedEventArgs e)
         {
             var state = tgGroup.IsChecked.Value;
@@ -271,6 +262,7 @@ namespace HandyWinget.Views
             }
         }
         #endregion
+
     }
 }
 

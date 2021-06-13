@@ -71,6 +71,10 @@ namespace HandyWinget.Common
             await hwgDB.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Get All Packages from indexV4.db
+        /// </summary>
+        /// <returns></returns>
         public async static Task<IEnumerable<HWGPackageModel>> GetAllPackageAsync()
         {
             using var hwgDB = new HWGContext();
@@ -80,7 +84,7 @@ namespace HandyWinget.Common
                 x.PackageId,
                 x.YamlUri,
                 x.ProductCode,
-                x.Version,
+                x.Version
             });
             var data = await dbQuery.ToListAsync();
 
@@ -95,8 +99,9 @@ namespace HandyWinget.Common
                     YamlUri = g.Select(x => x.YamlUri).First(),
                     ProductCode = g.Select(x => x.ProductCode).First(),
                     PackageVersion = g.Select(x => new PackageVersion { Version = x.Version, YamlUri = x.YamlUri }).OrderByDescending(x => x.Version).First(),
-                    Versions = g.Select(x => new PackageVersion { Version = x.Version, YamlUri = x.YamlUri }).OrderByDescending(x => x.Version).ToList(),
+                    Versions = g.Select(x => new PackageVersion { Version = x.Version, YamlUri = x.YamlUri }).OrderByDescending(x => x.Version).ToList()
                 });
         }
+
     }
 }

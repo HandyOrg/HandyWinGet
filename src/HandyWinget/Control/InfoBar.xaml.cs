@@ -11,7 +11,7 @@ namespace HandyWinget.Control
     {
         #region Dependency Property
         public static readonly DependencyProperty SeverityProperty =
-           DependencyProperty.Register("Severity", typeof(Severity), typeof(InfoBar), new PropertyMetadata(Severity.Warning, OnSeverityChanged));
+           DependencyProperty.Register("Severity", typeof(Severity), typeof(InfoBar), new PropertyMetadata(Severity.Information, OnSeverityChanged));
 
         public Severity Severity
         {
