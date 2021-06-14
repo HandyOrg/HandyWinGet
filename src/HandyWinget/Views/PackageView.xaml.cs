@@ -302,13 +302,29 @@ namespace HandyWinget.Views
         }
 
         #region Filter DataGrid
+        ICollectionView view;
+        ICollectionView viewInstalled;
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!string.IsNullOrEmpty(autoBox.Text))
             {
-                ICollectionView view = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+                view = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+                if (view == null)
+                    return;
                 view.Filter = new Predicate<object>(filterPackages);
             }
+            view?.Refresh();
+        }
+        private void autoBoxInstalled_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (!string.IsNullOrEmpty(autoBoxInstalled.Text))
+            {
+                viewInstalled = CollectionViewSource.GetDefaultView(dataGridInstalled.ItemsSource);
+                if (viewInstalled == null)
+                    return;
+                viewInstalled.Filter = new Predicate<object>(filterInstalledPackages);
+            }
+            viewInstalled?.Refresh();
         }
         private bool filterPackages(object item)
         {
@@ -316,6 +332,19 @@ namespace HandyWinget.Views
             if (search.PackageId.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
                 search.Name.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
                 search.Publisher.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase)) { 
+
+                return true;
+            }
+            return false;
+        }
+
+        private bool filterInstalledPackages(object item)
+        {
+            var search = item as HWGInstalledPackageModel;
+            if (search.PackageId.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase) ||
+                search.Name.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase) ||
+                search.Publisher.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase))
+            {
 
                 return true;
             }
@@ -385,6 +414,7 @@ namespace HandyWinget.Views
         }
 
         #endregion
+
 
     }
 }

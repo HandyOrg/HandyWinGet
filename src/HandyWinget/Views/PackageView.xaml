@@ -124,6 +124,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel x:Name="panelInstalled" Margin="10">
@@ -131,6 +132,11 @@
                         <TextBlock Visibility="{Binding ElementName=prgInstalled, Path=Visibility}" Margin="10,5,10,5" HorizontalAlignment="Center" Text="{Binding ElementName=prgInstalled, Path=Value, StringFormat={}{0}%}"/>
                         <TextBlock Visibility="{Binding ElementName=prgInstalled, Path=Visibility}" Margin="10,5,10,5" HorizontalAlignment="Center" Text="Please wait a minute We are identifying packages"/>
                     </StackPanel>
+                    <ui:AutoSuggestBox Name="autoBoxInstalled" Grid.Row="1" Margin="0,10" MaxSuggestionListHeight="200" PlaceholderText="Search Packages..." TextChanged="autoBoxInstalled_TextChanged">
+                        <ui:AutoSuggestBox.QueryIcon>
+                            <ui:PathIcon Width="14" Data="{DynamicResource SearchGeometry}"/>
+                        </ui:AutoSuggestBox.QueryIcon>
+                    </ui:AutoSuggestBox>
                     <DataGrid x:Name="dataGridInstalled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5"
                               Grid.Row="2" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel"
                               hc:DataGridAttach.ShowRowNumber="True" hc:Empty.ShowEmpty="True" LayoutUpdated="dataGridInstalled_LayoutUpdated">
