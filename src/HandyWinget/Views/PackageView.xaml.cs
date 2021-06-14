@@ -20,6 +20,11 @@ using System.Windows.Data;
 using HandyWinget.Common.Models;
 using System.Linq;
 using HandyControl.Controls;
+using Microsoft.VisualBasic;
+using System.Diagnostics;
+using System.Text;
+using Microsoft.Win32;
+using System.Windows.Input;
 
 namespace HandyWinget.Views
 {
@@ -397,24 +402,211 @@ namespace HandyWinget.Views
         #endregion
 
         #region ContextMenu
-        private void ContextMenu_Click(object sender, RoutedEventArgs e)
+        private void DataGridContextMenu_Loaded(object sender, RoutedEventArgs e)
+        {
+            var selectedRows = dataGrid.SelectedItems.Count;
+
+            if (selectedRows > 1)
+            {
+                mnuCopyScript.IsEnabled = false;
+                mnuSendToCmd.IsEnabled = false;
+            }
+            else
+            {
+                mnuCopyScript.IsEnabled = true;
+                mnuSendToCmd.IsEnabled = true;
+            }
+        }
+
+        private void DataGridContextMenu_Click(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is MenuItem button)
             {
-                ContextMenuActions(button.Tag.ToString());
+                DataGridContextMenuActions(button.Tag.ToString());
             }
         }
-        private void ContextMenuActions(string tag)
-        {
-            
-        }
-        private void ContextMenu_Loaded(object sender, RoutedEventArgs e)
-        {
 
+        private void DataGridContextMenuActions(string tag)
+        {
+            var selectedRows = dataGrid.SelectedItems.Count;
+            var item = dataGrid.SelectedItem as HWGPackageModel;
+
+            string text = $"winget install {item.PackageId} -v {item.PackageVersion.Version}";
+            switch (tag)
+            {
+                case "SendToPow":
+                    if (selectedRows > 1)
+                    {
+                        var script = CreatePowerShellScript(false);
+                        Process.Start("powershell.exe", script);
+                    }
+                    else if (selectedRows == 1)
+                    {
+                        Process.Start("powershell.exe", text);
+                    }
+                    break;
+                case "SendToCmd":
+                    Interaction.Shell(text, AppWinStyle.NormalFocus);
+                    break;
+                case "Copy":
+                    Clipboard.SetText(text);
+                    break;
+                case "Export":
+                    ExportPowerShellScript();
+                    break;
+            }
+
+        }
+
+        private void DataGridInstalledContextMenu_Loaded(object sender, RoutedEventArgs e)
+        {
+            var selectedRows = dataGridInstalled.SelectedItems.Count;
+
+            if (selectedRows > 1)
+            {
+                mnuUpgrade.IsEnabled = false;
+                mnuUninstall.IsEnabled = false;
+                mnuInstalledCopyScript.IsEnabled = false;
+            }
+            else
+            {
+                mnuUpgrade.IsEnabled = true;
+                mnuUninstall.IsEnabled = true;
+                mnuInstalledCopyScript.IsEnabled = true;
+            }
+        }
+        private void DataGridInstalledContextMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is MenuItem button)
+            {
+                DataGridInstalledContextMenuActions(button.Tag.ToString());
+            }
+        }
+        private void DataGridInstalledContextMenuActions(string tag)
+        {
+            var selectedRows = dataGridInstalled.SelectedItems.Count;
+            var item = dataGridInstalled.SelectedItem as HWGInstalledPackageModel;
+
+            string text = $"winget install {item.PackageId} -v {item.Version}";
+            switch (tag)
+            {
+                case "Copy":
+                    Clipboard.SetText(text);
+                    break;
+                case "Export":
+                    ExportPowerShellScript(true);
+                    break;
+                case "Upgrade":
+                    // Todo: Upgrade
+                    break;
+                case "Uninstall":
+                    if (selectedRows == 1 && !string.IsNullOrEmpty(item.Name))
+                    {
+                        if (!string.IsNullOrEmpty(item.ProductCode))
+                        {
+                            UninstallPackage(item.ProductCode);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        public async void ExportPowerShellScript(bool isInstalled = false)
+        {
+            var itemsCount = isInstalled ? dataGridInstalled.SelectedItems.Count : dataGrid.SelectedItems.Count;
+            if (itemsCount > 0)
+            {
+                var dialog = new SaveFileDialog
+                {
+                    Title = "Save Script",
+                    FileName = "winget-script.ps1",
+                    DefaultExt = "ps1",
+                    Filter = "Powershell Script (*.ps1)|*.ps1"
+                };
+                if (dialog.ShowDialog() == true)
+                {
+                    if (isInstalled)
+                    {
+                        await File.WriteAllTextAsync(dialog.FileName, CreatePowerShellScript(true, true));
+                    }
+                    else
+                    {
+                        await File.WriteAllTextAsync(dialog.FileName, CreatePowerShellScript(true));
+                    }
+                }
+            }
+        }
+
+        private string CreatePowerShellScript(bool isExportScript, bool isInstalled = false)
+        {
+            StringBuilder builder = new StringBuilder();
+            if (isExportScript)
+            {
+                builder.Append(Helper.PowerShellScript);
+            }
+
+            if (isInstalled)
+            {
+                foreach (var item in dataGridInstalled.SelectedItems)
+                {
+                    builder.Append($"winget install {((HWGInstalledPackageModel) item).PackageId} -v {((HWGInstalledPackageModel) item).Version} -e ; ");
+                }
+            }
+            else
+            {
+                foreach (var item in dataGrid.SelectedItems)
+                {
+                    builder.Append($"winget install {((HWGPackageModel) item).PackageId} -v {((HWGPackageModel) item).PackageVersion.Version} -e ; ");
+                }
+            }
+
+            builder.Remove(builder.ToString().LastIndexOf(";"), 1);
+            if (isExportScript)
+            {
+                builder.AppendLine("}");
+            }
+
+            return builder.ToString().TrimEnd();
         }
 
         #endregion
 
+        private void UserControl_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.P)
+            {
+                DataGridContextMenuActions("SendToPow");
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.W)
+            {
+                DataGridContextMenuActions("SendToCmd");
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.C)
+            {
+                DataGridContextMenuActions("Copy");
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.U)
+            {
+                DataGridContextMenuActions("Uninstall");
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.X)
+            {
+                DataGridContextMenuActions("Export");
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.U)
+            {
+                DataGridInstalledContextMenuActions("Upgrade");
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.I)
+            {
+                DataGridInstalledContextMenuActions("Copy");
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.E)
+            {
+                DataGridInstalledContextMenuActions("Export");
+            }
+        }
 
+       
     }
 }

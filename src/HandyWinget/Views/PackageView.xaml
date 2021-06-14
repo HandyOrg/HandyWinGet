@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:HandyWinget.Control"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="http://schemas.modernwpf.com/2019"
-             mc:Ignorable="d" 
+             mc:Ignorable="d" KeyDown="UserControl_KeyDown"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -88,31 +88,26 @@
                             </GroupStyle>
                         </DataGrid.GroupStyle>
                         <DataGrid.ContextMenu>
-                            <ContextMenu Loaded="ContextMenu_Loaded" Style="{StaticResource DefaultContextMenuStyle}">
-                                <MenuItem Click="ContextMenu_Click" InputGestureText="Ctrl+Shift+P" Header="Send To Powershell" Tag="SendToPow" >
+                            <ContextMenu Loaded="DataGridContextMenu_Loaded" Style="{StaticResource DefaultContextMenuStyle}">
+                                <MenuItem Click="DataGridContextMenu_Click" InputGestureText="Ctrl+Shift+P" Header="Send To Powershell" Tag="SendToPow" >
                                     <MenuItem.Icon>
                                         <ui:PathIcon Data="{DynamicResource PowerShellGeometry}"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Name="mnuSendToCmd" Click="ContextMenu_Click" InputGestureText="Ctrl+Shift+W" Header="Send To CMD" Tag="SendToCmd" >
+                                <MenuItem Name="mnuSendToCmd" Click="DataGridContextMenu_Click" InputGestureText="Ctrl+Shift+W" Header="Send To CMD" Tag="SendToCmd" >
                                     <MenuItem.Icon>
                                         <ui:PathIcon Data="{DynamicResource ConsoleGeometry}"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Name="mnuExport" Click="ContextMenu_Click" InputGestureText="Ctrl+Shift+X" Header="Export Powershell Script" Tag="Export" >
-                                    <MenuItem.Icon>
-                                        <ui:PathIcon Data="{DynamicResource PowerShellGeometry}"/>
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <Separator/>
-                                <MenuItem Name="mnuCmd" Click="ContextMenu_Click" InputGestureText="Ctrl+Shift+C" Header="Copy Install Command" Tag="Copy" >
+                                <MenuItem Name="mnuCopyScript" Click="DataGridContextMenu_Click" InputGestureText="Ctrl+Shift+C" Header="Copy Install Command" Tag="Copy" >
                                     <MenuItem.Icon>
                                         <ui:PathIcon Data="{DynamicResource ScriptGeometry}"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Name="mnuUninstall" Click="ContextMenu_Click" InputGestureText="Ctrl+U" Header="Uninstall Package" Tag="Uninstall">
+                                <Separator/>
+                                <MenuItem Name="mnuExport" Click="DataGridContextMenu_Click" InputGestureText="Ctrl+Shift+X" Header="Export Powershell Script" Tag="Export" >
                                     <MenuItem.Icon>
-                                        <ui:PathIcon Data="{DynamicResource UninstallGeometry}"/>
+                                        <ui:PathIcon Data="{DynamicResource PowerShellGeometry}"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>
@@ -185,6 +180,31 @@
                                 </GroupStyle.ContainerStyle>
                             </GroupStyle>
                         </DataGrid.GroupStyle>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu Loaded="DataGridInstalledContextMenu_Loaded" Style="{StaticResource DefaultContextMenuStyle}">
+                                <MenuItem Name="mnuUpgrade" Click="DataGridInstalledContextMenu_Click" InputGestureText="Ctrl+Shift+U" Header="Upgrade Package" Tag="Upgrade" >
+                                    <MenuItem.Icon>
+                                        <ui:PathIcon Data="{DynamicResource ScriptGeometry}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Name="mnuUninstall" Click="DataGridInstalledContextMenu_Click" InputGestureText="Ctrl+U" Header="Uninstall Package" Tag="Uninstall">
+                                    <MenuItem.Icon>
+                                        <ui:PathIcon Data="{DynamicResource UninstallGeometry}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <Separator/>
+                                <MenuItem Name="mnuInstalledCopyScript" Click="DataGridInstalledContextMenu_Click" InputGestureText="Ctrl+Shift+I" Header="Copy Install Command" Tag="Copy" >
+                                    <MenuItem.Icon>
+                                        <ui:PathIcon Data="{DynamicResource ScriptGeometry}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Name="mnuInstalledExport" Click="DataGridInstalledContextMenu_Click" InputGestureText="Ctrl+Shift+E" Header="Export Powershell Script" Tag="Export" >
+                                    <MenuItem.Icon>
+                                        <ui:PathIcon Data="{DynamicResource PowerShellGeometry}"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                     </DataGrid>
 
                 </Grid>

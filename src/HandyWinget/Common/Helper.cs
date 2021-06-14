@@ -17,9 +17,6 @@ using System.Windows.Media;
 using System.Windows;
 using System.Text;
 using System.Linq;
-using System.Threading.Tasks;
-using System.IO.Packaging;
-using System.Windows.Shapes;
 using Path = System.IO.Path;
 using System.Text.RegularExpressions;
 
@@ -33,6 +30,18 @@ namespace HandyWinget.Common
                                    .LoadNow()
                                    .EnableAutosave();
 
+        public static bool UninstallPackage(string productCode)
+        {
+            try
+            {
+                Interaction.Shell($"msiexec.exe /x {productCode}", AppWinStyle.NormalFocus);
+                return true;
+            }
+            catch (FileNotFoundException)
+            {
+            }
+            return false;
+        }
         public static void CreateColorPicker()
         {
             SolidColorBrush tempAccent = null;
@@ -249,44 +258,7 @@ namespace HandyWinget.Common
             }
             return (packageId: null, version: null, availableVersion: null);
         }
-        public static test ParseInstallScriptLineT(string line, string packageId)
-        {
-            line = Regex.Replace(line, "[ ]{2,}", " ", RegexOptions.IgnoreCase);
-            line = Regex.Replace(line, $@".*(?=({Regex.Escape(packageId)}))", "", RegexOptions.IgnoreCase);
-            var lines = line.Split(" ");
-            if (lines.Count() >= 3)
-            {
-                return new test { packageId = lines[0], version = lines[1], availableVersion = lines[2] };
-            }
-            else if (lines.Count() == 2)
-            {
-                return new test { packageId = lines[0], version = lines[1], availableVersion = null };
-            }
-            return new test { packageId = null, version = null, availableVersion = null };
-        }
-
-        public class test
-        {
-            public string packageId { get; set; }
-            public string version { get; set; }
-            public string availableVersion { get; set; }
-        }
-        #region Uninstall Package
-        public static bool UninstallPackage(string uninstallString)
-        {
-            try
-            {
-                Interaction.Shell(uninstallString, AppWinStyle.NormalFocus);
-                return true;
-            }
-            catch (FileNotFoundException)
-            {
-            }
-            return false;
-        }
-        
-        #endregion
-
+       
         public static string RemoveComment(string url)
         {
             var index = url.IndexOf("#");
