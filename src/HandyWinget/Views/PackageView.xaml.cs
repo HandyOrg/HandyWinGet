@@ -195,9 +195,12 @@ namespace HandyWinget.Views
         {
             if (Settings.IdentifyInstalledPackage)
             {
-                if (!IsOsSupported())
+                if (!IsWingetInstalled())
                 {
-                    CreateInfoBar("OS Not Supported", "Your operating system does not support this feature", panelInstalled, Severity.Error);
+                    CreateInfoBarWithAction("Winget-Cli", "We need Winget-cli version 1.0 or higher to identify packages, Please download and install it first then restart HandyWinget.", panelInstalled, Severity.Error, "Download", () =>
+                    {
+                        StartProcess(Consts.WingetRepository);
+                    });
                 }
                 else
                 {
@@ -229,19 +232,6 @@ namespace HandyWinget.Views
         /// <param name="progress"></param>
         private async void LoadInstalledListAsync(IProgress<int> progress)
         {
-            if (!IsWingetInstalled())
-            {
-                RunOnMainThread(() =>
-                {
-                    CreateInfoBarWithAction("Winget-Cli", "We need Winget-cli version 1.0 or higher to identify packages, Please download and install it first then restart HandyWinget.", panelInstalled, Severity.Error, "Download", () =>
-                    {
-                        StartProcess(Consts.WingetRepository);
-                    });
-                });
-
-                return;
-            }
-
             var installedData = new ThreadSafeObservableCollection<HWGInstalledPackageModel>();
             var lines = GetInstalledScript();
 
@@ -446,10 +436,16 @@ namespace HandyWinget.Views
                     }
                     break;
                 case "SendToCmd":
-                    Interaction.Shell(text, AppWinStyle.NormalFocus);
+                    if (selectedRows == 1)
+                    {
+                        Interaction.Shell(text, AppWinStyle.NormalFocus);
+                    }
                     break;
                 case "Copy":
-                    Clipboard.SetText(text);
+                    if (selectedRows == 1)
+                    {
+                        Clipboard.SetText(text);
+                    }
                     break;
                 case "Export":
                     ExportPowerShellScript();
@@ -474,6 +470,12 @@ namespace HandyWinget.Views
                 mnuUninstall.IsEnabled = true;
                 mnuInstalledCopyScript.IsEnabled = true;
             }
+
+            if (!IsWingetInstalled())
+            {
+                mnuUpgrade.IsEnabled = false;
+                mnuUninstall.IsEnabled = false;
+            }
         }
         private void DataGridInstalledContextMenu_Click(object sender, RoutedEventArgs e)
         {
@@ -482,7 +484,7 @@ namespace HandyWinget.Views
                 DataGridInstalledContextMenuActions(button.Tag.ToString());
             }
         }
-        private void DataGridInstalledContextMenuActions(string tag)
+        private async void DataGridInstalledContextMenuActions(string tag)
         {
             var selectedRows = dataGridInstalled.SelectedItems.Count;
             var item = dataGridInstalled.SelectedItem as HWGInstalledPackageModel;
@@ -491,22 +493,61 @@ namespace HandyWinget.Views
             switch (tag)
             {
                 case "Copy":
-                    Clipboard.SetText(text);
+                    if (selectedRows == 1)
+                    {
+                        Clipboard.SetText(text);
+                    }
                     break;
                 case "Export":
                     ExportPowerShellScript(true);
                     break;
                 case "Upgrade":
-                    // Todo: Upgrade
-                    break;
-                case "Uninstall":
-                    if (selectedRows == 1 && !string.IsNullOrEmpty(item.Name))
+                    if (selectedRows == 1 && !string.IsNullOrEmpty(item.AvailableVersion))
                     {
-                        if (!string.IsNullOrEmpty(item.ProductCode))
+                        var result = false;
+                        mnuUpgrade.IsEnabled = false;
+                        await Task.Run(() => {
+                             result = UpgradePackage(item.PackageId);
+                        });
+                        if (result)
                         {
-                            UninstallPackage(item.ProductCode);
+                            CreateInfoBar("Upgrade", $"Your Selected Package ({item.PackageId}) Successfully Upgraded", panelInstalled, Severity.Success);
+                        }
+                        else
+                        {
+                            CreateInfoBar("Upgrade", $"We Cant Upgrade Your Selected Package ({item.PackageId})", panelInstalled, Severity.Error);
                         }
                     }
+                    else
+                    {
+                        CreateInfoBar("Upgrade", $"Your Selected Package ({item.PackageId}) does not have any Available Version", panelInstalled, Severity.Error);
+                    }
+                    mnuUpgrade.IsEnabled = true;
+
+                    break;
+                case "Uninstall":
+                    if (selectedRows == 1 && !string.IsNullOrEmpty(item.ProductCode))
+                    {
+                        var result = false;
+                        mnuUninstall.IsEnabled = false;
+                        await Task.Run(() => {
+                            result = UninstallPackage(item.ProductCode);
+                        });
+                        if (result)
+                        {
+                            CreateInfoBar("Uninstall", $"Your Selected Package ({item.PackageId}) Successfully Uninstalled", panelInstalled, Severity.Success);
+                        }
+                        else
+                        {
+                            CreateInfoBar("Uninstall", $"We Cant Uninstall Your Selected Package ({item.PackageId})", panelInstalled, Severity.Error);
+                        }
+                    }
+                    else
+                    {
+                        CreateInfoBar("Uninstall", $"Your Selected Package ({item.PackageId}) does not have a productCode", panelInstalled, Severity.Error);
+                    }
+                    mnuUninstall.IsEnabled = true;
+
                     break;
             }
         }

@@ -34,14 +34,70 @@ namespace HandyWinget.Common
         {
             try
             {
-                Interaction.Shell($"msiexec.exe /x {productCode}", AppWinStyle.NormalFocus);
-                return true;
+                var p = new Process
+                {
+                    StartInfo =
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true,
+                        FileName = "winget",
+                        Arguments = $@"uninstall --id ""{productCode}"""
+                    }
+                };
+                p.Start();
+                var _wingetData = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+
+                if (_wingetData.Contains("Unrecognized command"))
+                {
+                    return false;
+                }
+                if (_wingetData.Contains("successfully uninstalled", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
             }
             catch (FileNotFoundException)
             {
             }
             return false;
         }
+
+        public static bool UpgradePackage(string packageId)
+        {
+            try
+            {
+                var p = new Process
+                {
+                    StartInfo =
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true,
+                        FileName = "winget",
+                        Arguments = $@"upgrade --id {packageId}"
+                    }
+                };
+                p.Start();
+                var _wingetData = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+
+                if (_wingetData.Contains("Unrecognized command"))
+                {
+                    return false;
+                }
+                if (_wingetData.Contains("successfully installed", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            catch (FileNotFoundException)
+            {
+            }
+            return false;
+        }
+
         public static void CreateColorPicker()
         {
             SolidColorBrush tempAccent = null;
@@ -94,6 +150,7 @@ namespace HandyWinget.Common
             bar.Severity = severity;
             bar.Title = title;
             bar.Message = message;
+            bar.Margin = new Thickness(0, 5, 0, 0);
 
             panel.Children.Add(bar);
         }
@@ -103,6 +160,7 @@ namespace HandyWinget.Common
             bar.Severity = severity;
             bar.Title = title;
             bar.Message = message;
+            bar.Margin = new Thickness(0, 5, 0, 0);
 
             var btnAction = new Button();
             btnAction.Content = buttonContent;
