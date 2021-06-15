@@ -21,7 +21,7 @@
         <hc:ScrollViewer Margin="10">
             <StackPanel x:Name="panel"/>
         </hc:ScrollViewer>
-        <TabControl x:Name="tab" Grid.Row="1" Style="{StaticResource TabControlPivotStyle}">
+        <TabControl x:Name="mainTab" Grid.Row="1" Style="{StaticResource TabControlPivotStyle}">
             <TabItem Header="All">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -34,8 +34,9 @@
                             <Button x:Name="btnUpdate" Content="Update Packages" Click="btnUpdate_Click" Style="{StaticResource AccentButton}"/>
                             <TextBlock x:Name="txtUpdateDate" Margin="20,10" Text="Last Update: May/16, 22:36" Style="{StaticResource SubtitleTextBlockStyle}" FontFamily="{StaticResource CascadiaCodeSemiLight}"/>
                         </StackPanel>
+                        <Button x:Name="btnGoToDetail" Content="Get Details" Margin="10,0" Click="btnGoToDetail_Click"/>
                         <ui:ProgressBar Name="prgMSIX" Visibility="Collapsed" Value="56"/>
-                        <TextBlock x:Name="txtPrgStatus" Visibility="{Binding ElementName=prgMSIX, Path=Visibility}" Margin="0,5" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="txtMSIXStatus" Visibility="{Binding ElementName=prgMSIX, Path=Visibility}" Margin="0,5" HorizontalAlignment="Center"/>
                         <TextBlock x:Name="txtStatus" Visibility="{Binding ElementName=prgMSIX, Path=Visibility}" Text="Downloading MSIX..." HorizontalAlignment="Center"/>
                         <Separator Margin="0,10,0,5"/>
                     </StackPanel>
@@ -44,7 +45,7 @@
                             <ui:PathIcon Width="14" Data="{DynamicResource SearchGeometry}"/>
                         </ui:AutoSuggestBox.QueryIcon>
                     </ui:AutoSuggestBox>
-                    <DataGrid x:Name="dataGrid" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5" BeginningEdit="Grid_BeginningEdit"
+                    <DataGrid x:Name="dataGrid" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5" BeginningEdit="dataGrid_BeginningEdit"
                               Grid.Row="2" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel" RowStyle="{StaticResource datagridRowStyle}"
                               hc:DataGridAttach.ShowRowNumber="True" hc:Empty.ShowEmpty="True" LayoutUpdated="dataGrid_LayoutUpdated">
                         <DataGrid.RowHeaderTemplate>
@@ -125,6 +126,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <StackPanel x:Name="panelInstalled" Margin="10">
@@ -132,13 +134,15 @@
                         <TextBlock Visibility="{Binding ElementName=prgInstalled, Path=Visibility}" Margin="10,5,10,5" HorizontalAlignment="Center" Text="{Binding ElementName=prgInstalled, Path=Value, StringFormat={}{0}%}"/>
                         <TextBlock Visibility="{Binding ElementName=prgInstalled, Path=Visibility}" Margin="10,5,10,5" HorizontalAlignment="Center" Text="Please wait a minute We are identifying packages"/>
                     </StackPanel>
-                    <ui:AutoSuggestBox Name="autoBoxInstalled" Grid.Row="1" Margin="0,10" MaxSuggestionListHeight="200" PlaceholderText="Search Packages..." TextChanged="autoBoxInstalled_TextChanged">
+                    <Button Grid.Row="1" Content="Get Details" Margin="10" Click="btnGoToDetail_Click"/>
+
+                    <ui:AutoSuggestBox Name="autoBoxInstalled" Grid.Row="2" Margin="0,10" MaxSuggestionListHeight="200" PlaceholderText="Search Packages..." TextChanged="autoBoxInstalled_TextChanged">
                         <ui:AutoSuggestBox.QueryIcon>
                             <ui:PathIcon Width="14" Data="{DynamicResource SearchGeometry}"/>
                         </ui:AutoSuggestBox.QueryIcon>
                     </ui:AutoSuggestBox>
-                    <DataGrid x:Name="dataGridInstalled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5" BeginningEdit="Grid_BeginningEdit"
-                              Grid.Row="2" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel" RowStyle="{StaticResource datagridRowStyle}"
+                    <DataGrid x:Name="dataGridInstalled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5" BeginningEdit="dataGrid_BeginningEdit"
+                              Grid.Row="3" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel" RowStyle="{StaticResource datagridRowStyle}"
                               hc:DataGridAttach.ShowRowNumber="True" hc:Empty.ShowEmpty="True" LayoutUpdated="dataGridInstalled_LayoutUpdated">
                         <DataGrid.RowHeaderTemplate>
                             <DataTemplate>
@@ -213,11 +217,8 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Details">
-
-            </TabItem>
-            <TabItem Header="Download Manager">
-
+            <TabItem Name="mainTabItemDetail" IsEnabled="False" Header="Details/Install">
+                <hc:TabControl Name="tabItemPackage" Margin="0, 10" Padding="10" Grid.Row="1" Visibility="Collapsed" IsScrollable="True" ShowCloseButton="True" ShowScrollButton="True" ShowOverflowButton="False"/>
             </TabItem>
         </TabControl>
     </Grid>

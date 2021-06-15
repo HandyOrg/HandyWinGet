@@ -144,7 +144,7 @@ namespace HandyWinget.Common
         {
             return (T) Enum.Parse(typeof(T), value, true);
         }
-        public static void CreateInfoBar(string title, string message, StackPanel panel, Severity severity)
+        public static InfoBar CreateInfoBar(string title, string message, StackPanel panel, Severity severity)
         {
             var bar = new InfoBar();
             bar.Severity = severity;
@@ -152,9 +152,10 @@ namespace HandyWinget.Common
             bar.Message = message;
             bar.Margin = new Thickness(0, 5, 0, 0);
 
-            panel.Children.Add(bar);
+            panel.Children.Insert(0, bar);
+            return bar;
         }
-        public static void CreateInfoBarWithAction(string title, string message, StackPanel panel, Severity severity, string buttonContent, Action action)
+        public static InfoBar CreateInfoBarWithAction(string title, string message, StackPanel panel, Severity severity, string buttonContent, Action action)
         {
             var bar = new InfoBar();
             bar.Severity = severity;
@@ -167,7 +168,8 @@ namespace HandyWinget.Common
             btnAction.Click += (e, s) => { action(); };
 
             bar.ActionButton = btnAction;
-            panel.Children.Add(bar);
+            panel.Children.Insert(0, bar);
+            return bar;
         }
         public static string BytesToMegabytes(long bytes)
         {
@@ -274,7 +276,7 @@ namespace HandyWinget.Common
                 }
             }
         }
-        public static IEnumerable<string> GetInstalledScript()
+        public static IEnumerable<string> GetInstalledAppList()
         {
             var p = new Process
             {
@@ -301,7 +303,7 @@ namespace HandyWinget.Common
             return lines;
         }
 
-        public static (string packageId, string version, string availableVersion) ParseInstallScriptLine(string line, string packageId)
+        public static (string packageId, string version, string availableVersion) ParseInstalledApp(string line, string packageId)
         {
             line = Regex.Replace(line, "[ ]{2,}", " ", RegexOptions.IgnoreCase);
             line = Regex.Replace(line, $@".*(?=({Regex.Escape(packageId)}))", "", RegexOptions.IgnoreCase);

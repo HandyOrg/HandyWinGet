@@ -55,18 +55,18 @@ namespace HandyWinget.Views
             switch (Settings.InstallMode)
             {
                 case InstallMode.Wingetcli:
-                    stkIDM.Visibility = Visibility.Collapsed;
+                    stackIDM.Visibility = Visibility.Collapsed;
                     break;
                 case InstallMode.Internal:
-                    stkIDM.Visibility = Visibility.Visible;
+                    stackIDM.Visibility = Visibility.Visible;
                     break;
             }
 
-            tgIDM.IsChecked = Settings.IsIDMEnabled;
-            tgGroup.IsChecked = Settings.GroupByPublisher;
-            tgSaveDGColumnWidth.IsChecked = Settings.IsStoreDataGridColumnWidth;
-            tgAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
-            tgIdentify.IsChecked = Settings.IdentifyInstalledPackage;
+            toogleIDM.IsChecked = Settings.IsIDMEnabled;
+            toogleGroup.IsChecked = Settings.GroupByPublisher;
+            toogleSaveDGColumnWidth.IsChecked = Settings.IsStoreDataGridColumnWidth;
+            toogleAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
+            toogleShowInstalled.IsChecked = Settings.IdentifyInstalledPackage;
 
             if (Settings.Theme == ApplicationTheme.Light)
             {
@@ -86,7 +86,7 @@ namespace HandyWinget.Views
             switch (mode)
             {
                 case InstallMode.Wingetcli:
-                    stkIDM.Visibility = Visibility.Collapsed;
+                    stackIDM.Visibility = Visibility.Collapsed;
                     if (!IsOsSupported())
                     {
                         cmbInstall.SelectedIndex = 1;
@@ -98,7 +98,7 @@ namespace HandyWinget.Views
                     }
                     break;
                 case InstallMode.Internal:
-                    stkIDM.Visibility = Visibility.Visible;
+                    stackIDM.Visibility = Visibility.Visible;
                     break;
             }
 
@@ -111,49 +111,49 @@ namespace HandyWinget.Views
         #endregion
 
         #region ToggleButtons
-        private void tgIDM_Checked(object sender, System.Windows.RoutedEventArgs e)
+        private void toogleIDM_Checked(object sender, System.Windows.RoutedEventArgs e)
         {
-            var state = tgIDM.IsChecked.Value;
+            var state = toogleIDM.IsChecked.Value;
             if (state != Settings.IsIDMEnabled)
             {
                 Settings.IsIDMEnabled = state;
             }
         }
 
-        private void tgIdentify_Checked(object sender, RoutedEventArgs e)
+        private void toogleShowInstalled_Checked(object sender, RoutedEventArgs e)
         {
             if (!IsOsSupported())
             {
-                tgIdentify.IsChecked = false;
+                toogleShowInstalled.IsChecked = false;
                 CreateInfoBar("OS Not Supported", "Your operating system does not support this feature", panel, Severity.Error);
             }
-            var state = tgIdentify.IsChecked.Value;
+            var state = toogleShowInstalled.IsChecked.Value;
             if (state != Settings.IdentifyInstalledPackage)
             {
                 Settings.IdentifyInstalledPackage = state;
             }
         }
 
-        private void tgGroup_Checked(object sender, RoutedEventArgs e)
+        private void toogleGroup_Checked(object sender, RoutedEventArgs e)
         {
-            var state = tgGroup.IsChecked.Value;
+            var state = toogleGroup.IsChecked.Value;
             if (state != Settings.GroupByPublisher)
             {
                 Settings.GroupByPublisher = state;
             }
         }
-        private void tgAutoRefresh_Checked(object sender, RoutedEventArgs e)
+        private void toogleAutoRefresh_Checked(object sender, RoutedEventArgs e)
         {
-            var state = tgAutoRefresh.IsChecked.Value;
+            var state = toogleAutoRefresh.IsChecked.Value;
             if (state != Settings.AutoRefreshInStartup)
             {
                 Settings.AutoRefreshInStartup = state;
             }
         }
 
-        private void tgSaveDGColumnWidth_Checked(object sender, RoutedEventArgs e)
+        private void toogleSaveDGColumnWidth_Checked(object sender, RoutedEventArgs e)
         {
-            var state = tgSaveDGColumnWidth.IsChecked.Value;
+            var state = toogleSaveDGColumnWidth.IsChecked.Value;
             if (state != Settings.IsStoreDataGridColumnWidth)
             {
                 Settings.IsStoreDataGridColumnWidth = state;

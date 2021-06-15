@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,8 +22,8 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Win32;
 using System.Windows.Input;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
+using TabItem = HandyControl.Controls.TabItem;
+using System.Collections.Generic;
 
 namespace HandyWinget.Views
 {
@@ -32,16 +31,18 @@ namespace HandyWinget.Views
     {
         private bool hasLoaded = false;
         private bool hasViewLoaded = false;
-
+        ICollectionView view;
+        ICollectionView viewInstalled;
+        List<string> openedPackages = new List<string>();
         public PackageView()
         {
             InitializeComponent();
             DataContext = this;
             Loaded += PackageView_Loaded;
-            initSettings();
+            InitSettings();
         }
 
-        private void initSettings()
+        private void InitSettings()
         {
             txtUpdateDate.Text = $"Last Update: {Settings.UpdatedDate}";
             ((App) Application.Current).UpdateAccent(Settings.Accent);
@@ -108,6 +109,7 @@ namespace HandyWinget.Views
             }
         }
 
+        #region Download MSIX
         /// <summary>
         /// Download MSIX from Azure
         /// </summary>
@@ -115,11 +117,11 @@ namespace HandyWinget.Views
         /// <param name="e"></param>
         private async void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
-            bool _isConnected = ApplicationHelper.IsConnectedToInternet();
-            if (_isConnected)
+            bool isConnected = ApplicationHelper.IsConnectedToInternet();
+            if (isConnected)
             {
                 txtStatus.Text = "Downloading Database...";
-                txtPrgStatus.Text = string.Empty;
+                txtMSIXStatus.Text = string.Empty;
                 prgMSIX.Value = 0;
                 prgMSIX.Visibility = Visibility.Visible;
                 prgMSIX.IsIndeterminate = false;
@@ -169,11 +171,11 @@ namespace HandyWinget.Views
 
         private void Downloader_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            var progress = (int) e.ProgressPercentage;
+            var value = (int) e.ProgressPercentage;
             RunOnMainThread(() =>
             {
-                prgMSIX.Value = progress;
-                txtPrgStatus.Text = $"Downloading {BytesToMegabytes(e.ReceivedBytesSize)} MB of {BytesToMegabytes(e.TotalBytesToReceive)} MB  -  {progress}%";
+                prgMSIX.Value = value;
+                txtMSIXStatus.Text = $"Downloading {BytesToMegabytes(e.ReceivedBytesSize)} MB of {BytesToMegabytes(e.TotalBytesToReceive)} MB  -  {value}%";
             });
         }
 
@@ -185,15 +187,17 @@ namespace HandyWinget.Views
             dataGrid.ItemsSource = await GetAllPackageAsync();
             SetGroupDataGrid();
 
-            IdentifyPackages();
+            IdentifyInstalledPackages();
         }
+
+        #endregion
 
         #region Identify Installed Packages
 
         /// <summary>
         /// Identify Installed Packages
         /// </summary>
-        private async void IdentifyPackages()
+        private async void IdentifyInstalledPackages()
         {
             if (Settings.IdentifyInstalledPackage)
             {
@@ -207,10 +211,10 @@ namespace HandyWinget.Views
                 else
                 {
                     prgInstalled.Visibility = Visibility.Visible;
-                    var progressIndicator = new Progress<int>(ReportProgress);
+                    var value = new Progress<int>(ReportProgress);
                     await Task.Run(() =>
                     {
-                        LoadInstalledListAsync(progressIndicator);
+                        LoadInstalledListAsync(value);
                     });
                 }
             }
@@ -234,10 +238,10 @@ namespace HandyWinget.Views
         /// <param name="progress"></param>
         private async void LoadInstalledListAsync(IProgress<int> progress)
         {
-            var installedData = new ThreadSafeObservableCollection<HWGInstalledPackageModel>();
-            var lines = GetInstalledScript();
+            var installedList = new ThreadSafeObservableCollection<HWGInstalledPackageModel>();
+            var installedAppList = GetInstalledAppList();
 
-            if (lines == null)
+            if (installedAppList == null)
             {
                 RunOnMainThread(() =>
                 {
@@ -248,29 +252,29 @@ namespace HandyWinget.Views
                 });
                 return;
             }
-            var query = await GetAllPackageAsync();
-            var queryCount = query.Count();
+            var allPackages = await GetAllPackageAsync();
+            var allPackagesCount = allPackages.Count();
             int currentItemIndex = 0;
-            foreach (var packageItem in query)
+            foreach (var package in allPackages)
             {
                 currentItemIndex += 1;
-                progress.Report((currentItemIndex * 100 / queryCount));
-                foreach (var installedItem in lines)
+                progress.Report((currentItemIndex * 100 / allPackagesCount));
+                foreach (var installedItem in installedAppList)
                 {
-                    var item = ParseInstallScriptLine(installedItem, packageItem.PackageId);
-                    if (item.packageId != null && item.version != null)
+                    var installedApp = ParseInstalledApp(installedItem, package.PackageId);
+                    if (installedApp.packageId != null && installedApp.version != null)
                     {
-                        if (packageItem.PackageId.Equals(item.packageId, StringComparison.OrdinalIgnoreCase))
+                        if (package.PackageId.Equals(installedApp.packageId, StringComparison.OrdinalIgnoreCase))
                         {
-                            installedData.Add(new HWGInstalledPackageModel
+                            installedList.Add(new HWGInstalledPackageModel
                             {
-                                Name = packageItem.Name,
-                                PackageId = packageItem.PackageId,
-                                Publisher = packageItem.Publisher,
-                                ProductCode = packageItem.ProductCode,
-                                YamlUri = packageItem.YamlUri,
-                                Version = item.version,
-                                AvailableVersion = item.availableVersion
+                                Name = package.Name,
+                                PackageId = package.PackageId,
+                                Publisher = package.Publisher,
+                                ProductCode = package.ProductCode,
+                                YamlUri = package.YamlUri,
+                                Version = installedApp.version,
+                                AvailableVersion = installedApp.availableVersion
                             });
                             break;
                         }
@@ -281,14 +285,12 @@ namespace HandyWinget.Views
             RunOnMainThread(() =>
             {
                 prgInstalled.Visibility = Visibility.Collapsed;
-                dataGridInstalled.ItemsSource = installedData;
+                dataGridInstalled.ItemsSource = installedList;
             });
         }
         #endregion
 
         #region Filter DataGrid
-        ICollectionView view;
-        ICollectionView viewInstalled;
 
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
@@ -314,10 +316,10 @@ namespace HandyWinget.Views
         }
         private bool filterPackages(object item)
         {
-            var search = item as HWGPackageModel;
-            if (search.PackageId.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
-                search.Name.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
-                search.Publisher.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase)) { 
+            var filter = item as HWGPackageModel;
+            if (filter.PackageId.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
+                filter.Name.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
+                filter.Publisher.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase)) { 
 
                 return true;
             }
@@ -326,10 +328,10 @@ namespace HandyWinget.Views
 
         private bool filterInstalledPackages(object item)
         {
-            var search = item as HWGInstalledPackageModel;
-            if (search.PackageId.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase) ||
-                search.Name.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase) ||
-                search.Publisher.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase))
+            var filter = item as HWGInstalledPackageModel;
+            if (filter.PackageId.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase) ||
+                filter.Name.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase) ||
+                filter.Publisher.Contains(autoBoxInstalled.Text, StringComparison.OrdinalIgnoreCase))
             {
 
                 return true;
@@ -385,9 +387,9 @@ namespace HandyWinget.Views
         #region ContextMenu
         private void DataGridContextMenu_Loaded(object sender, RoutedEventArgs e)
         {
-            var selectedRows = dataGrid.SelectedItems.Count;
+            var selectedRowsCount = dataGrid.SelectedItems.Count;
 
-            if (selectedRows > 1)
+            if (selectedRowsCount > 1)
             {
                 mnuCopyScript.IsEnabled = false;
                 mnuSendToCmd.IsEnabled = false;
@@ -409,31 +411,31 @@ namespace HandyWinget.Views
 
         private void DataGridContextMenuActions(string tag)
         {
-            var selectedRows = dataGrid.SelectedItems.Count;
-            var item = dataGrid.SelectedItem as HWGPackageModel;
+            var selectedRowsCount = dataGrid.SelectedItems.Count;
+            var package = dataGrid.SelectedItem as HWGPackageModel;
 
-            string text = $"winget install {item.PackageId} -v {item.PackageVersion.Version}";
+            string text = $"winget install {package.PackageId} -v {package.PackageVersion.Version}";
             switch (tag)
             {
                 case "SendToPow":
-                    if (selectedRows > 1)
+                    if (selectedRowsCount > 1)
                     {
                         var script = CreatePowerShellScript(false);
                         Process.Start("powershell.exe", script);
                     }
-                    else if (selectedRows == 1)
+                    else if (selectedRowsCount == 1)
                     {
                         Process.Start("powershell.exe", text);
                     }
                     break;
                 case "SendToCmd":
-                    if (selectedRows == 1)
+                    if (selectedRowsCount == 1)
                     {
                         Interaction.Shell(text, AppWinStyle.NormalFocus);
                     }
                     break;
                 case "Copy":
-                    if (selectedRows == 1)
+                    if (selectedRowsCount == 1)
                     {
                         Clipboard.SetText(text);
                     }
@@ -447,9 +449,9 @@ namespace HandyWinget.Views
 
         private void DataGridInstalledContextMenu_Loaded(object sender, RoutedEventArgs e)
         {
-            var selectedRows = dataGridInstalled.SelectedItems.Count;
+            var selectedRowsCount = dataGridInstalled.SelectedItems.Count;
 
-            if (selectedRows > 1)
+            if (selectedRowsCount > 1)
             {
                 mnuUpgrade.IsEnabled = false;
                 mnuUninstall.IsEnabled = false;
@@ -477,14 +479,14 @@ namespace HandyWinget.Views
         }
         private async void DataGridInstalledContextMenuActions(string tag)
         {
-            var selectedRows = dataGridInstalled.SelectedItems.Count;
-            var item = dataGridInstalled.SelectedItem as HWGInstalledPackageModel;
+            var selectedRowsCount = dataGridInstalled.SelectedItems.Count;
+            var package = dataGridInstalled.SelectedItem as HWGInstalledPackageModel;
 
-            string text = $"winget install {item.PackageId} -v {item.Version}";
+            string text = $"winget install {package.PackageId} -v {package.Version}";
             switch (tag)
             {
                 case "Copy":
-                    if (selectedRows == 1)
+                    if (selectedRowsCount == 1)
                     {
                         Clipboard.SetText(text);
                     }
@@ -493,49 +495,49 @@ namespace HandyWinget.Views
                     ExportPowerShellScript(true);
                     break;
                 case "Upgrade":
-                    if (selectedRows == 1 && !string.IsNullOrEmpty(item.AvailableVersion))
+                    if (selectedRowsCount == 1 && !string.IsNullOrEmpty(package.AvailableVersion))
                     {
                         var result = false;
                         mnuUpgrade.IsEnabled = false;
                         await Task.Run(() => {
-                             result = UpgradePackage(item.PackageId);
+                             result = UpgradePackage(package.PackageId);
                         });
                         if (result)
                         {
-                            CreateInfoBar("Upgrade", $"Your Selected Package ({item.PackageId}) Successfully Upgraded", panelInstalled, Severity.Success);
+                            CreateInfoBar("Upgrade", $"Your Selected Package ({package.PackageId}) Successfully Upgraded", panelInstalled, Severity.Success);
                         }
                         else
                         {
-                            CreateInfoBar("Upgrade", $"We Cant Upgrade Your Selected Package ({item.PackageId})", panelInstalled, Severity.Error);
+                            CreateInfoBar("Upgrade", $"We Cant Upgrade Your Selected Package ({package.PackageId})", panelInstalled, Severity.Error);
                         }
                     }
                     else
                     {
-                        CreateInfoBar("Upgrade", $"Your Selected Package ({item.PackageId}) does not have any Available Version", panelInstalled, Severity.Error);
+                        CreateInfoBar("Upgrade", $"Your Selected Package ({package.PackageId}) does not have any Available Version", panelInstalled, Severity.Error);
                     }
                     mnuUpgrade.IsEnabled = true;
 
                     break;
                 case "Uninstall":
-                    if (selectedRows == 1 && !string.IsNullOrEmpty(item.ProductCode))
+                    if (selectedRowsCount == 1 && !string.IsNullOrEmpty(package.ProductCode))
                     {
                         var result = false;
                         mnuUninstall.IsEnabled = false;
                         await Task.Run(() => {
-                            result = UninstallPackage(item.ProductCode);
+                            result = UninstallPackage(package.ProductCode);
                         });
                         if (result)
                         {
-                            CreateInfoBar("Uninstall", $"Your Selected Package ({item.PackageId}) Successfully Uninstalled", panelInstalled, Severity.Success);
+                            CreateInfoBar("Uninstall", $"Your Selected Package ({package.PackageId}) Successfully Uninstalled", panelInstalled, Severity.Success);
                         }
                         else
                         {
-                            CreateInfoBar("Uninstall", $"We Cant Uninstall Your Selected Package ({item.PackageId})", panelInstalled, Severity.Error);
+                            CreateInfoBar("Uninstall", $"We Cant Uninstall Your Selected Package ({package.PackageId})", panelInstalled, Severity.Error);
                         }
                     }
                     else
                     {
-                        CreateInfoBar("Uninstall", $"Your Selected Package ({item.PackageId}) does not have a productCode", panelInstalled, Severity.Error);
+                        CreateInfoBar("Uninstall", $"Your Selected Package ({package.PackageId}) does not have a productCode", panelInstalled, Severity.Error);
                     }
                     mnuUninstall.IsEnabled = true;
 
@@ -545,8 +547,8 @@ namespace HandyWinget.Views
 
         public async void ExportPowerShellScript(bool isInstalled = false)
         {
-            var itemsCount = isInstalled ? dataGridInstalled.SelectedItems.Count : dataGrid.SelectedItems.Count;
-            if (itemsCount > 0)
+            var selectedRowsCount = isInstalled ? dataGridInstalled.SelectedItems.Count : dataGrid.SelectedItems.Count;
+            if (selectedRowsCount > 0)
             {
                 var dialog = new SaveFileDialog
                 {
@@ -639,64 +641,114 @@ namespace HandyWinget.Views
             }
         }
 
-        private async void GetManifestAsync(bool isInstalled = false)
+        #region Get Manifests
+        private void GetYamlLink(bool isInstalled = false)
         {
-            string link = string.Empty;
-            var installedSelectedItem = dataGridInstalled.SelectedItem as HWGInstalledPackageModel;
-            var selectedItem = dataGrid.SelectedItem as HWGPackageModel;
-
-            if (isInstalled && installedSelectedItem != null)
+            if (isInstalled)
             {
-                link = $"{Consts.AzureBaseUrl}{installedSelectedItem.YamlUri}";
-            }
-            else if (!isInstalled && selectedItem != null)
-            {
-                link = $"{Consts.AzureBaseUrl}{selectedItem.YamlUri}";
+                foreach (var item in dataGridInstalled.SelectedItems)
+                {
+                    var selectedRow = item as HWGInstalledPackageModel;
+                    var yamlLink = $"{Consts.AzureBaseUrl}{selectedRow.YamlUri}";
+                    var header = $"{selectedRow.Name}-{selectedRow.Version}";
+                    if (!openedPackages.Any(x=>x.Equals(header + "installed")))
+                    {
+                        CreateTabItem(header, yamlLink, true);
+                    }
+                }
             }
             else
             {
-                return;
-            }
-
-            using var client = new HttpClient();
-            var responseString = await client.GetStringAsync(link);
-
-            if (!string.IsNullOrEmpty(responseString))
-            {
-                var deserializer = new DeserializerBuilder()
-                                                       .WithNamingConvention(PascalCaseNamingConvention.Instance)
-                                                       .IgnoreUnmatchedProperties()
-                                                       .Build();
-                var result = deserializer.Deserialize<ManifestDetailModel>(responseString);
-                if (result != null)
+                foreach (var item in dataGrid.SelectedItems)
                 {
-                    // parse
-                    Debug.WriteLine(result.PackageIdentifier);
-                    Debug.WriteLine(result.PackageName);
-                    Debug.WriteLine(result.PackageVersion);
-                    Debug.WriteLine(result.Publisher);
-                    Debug.WriteLine(result.ShortDescription);
+                    var selectedRow = item as HWGPackageModel;
+                    var yamlLink = $"{Consts.AzureBaseUrl}{selectedRow.PackageVersion.YamlUri}";
+                    var header = $"{selectedRow.Name}-{selectedRow.PackageVersion.Version}";
+                    if (!openedPackages.Any(x => x.Equals(header)))
+                    {
+                        CreateTabItem(header, yamlLink);
+                    }
                 }
             }
         }
         private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (tab.SelectedIndex == 1)
+            var currentDataGrid = GetCurrentActiveDataGrid();
+
+            if (currentDataGrid.SelectedItems.Count == 1)
             {
-                GetManifestAsync(true);
+                if (mainTab.SelectedIndex == 1)
+                {
+                    GetYamlLink(true);
+                }
+                else
+                {
+                    GetYamlLink();
+                }
+                mainTabItemDetail.IsEnabled = true;
+                mainTab.SelectedIndex = 2;
             }
-            else
-            {
-                GetManifestAsync();
-            }
-            tab.SelectedIndex = 2;
             e.Handled = true;
         }
-        private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        private void dataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             //// Have to do this in the unusual case where the border of the cell gets selected.
             //// and causes a crash 'EditItem is not allowed'
             e.Cancel = true;
+        }
+
+        private void CreateTabItem(string header, string yamlLink, bool isInstalled = false)
+        {
+            if (string.IsNullOrEmpty(header) && string.IsNullOrEmpty(yamlLink))
+            {
+                return;
+            }
+            var tabItem = new TabItem();
+            tabItem.Header = header;
+            tabItem.Closing += (s, e) =>
+            {
+                var currentTabItem = s as TabItem;
+                if (tabItemPackage.Items.Count == 1)
+                {
+                    tabItemPackage.Visibility = Visibility.Collapsed;
+                    mainTab.SelectedIndex = 0;
+                    openedPackages.Clear();
+                }
+                openedPackages.Remove(mainTab.SelectedIndex == 1 ? currentTabItem.Header.ToString() + "installed" : currentTabItem.Header.ToString());
+            };
+            openedPackages.Add(isInstalled ? header + "installed" : header);
+            tabItem.Content = new PackageDetailView(yamlLink, isInstalled);
+            tabItemPackage.Items.Add(tabItem);
+            tabItemPackage.Visibility = Visibility.Visible;
+            tabItemPackage.SelectedIndex = tabItemPackage.Items.Count - 1;
+        }
+
+        #endregion
+
+        private void btnGoToDetail_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainTab.SelectedIndex == 1)
+            {
+                GetYamlLink(true);
+            }
+            else
+            {
+                GetYamlLink();
+            }
+            mainTabItemDetail.IsEnabled = true;
+            mainTab.SelectedIndex = 2;
+        }
+
+        private DataGrid GetCurrentActiveDataGrid()
+        {
+            if (mainTab.SelectedIndex == 1)
+            {
+                return dataGridInstalled;
+            }
+            else
+            {
+                return dataGrid;
+            }
         }
     }
 }
