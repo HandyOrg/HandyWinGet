@@ -8,6 +8,11 @@
              xmlns:ui="http://schemas.modernwpf.com/2019"
              mc:Ignorable="d" KeyDown="UserControl_KeyDown"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="datagridRowStyle" TargetType="DataGridRow" BasedOn="{StaticResource DataGridRowStyle}">
+            <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -16,7 +21,7 @@
         <hc:ScrollViewer Margin="10">
             <StackPanel x:Name="panel"/>
         </hc:ScrollViewer>
-        <TabControl Grid.Row="1" Style="{StaticResource TabControlPivotStyle}">
+        <TabControl x:Name="tab" Grid.Row="1" Style="{StaticResource TabControlPivotStyle}">
             <TabItem Header="All">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -39,8 +44,8 @@
                             <ui:PathIcon Width="14" Data="{DynamicResource SearchGeometry}"/>
                         </ui:AutoSuggestBox.QueryIcon>
                     </ui:AutoSuggestBox>
-                    <DataGrid x:Name="dataGrid" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5"
-                              Grid.Row="2" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel"
+                    <DataGrid x:Name="dataGrid" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5" BeginningEdit="Grid_BeginningEdit"
+                              Grid.Row="2" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel" RowStyle="{StaticResource datagridRowStyle}"
                               hc:DataGridAttach.ShowRowNumber="True" hc:Empty.ShowEmpty="True" LayoutUpdated="dataGrid_LayoutUpdated">
                         <DataGrid.RowHeaderTemplate>
                             <DataTemplate>
@@ -132,8 +137,8 @@
                             <ui:PathIcon Width="14" Data="{DynamicResource SearchGeometry}"/>
                         </ui:AutoSuggestBox.QueryIcon>
                     </ui:AutoSuggestBox>
-                    <DataGrid x:Name="dataGridInstalled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5"
-                              Grid.Row="2" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel"
+                    <DataGrid x:Name="dataGridInstalled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" Margin="0,0,0,5" BeginningEdit="Grid_BeginningEdit"
+                              Grid.Row="2" HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" VirtualizingPanel.ScrollUnit="Pixel" RowStyle="{StaticResource datagridRowStyle}"
                               hc:DataGridAttach.ShowRowNumber="True" hc:Empty.ShowEmpty="True" LayoutUpdated="dataGridInstalled_LayoutUpdated">
                         <DataGrid.RowHeaderTemplate>
                             <DataTemplate>
@@ -206,7 +211,6 @@
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                     </DataGrid>
-
                 </Grid>
             </TabItem>
             <TabItem Header="Details">

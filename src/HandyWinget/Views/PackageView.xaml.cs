@@ -8,8 +8,6 @@ using System.Windows.Controls;
 using Downloader;
 using HandyControl.Tools;
 using HandyWinget.Common;
-using HandyWinget.Database;
-using Microsoft.EntityFrameworkCore;
 using ModernWpf.Controls;
 using static HandyWinget.Common.Helper;
 using static HandyControl.Tools.DispatcherHelper;
@@ -25,6 +23,8 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Win32;
 using System.Windows.Input;
+using YamlDotNet.Serialization.NamingConventions;
+using YamlDotNet.Serialization;
 
 namespace HandyWinget.Views
 {
@@ -32,9 +32,11 @@ namespace HandyWinget.Views
     {
         private bool hasLoaded = false;
         private bool hasViewLoaded = false;
+
         public PackageView()
         {
             InitializeComponent();
+            DataContext = this;
             Loaded += PackageView_Loaded;
             initSettings();
         }
@@ -284,21 +286,10 @@ namespace HandyWinget.Views
         }
         #endregion
 
-        private async void GetManifestAsync()
-        {
-            using var db = new HWGContext();
-            using var client = new HttpClient();
-
-            var list = await db.ManifestTable.ToListAsync();
-
-
-            //var link = $"{Consts.AzureBaseUrl}{item.YamlName}";
-            //var responseString = await client.GetStringAsync(link).ConfigureAwait(false);
-        }
-
         #region Filter DataGrid
         ICollectionView view;
         ICollectionView viewInstalled;
+
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!string.IsNullOrEmpty(autoBox.Text))
@@ -648,6 +639,64 @@ namespace HandyWinget.Views
             }
         }
 
-       
+        private async void GetManifestAsync(bool isInstalled = false)
+        {
+            string link = string.Empty;
+            var installedSelectedItem = dataGridInstalled.SelectedItem as HWGInstalledPackageModel;
+            var selectedItem = dataGrid.SelectedItem as HWGPackageModel;
+
+            if (isInstalled && installedSelectedItem != null)
+            {
+                link = $"{Consts.AzureBaseUrl}{installedSelectedItem.YamlUri}";
+            }
+            else if (!isInstalled && selectedItem != null)
+            {
+                link = $"{Consts.AzureBaseUrl}{selectedItem.YamlUri}";
+            }
+            else
+            {
+                return;
+            }
+
+            using var client = new HttpClient();
+            var responseString = await client.GetStringAsync(link);
+
+            if (!string.IsNullOrEmpty(responseString))
+            {
+                var deserializer = new DeserializerBuilder()
+                                                       .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                                                       .IgnoreUnmatchedProperties()
+                                                       .Build();
+                var result = deserializer.Deserialize<ManifestDetailModel>(responseString);
+                if (result != null)
+                {
+                    // parse
+                    Debug.WriteLine(result.PackageIdentifier);
+                    Debug.WriteLine(result.PackageName);
+                    Debug.WriteLine(result.PackageVersion);
+                    Debug.WriteLine(result.Publisher);
+                    Debug.WriteLine(result.ShortDescription);
+                }
+            }
+        }
+        private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (tab.SelectedIndex == 1)
+            {
+                GetManifestAsync(true);
+            }
+            else
+            {
+                GetManifestAsync();
+            }
+            tab.SelectedIndex = 2;
+            e.Handled = true;
+        }
+        private void Grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            //// Have to do this in the unusual case where the border of the cell gets selected.
+            //// and causes a crash 'EditItem is not allowed'
+            e.Cancel = true;
+        }
     }
 }
