@@ -729,10 +729,18 @@ namespace HandyWinget.Views
         {
             if (mainTab.SelectedIndex == 1)
             {
+                if (dataGridInstalled.SelectedIndex == -1)
+                {
+                    return;
+                }
                 GetYamlLink(true);
             }
             else
             {
+                if (dataGrid.SelectedIndex == -1)
+                {
+                    return;
+                }
                 GetYamlLink();
             }
             mainTabItemDetail.IsEnabled = true;
