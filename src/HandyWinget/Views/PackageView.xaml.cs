@@ -653,7 +653,7 @@ namespace HandyWinget.Views
                     var header = $"{selectedRow.Name}-{selectedRow.Version}";
                     if (!openedPackages.Any(x=>x.Equals(header + "installed")))
                     {
-                        CreateTabItem(header, yamlLink, true);
+                        CreateTabItem(header, yamlLink, null, true);
                     }
                 }
             }
@@ -666,7 +666,7 @@ namespace HandyWinget.Views
                     var header = $"{selectedRow.Name}-{selectedRow.PackageVersion.Version}";
                     if (!openedPackages.Any(x => x.Equals(header)))
                     {
-                        CreateTabItem(header, yamlLink);
+                        CreateTabItem(header, yamlLink, selectedRow.Versions);
                     }
                 }
             }
@@ -697,7 +697,7 @@ namespace HandyWinget.Views
             e.Cancel = true;
         }
 
-        private void CreateTabItem(string header, string yamlLink, bool isInstalled = false)
+        private void CreateTabItem(string header, string yamlLink, List<PackageVersion> versions, bool isInstalled = false)
         {
             if (string.IsNullOrEmpty(header) && string.IsNullOrEmpty(yamlLink))
             {
@@ -717,7 +717,7 @@ namespace HandyWinget.Views
                 openedPackages.Remove(mainTab.SelectedIndex == 1 ? currentTabItem.Header.ToString() + "installed" : currentTabItem.Header.ToString());
             };
             openedPackages.Add(isInstalled ? header + "installed" : header);
-            tabItem.Content = new PackageDetailView(yamlLink, isInstalled);
+            tabItem.Content = new PackageDetailView(yamlLink, versions, isInstalled);
             tabItemPackage.Items.Add(tabItem);
             tabItemPackage.Visibility = Visibility.Visible;
             tabItemPackage.SelectedIndex = tabItemPackage.Items.Count - 1;
@@ -729,7 +729,7 @@ namespace HandyWinget.Views
         {
             if (mainTab.SelectedIndex == 1)
             {
-                if (dataGridInstalled.SelectedIndex == -1)
+                if (dataGridInstalled.SelectedItems.Count == 0)
                 {
                     return;
                 }
@@ -737,7 +737,7 @@ namespace HandyWinget.Views
             }
             else
             {
-                if (dataGrid.SelectedIndex == -1)
+                if (dataGrid.SelectedItems.Count == 0)
                 {
                     return;
                 }

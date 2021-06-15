@@ -7,6 +7,8 @@ using HandyControl.Tools;
 using HandyWinget.Control;
 using HandyWinget.Common;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace HandyWinget.Views
 {
@@ -14,10 +16,12 @@ namespace HandyWinget.Views
     {
         bool hasLoaded = false;
         string yamlLink = string.Empty;
-        public PackageDetailView(string yamlLink, bool isInstalled = false)
+        List<PackageVersion> versions;
+        public PackageDetailView(string yamlLink, List<PackageVersion> versions, bool isInstalled = false)
         {
             InitializeComponent();
             this.yamlLink = yamlLink;
+            this.versions = versions;
             if (isInstalled)
             {
                 HideControls();
@@ -33,15 +37,15 @@ namespace HandyWinget.Views
             progressLoaded.Visibility = System.Windows.Visibility.Collapsed;
             progressLoaded.IsIndeterminate = false;
         }
-        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        private async void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             if (!hasLoaded)
             {
-                GetManifestAsync();
+                await GetManifestAsync(yamlLink);
             }
         }
 
-        private async void GetManifestAsync()
+        private async Task<ManifestDetailModel> GetManifestAsync(string yamlLink)
         {
             var isConnected = ApplicationHelper.IsConnectedToInternet();
             if (isConnected)
@@ -68,7 +72,9 @@ namespace HandyWinget.Views
                             txtVersion.Text = result.PackageVersion;
                             txtLicense.Text = result.License;
                             txtDescription.Text = result.ShortDescription;
+                            cmbVersions.ItemsSource = versions;
                             hasLoaded = true;
+                            return result;
                         }
                     }
                 }
@@ -80,6 +86,23 @@ namespace HandyWinget.Views
             {
                 HideControls();
                 Helper.CreateInfoBar("Network UnAvailable", "Unable to connect to the Internet", panel, Severity.Error);
+                return null;
+            }
+            return null;
+        }
+
+        private async void cmbVersions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmbVersions.SelectedItem != null)
+            {
+                var item = cmbVersions.SelectedItem as PackageVersion;
+                cmbArchitectures.ItemsSource = null;
+                var detail = await GetManifestAsync($"{Consts.AzureBaseUrl}{item.YamlUri}");
+                if (detail != null)
+                {
+                    cmbArchitectures.ItemsSource = detail.Installers;
+                    cmbArchitectures.SelectedIndex = 0;
+                }
             }
         }
     }
