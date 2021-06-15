@@ -94,7 +94,7 @@ namespace HandyWinget.Common
                 .Select(g => new HWGPackageModel
                 {
                     PackageId = g.Key,
-                    Name = g.Select(x => Helper.AddSpacesToString(Helper.GetPublisherAndName(x.YamlUri).name)).First(),
+                    Name = g.Select(x => Helper.AddSpacesBeforeCapital(Helper.GetPublisherAndName(x.YamlUri).name)).First(),
                     Publisher = g.Select(x => Helper.GetPublisherAndName(x.YamlUri).publisher).First(),
                     YamlUri = g.Select(x => x.YamlUri).First(),
                     ProductCode = g.Select(x => x.ProductCode).First(),

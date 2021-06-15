@@ -450,6 +450,7 @@ namespace HandyWinget.Views
         private void DataGridInstalledContextMenu_Loaded(object sender, RoutedEventArgs e)
         {
             var selectedRowsCount = dataGridInstalled.SelectedItems.Count;
+            var selectedRow = dataGridInstalled.SelectedItem as HWGInstalledPackageModel;
 
             if (selectedRowsCount > 1)
             {
@@ -468,6 +469,10 @@ namespace HandyWinget.Views
             {
                 mnuUpgrade.IsEnabled = false;
                 mnuUninstall.IsEnabled = false;
+            }
+            if (string.IsNullOrEmpty(selectedRow.AvailableVersion) || selectedRowsCount > 1)
+            {
+                mnuUpgrade.IsEnabled = false;
             }
         }
         private void DataGridInstalledContextMenu_Click(object sender, RoutedEventArgs e)

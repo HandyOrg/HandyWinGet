@@ -1,6 +1,5 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Tools;
-using Microsoft.VisualBasic;
 using Nucs.JsonSettings.Modulation.Recovery;
 using Nucs.JsonSettings.Modulation;
 using System.Collections.Generic;
@@ -140,10 +139,12 @@ namespace HandyWinget.Common
             };
             window.Show();
         }
+
         public static T ParseEnum<T>(string value)
         {
             return (T) Enum.Parse(typeof(T), value, true);
         }
+
         public static InfoBar CreateInfoBar(string title, string message, StackPanel panel, Severity severity)
         {
             var bar = new InfoBar();
@@ -155,6 +156,7 @@ namespace HandyWinget.Common
             panel.Children.Insert(0, bar);
             return bar;
         }
+
         public static InfoBar CreateInfoBarWithAction(string title, string message, StackPanel panel, Severity severity, string buttonContent, Action action)
         {
             var bar = new InfoBar();
@@ -171,6 +173,12 @@ namespace HandyWinget.Common
             panel.Children.Insert(0, bar);
             return bar;
         }
+
+        /// <summary>
+        /// Convert bytes to megabytes
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
         public static string BytesToMegabytes(long bytes)
         {
             return ((bytes / 1024f) / 1024f).ToString("0.00");
@@ -192,7 +200,7 @@ namespace HandyWinget.Common
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static string AddSpacesToString(string text)
+        public static string AddSpacesBeforeCapital(string text)
         {
             try
             {
@@ -220,6 +228,10 @@ namespace HandyWinget.Common
             }
         }
 
+        /// <summary>
+        /// Check if winget-cli is installed or not
+        /// </summary>
+        /// <returns></returns>
         public static bool IsWingetInstalled()
         {
             try
@@ -252,7 +264,6 @@ namespace HandyWinget.Common
             }
             else
             {
-                Growl.ErrorGlobal("Your Windows Is Not Supported, Winget-cli requires Windows 10 version 1709 (build 16299) Please Update to Windows 10 1709 (build 16299) or later");
                 return false;
             }
         }
@@ -268,14 +279,15 @@ namespace HandyWinget.Common
                 };
                 Process.Start(ps);
             }
-            catch (Win32Exception ex)
+            catch (Win32Exception)
             {
-                if (!ex.Message.Contains("The system cannot find the file specified."))
-                {
-                    Growl.ErrorGlobal(ex.Message);
-                }
             }
         }
+
+        /// <summary>
+        /// Execute winget list command and return all installed app details
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<string> GetInstalledAppList()
         {
             var p = new Process
@@ -303,33 +315,32 @@ namespace HandyWinget.Common
             return lines;
         }
 
+        /// <summary>
+        /// Parse and Find PackageId, Version and Available Version for Installed App
+        /// </summary>
+        /// <param name="line">installed app line details, extracted from winget list command</param>
+        /// <param name="packageId"></param>
+        /// <returns></returns>
         public static (string packageId, string version, string availableVersion) ParseInstalledApp(string line, string packageId)
         {
-            line = Regex.Replace(line, "[ ]{2,}", " ", RegexOptions.IgnoreCase);
-            line = Regex.Replace(line, $@".*(?=({Regex.Escape(packageId)}))", "", RegexOptions.IgnoreCase);
+            line = Regex.Replace(line, "[ ]{2,}", " ", RegexOptions.IgnoreCase); // remove more than 2 spaces
+            line = Regex.Replace(line, $@".*(?=({Regex.Escape(packageId)}))", "", RegexOptions.IgnoreCase); // remove everythings before package id
             var lines = line.Split(" ");
-            if (lines.Count() >= 3)
+            if (lines.Count() >= 3) // available version exist
             {
                 return (packageId: lines[0], version: lines[1], availableVersion: lines[2]);
             }
-            else if (lines.Count() == 2)
+            else if (lines.Count() == 2) // only version exist
             {
                 return (packageId: lines[0], version: lines[1], availableVersion: null);
             }
             return (packageId: null, version: null, availableVersion: null);
         }
-       
-        public static string RemoveComment(string url)
-        {
-            var index = url.IndexOf("#");
-            if (index >= 0)
-            {
-                return url.Substring(0, index).Trim();
-            }
 
-            return url.Trim();
-        }
-
+        /// <summary>
+        /// Pass Url to Internet Download Manager
+        /// </summary>
+        /// <param name="link"></param>
         public static void DownloadWithIDM(string link)
         {
             var command = $"/C /d \"{link}\"";
@@ -347,6 +358,11 @@ namespace HandyWinget.Common
             }
         }
 
+        /// <summary>
+        /// Get URL Extension
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public static string GetExtension(string url)
         {
             var ext = Path.GetExtension(url);
