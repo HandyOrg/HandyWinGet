@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -22,7 +21,7 @@ namespace HandyWinget.Control
         private static void OnSeverityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ctl = (InfoBar) d;
-            ctl.ChangeBackground((Severity)e.NewValue);
+            ctl.ChangeBackground((Severity) e.NewValue);
         }
 
 

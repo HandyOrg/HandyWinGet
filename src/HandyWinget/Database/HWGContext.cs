@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HandyWinget.Common;
+﻿using HandyWinget.Common;
 using HandyWinget.Database.Tables;
 using Microsoft.EntityFrameworkCore;
 

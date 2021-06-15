@@ -1,23 +1,23 @@
-﻿using HandyControl.Controls;
-using HandyControl.Tools;
-using Nucs.JsonSettings.Modulation.Recovery;
-using Nucs.JsonSettings.Modulation;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using Nucs.JsonSettings;
-using Nucs.JsonSettings.Fluent;
-using Nucs.JsonSettings.Autosave;
-using HandyWinget.Control;
-using System.Windows.Controls;
-using System;
-using System.Windows.Media;
-using System.Windows;
-using System.Text;
 using System.Linq;
-using Path = System.IO.Path;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using HandyControl.Controls;
+using HandyControl.Tools;
+using HandyWinget.Control;
+using Nucs.JsonSettings;
+using Nucs.JsonSettings.Autosave;
+using Nucs.JsonSettings.Fluent;
+using Nucs.JsonSettings.Modulation;
+using Nucs.JsonSettings.Modulation.Recovery;
+using Path = System.IO.Path;
 
 namespace HandyWinget.Common
 {

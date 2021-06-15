@@ -29,7 +29,7 @@ namespace HandyWinget.Common
         /// ApplicationData\HandyWinGet\Cache
         /// </summary>
         public static readonly string CachePath = Path.Combine(RootPath, "Cache");
-        
+
         public const string AppSecret = "0153dc1d-eda3-4da2-98c9-ce29361d622d";
 
         public const string IDManX64Location = @"C:\Program Files (x86)\Internet Download Manager\IDMan.exe";

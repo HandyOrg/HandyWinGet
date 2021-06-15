@@ -1,14 +1,13 @@
-﻿using System.Net.Http;
-using System.Windows.Controls;
-using HandyWinget.Common.Models;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
-using HandyControl.Tools;
-using HandyWinget.Control;
-using HandyWinget.Common;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Collections.Generic;
+using System.Windows.Controls;
+using HandyControl.Tools;
+using HandyWinget.Common;
+using HandyWinget.Common.Models;
+using HandyWinget.Control;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace HandyWinget.Views
 {

@@ -253,7 +253,8 @@ namespace HandyWinget.Views
 
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            DispatcherHelper.RunOnMainThread(() => {
+            DispatcherHelper.RunOnMainThread(() =>
+            {
                 string fileName = ((DownloadPackage) e.UserState).FileName;
                 prgStatus.Value = 0;
                 txtHash.Text = CryptographyHelper.GenerateSHA256FromFile(fileName);
@@ -267,7 +268,8 @@ namespace HandyWinget.Views
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            DispatcherHelper.RunOnMainThread(() => {
+            DispatcherHelper.RunOnMainThread(() =>
+            {
                 prgStatus.Value = (int) e.ProgressPercentage;
             });
         }

@@ -1,29 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 using Downloader;
+using HandyControl.Controls;
 using HandyControl.Tools;
 using HandyWinget.Common;
+using HandyWinget.Common.Models;
+using HandyWinget.Control;
+using Microsoft.VisualBasic;
+using Microsoft.Win32;
 using ModernWpf.Controls;
-using static HandyWinget.Common.Helper;
 using static HandyControl.Tools.DispatcherHelper;
 using static HandyWinget.Common.DatabaseOperation;
-using HandyWinget.Control;
-using System.ComponentModel;
-using System.Windows.Data;
-using HandyWinget.Common.Models;
-using System.Linq;
-using HandyControl.Controls;
-using Microsoft.VisualBasic;
-using System.Diagnostics;
-using System.Text;
-using Microsoft.Win32;
-using System.Windows.Input;
+using static HandyWinget.Common.Helper;
 using TabItem = HandyControl.Controls.TabItem;
-using System.Collections.Generic;
 
 namespace HandyWinget.Views
 {
@@ -146,26 +146,27 @@ namespace HandyWinget.Views
             var downloadInfo = e.UserState as DownloadPackage;
             if (downloadInfo != null && downloadInfo.FileName != null)
             {
-                RunOnMainThread(() => {
+                RunOnMainThread(() =>
+                {
                     txtStatus.Text = "Extracting...";
                     prgMSIX.IsIndeterminate = true;
                     ZipFile.ExtractToDirectory(downloadInfo.FileName, Consts.MSIXPath, true);
                 });
-               await Task.Run(() =>
-                {
-                    GenerateDatabaseAsync();
+                await Task.Run(() =>
+                 {
+                     GenerateDatabaseAsync();
 
-                }).ContinueWith( x =>
-                {
-                    RunOnMainThread(async() =>
-                    {
-                        prgMSIX.IsIndeterminate = false;
-                        prgMSIX.Visibility = Visibility.Collapsed;
-                        Settings.UpdatedDate = DateTime.Now;
-                        txtUpdateDate.Text = $"Last Update: {DateTime.Now}";
-                    });
-                    LoadDatabaseAsync();
-                });
+                 }).ContinueWith(x =>
+               {
+                   RunOnMainThread(async () =>
+                   {
+                       prgMSIX.IsIndeterminate = false;
+                       prgMSIX.Visibility = Visibility.Collapsed;
+                       Settings.UpdatedDate = DateTime.Now;
+                       txtUpdateDate.Text = $"Last Update: {DateTime.Now}";
+                   });
+                   LoadDatabaseAsync();
+               });
             }
         }
 
@@ -319,7 +320,8 @@ namespace HandyWinget.Views
             var filter = item as HWGPackageModel;
             if (filter.PackageId.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
                 filter.Name.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase) ||
-                filter.Publisher.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase)) { 
+                filter.Publisher.Contains(autoBox.Text, StringComparison.OrdinalIgnoreCase))
+            {
 
                 return true;
             }
@@ -504,8 +506,9 @@ namespace HandyWinget.Views
                     {
                         var result = false;
                         mnuUpgrade.IsEnabled = false;
-                        await Task.Run(() => {
-                             result = UpgradePackage(package.PackageId);
+                        await Task.Run(() =>
+                        {
+                            result = UpgradePackage(package.PackageId);
                         });
                         if (result)
                         {
@@ -528,7 +531,8 @@ namespace HandyWinget.Views
                     {
                         var result = false;
                         mnuUninstall.IsEnabled = false;
-                        await Task.Run(() => {
+                        await Task.Run(() =>
+                        {
                             result = UninstallPackage(package.ProductCode);
                         });
                         if (result)
@@ -656,7 +660,7 @@ namespace HandyWinget.Views
                     var selectedRow = item as HWGInstalledPackageModel;
                     var yamlLink = $"{Consts.AzureBaseUrl}{selectedRow.YamlUri}";
                     var header = $"{selectedRow.Name}-{selectedRow.Version}";
-                    if (!openedPackages.Any(x=>x.Equals(header + "installed")))
+                    if (!openedPackages.Any(x => x.Equals(header + "installed")))
                     {
                         CreateTabItem(header, yamlLink, null, true);
                     }

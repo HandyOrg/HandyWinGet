@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HandyWinget.Database.Tables;
+using HandyWinget.Common.Models;
 using HandyWinget.Database;
+using HandyWinget.Database.Tables;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
-using HandyWinget.Common.Models;
 
 namespace HandyWinget.Common
 {

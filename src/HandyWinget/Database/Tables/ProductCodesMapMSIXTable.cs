@@ -5,9 +5,9 @@ namespace HandyWinget.Database.Tables
 {
     [Table("productcodes_map")]
     [Keyless]
-	public class ProductCodesMapMSIXTable
-	{
-		public long manifest { get; set; }
-		public long productcode { get; set; }
-	}
+    public class ProductCodesMapMSIXTable
+    {
+        public long manifest { get; set; }
+        public long productcode { get; set; }
+    }
 }

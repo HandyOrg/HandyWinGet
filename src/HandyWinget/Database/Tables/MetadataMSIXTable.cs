@@ -5,10 +5,10 @@ namespace HandyWinget.Database.Tables
 {
     [Table("metadata")]
     [Keyless]
-	public class MetadataMSIXTable
-	{
-		public string name { get; set; }
-		public string value { get; set; }
-		
-	}
+    public class MetadataMSIXTable
+    {
+        public string name { get; set; }
+        public string value { get; set; }
+
+    }
 }

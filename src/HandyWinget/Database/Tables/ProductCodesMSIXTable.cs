@@ -5,10 +5,10 @@ namespace HandyWinget.Database.Tables
 {
     [Table("productcodes")]
     public class ProductCodesMSIXTable
-	{
-		[Key]
-		public long rowid { get; set; }
-		public string productcode { get; set; }
+    {
+        [Key]
+        public long rowid { get; set; }
+        public string productcode { get; set; }
 
-	}
+    }
 }

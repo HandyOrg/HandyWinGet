@@ -5,9 +5,9 @@ namespace HandyWinget.Database.Tables
 {
     [Table("versions")]
     public class VersionsMSIXTable
-	{
-		[Key]
-		public long rowid { get; set; }
-		public string version { get; set; }
-	}
+    {
+        [Key]
+        public long rowid { get; set; }
+        public string version { get; set; }
+    }
 }

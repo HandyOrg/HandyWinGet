@@ -5,9 +5,9 @@ namespace HandyWinget.Database.Tables
 {
     [Table("ids")]
     public class IdsMSIXTable
-	{
-		[Key]
-		public long rowid { get; set; }
-		public string id { get; set; }
-	}
+    {
+        [Key]
+        public long rowid { get; set; }
+        public string id { get; set; }
+    }
 }

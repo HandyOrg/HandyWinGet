@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace HandyWinget.Common.Models.Export
+﻿namespace HandyWinget.Common.Models.Export
 {
     public class ExportVersionModel
     {

@@ -1,11 +1,11 @@
-﻿using HandyControl.Themes;
+﻿using System.Windows;
+using System.Windows.Media;
+using HandyControl.Themes;
 using HandyControl.Tools;
 using HandyWinget.Common;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
-using System.Windows;
-using System.Windows.Media;
 using static HandyWinget.Common.Helper;
 namespace HandyWinget
 {
@@ -32,7 +32,7 @@ namespace HandyWinget
             if (ThemeManager.Current.ApplicationTheme != theme)
             {
                 ThemeManager.Current.ApplicationTheme = theme;
-                ModernWpf.ThemeManager.Current.ApplicationTheme = theme == ApplicationTheme.Light ? (ModernWpf.ApplicationTheme?)ModernWpf.ApplicationTheme.Light : (ModernWpf.ApplicationTheme?)ModernWpf.ApplicationTheme.Dark;
+                ModernWpf.ThemeManager.Current.ApplicationTheme = theme == ApplicationTheme.Light ? ModernWpf.ApplicationTheme.Light : ModernWpf.ApplicationTheme.Dark;
             }
         }
 

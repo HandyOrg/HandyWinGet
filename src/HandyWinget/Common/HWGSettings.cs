@@ -1,12 +1,12 @@
-﻿using HandyControl.Themes;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Windows.Controls;
+using System.Windows.Media;
+using HandyControl.Themes;
 using HandyWinget.Common;
 using ModernWpf.Controls;
 using Nucs.JsonSettings.Examples;
 using Nucs.JsonSettings.Modulation;
-using System;
-using System.Collections.ObjectModel;
-using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace HandyWinget
 {
@@ -29,7 +29,7 @@ namespace HandyWinget
         public virtual bool IdentifyInstalledPackage { get; set; } = false;
         public virtual ApplicationTheme Theme { get; set; } = ApplicationTheme.Light;
         public virtual Brush Accent { get; set; }
-       
+
         private ObservableCollection<DataGridLength> _DataGridColumnWidth = new ObservableCollection<DataGridLength>();
         public virtual ObservableCollection<DataGridLength> DataGridColumnWidth
         {
