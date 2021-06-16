@@ -12,7 +12,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Downloader;
-using DryIoc;
 using HandyControl.Controls;
 using HandyControl.Tools;
 using HandyWinget.Common;
@@ -84,7 +83,20 @@ namespace HandyWinget.Views
 
                     hasLoaded = true;
                 }
+                CheckLastTimeDatabaseUpdate();
             }
+        }
+
+        private void CheckLastTimeDatabaseUpdate()
+        {
+            var lastDT = Settings.UpdatedDate;
+            var currentDT = DateTime.Now;
+            TimeSpan duration = currentDT - lastDT;
+            if (duration.TotalHours >= 24)
+            {
+                CreateInfoBar("Update Database", $"You last time updated the database in {lastDT}. To get newer packages, please update the packages.", panel, Severity.Warning);
+            }
+
         }
 
         /// <summary>
