@@ -301,7 +301,14 @@ namespace HandyWinget.Views
             {
                 foreach (var item in view)
                 {
-                    suggestions.Add((item as HWGPackageModel).Name);
+                    if (GetCurrentActiveDataGrid() == dataGrid)
+                    {
+                        suggestions.Add((item as HWGPackageModel).Name);
+                    }
+                    else
+                    {
+                        suggestions.Add((item as HWGInstalledPackageModel).Name);
+                    }
                 }
 
                 if (suggestions.Count > 0)
