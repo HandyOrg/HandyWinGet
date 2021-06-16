@@ -29,6 +29,22 @@ namespace HandyWinget.Common
                                    .LoadNow()
                                    .EnableAutosave();
 
+        /// <summary>
+        /// Remove Comment from Url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string RemoveUrlComment(string url)
+        {
+            var index = url.IndexOf("#");
+            if (index >= 0)
+            {
+                return url.Substring(0, index).Trim();
+            }
+
+            return url.Trim();
+        }
+
         public static bool UninstallPackage(string productCode)
         {
             try
