@@ -81,6 +81,7 @@ namespace HandyWinget.Control
         public InfoBar()
         {
             InitializeComponent();
+            ChangeBackground(Severity);
         }
 
         private void ChangeBackground(Severity severity)
