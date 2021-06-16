@@ -35,7 +35,7 @@
                             <TextBlock x:Name="txtUpdateDate" Margin="20,10" Text="Last Update: May/16, 22:36" Style="{StaticResource SubtitleTextBlockStyle}" FontFamily="{StaticResource CascadiaCodeSemiLight}"/>
                         </StackPanel>
                         <Button x:Name="btnGoToDetail" Content="Get Details" Margin="10,0" Click="btnGoToDetail_Click"/>
-                        <ui:ProgressBar Name="prgMSIX" Visibility="Collapsed" Value="56"/>
+                        <ui:ProgressBar Name="prgMSIX" Visibility="Collapsed" Value="0" Margin="0,10"/>
                         <TextBlock x:Name="txtMSIXStatus" Visibility="{Binding ElementName=prgMSIX, Path=Visibility}" Margin="0,5" HorizontalAlignment="Center"/>
                         <TextBlock x:Name="txtStatus" Visibility="{Binding ElementName=prgMSIX, Path=Visibility}" Text="Downloading MSIX..." HorizontalAlignment="Center"/>
                         <Separator Margin="0,10,0,5"/>

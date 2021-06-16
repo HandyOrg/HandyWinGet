@@ -32,6 +32,7 @@ namespace HandyWinget.Views
     {
         private bool hasLoaded = false;
         private bool hasViewLoaded = false;
+        private bool hasStarted = false;
         ICollectionView view;
         ICollectionView viewInstalled;
         List<string> openedPackages = new List<string>();
@@ -118,6 +119,7 @@ namespace HandyWinget.Views
         /// <param name="e"></param>
         private async void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
+            btnUpdate.IsEnabled = false;
             bool isConnected = ApplicationHelper.IsConnectedToInternet();
             if (isConnected)
             {
@@ -134,6 +136,7 @@ namespace HandyWinget.Views
             else
             {
                 CreateInfoBar("Network UnAvailable", "Unable to connect to the Internet", panel, Severity.Error);
+                btnUpdate.IsEnabled = true;
             }
         }
 
@@ -142,32 +145,46 @@ namespace HandyWinget.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void Downloader_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        private async void Downloader_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            var downloadInfo = e.UserState as DownloadPackage;
-            if (downloadInfo != null && downloadInfo.FileName != null)
+            if (e.Error != null)
             {
                 RunOnMainThread(() =>
                 {
-                    txtStatus.Text = "Extracting...";
-                    prgMSIX.IsIndeterminate = true;
-                    ZipFile.ExtractToDirectory(downloadInfo.FileName, Consts.MSIXPath, true);
+                    prgMSIX.IsIndeterminate = false;
+                    prgMSIX.Visibility = Visibility.Collapsed;
+                    btnUpdate.IsEnabled = true;
+                    CreateInfoBar("Error", e.Error.Message, panel, Severity.Error);
                 });
-                await Task.Run(() =>
-                 {
-                     GenerateDatabaseAsync();
+            }
+            else
+            {
+                var downloadInfo = e.UserState as DownloadPackage;
+                if (downloadInfo != null && downloadInfo.FileName != null)
+                {
+                    RunOnMainThread(() =>
+                    {
+                        txtStatus.Text = "Extracting...";
+                        prgMSIX.IsIndeterminate = true;
+                        ZipFile.ExtractToDirectory(downloadInfo.FileName, Consts.MSIXPath, true);
+                    });
+                    await Task.Run(() =>
+                    {
+                        GenerateDatabaseAsync();
 
-                 }).ContinueWith(x =>
-               {
-                   RunOnMainThread(async () =>
-                   {
-                       prgMSIX.IsIndeterminate = false;
-                       prgMSIX.Visibility = Visibility.Collapsed;
-                       Settings.UpdatedDate = DateTime.Now;
-                       txtUpdateDate.Text = $"Last Update: {DateTime.Now}";
-                   });
-                   LoadDatabaseAsync();
-               });
+                    }).ContinueWith(x =>
+                    {
+                        RunOnMainThread(() =>
+                        {
+                            prgMSIX.IsIndeterminate = false;
+                            prgMSIX.Visibility = Visibility.Collapsed;
+                            Settings.UpdatedDate = DateTime.Now;
+                            txtUpdateDate.Text = $"Last Update: {DateTime.Now}";
+                            btnUpdate.IsEnabled = true;
+                        });
+                        LoadDatabaseAsync();
+                    });
+                }
             }
         }
 
@@ -186,10 +203,15 @@ namespace HandyWinget.Views
         /// </summary>
         private async void LoadDatabaseAsync()
         {
-            dataGrid.ItemsSource = await GetAllPackageAsync();
+            var list = await GetAllPackageAsync();
+            RunOnMainThread(() =>
+            {
+                dataGrid.ItemsSource = list;
+            });
+
             SetGroupDataGrid();
 
-            IdentifyInstalledPackages();
+            IdentifyInstalledPackages(list);
         }
 
         #endregion
@@ -199,46 +221,63 @@ namespace HandyWinget.Views
         /// <summary>
         /// Identify Installed Packages
         /// </summary>
-        private async void IdentifyInstalledPackages()
+        private async void IdentifyInstalledPackages(IEnumerable<HWGPackageModel> list)
         {
-            if (Settings.IdentifyInstalledPackage)
+            if (!hasStarted)
             {
-                if (!IsWingetInstalled())
+                if (Settings.IdentifyInstalledPackage)
                 {
-                    CreateInfoBarWithAction("Winget-Cli", "We need Winget-cli version 1.0 or higher to identify packages, Please download and install it first then restart HandyWinget.", panelInstalled, Severity.Error, "Download", () =>
+                    if (!IsWingetInstalled())
                     {
-                        StartProcess(Consts.WingetRepository);
-                    });
+                        RunOnMainThread(() =>
+                        {
+                            CreateInfoBarWithAction("Winget-Cli", "We need Winget-cli version 1.0 or higher to identify packages, Please download and install it first then restart HandyWinget.", panelInstalled, Severity.Error, "Download", () =>
+                            {
+                                StartProcess(Consts.WingetRepository);
+                            });
+                        });
+                    }
+                    else
+                    {
+                        RunOnMainThread(() =>
+                        {
+                            prgInstalled.Visibility = Visibility.Visible;
+                        });
+
+                        var value = new Progress<int>(ReportProgress);
+                        hasStarted = true;
+                        await Task.Run(() =>
+                        {
+                            LoadInstalledList(value, list);
+                        });
+                    }
                 }
                 else
                 {
-                    prgInstalled.Visibility = Visibility.Visible;
-                    var value = new Progress<int>(ReportProgress);
-                    await Task.Run(() =>
+                    RunOnMainThread(() =>
                     {
-                        LoadInstalledListAsync(value);
+                        CreateInfoBarWithAction("Note", "You have disabled package identification in settings, go to Settings and enable it (To be effective, you must restart HandyWinget). Note that activating this feature will reduce the loading speed.", panelInstalled, Severity.Warning, "Settings", () =>
+                        {
+                            MainWindow.Instance.navView.SelectedItem = MainWindow.Instance.navView.MenuItems[0] as NavigationViewItem;
+                        });
                     });
                 }
-            }
-            else
-            {
-                CreateInfoBarWithAction("Note", "You have disabled package identification in settings, go to Settings and enable it (To be effective, you must restart HandyWinget). Note that activating this feature will reduce the loading speed.", panelInstalled, Severity.Warning, "Settings", () =>
-                {
-                    MainWindow.Instance.navView.SelectedItem = MainWindow.Instance.navView.MenuItems[0] as NavigationViewItem;
-                });
             }
         }
 
         void ReportProgress(int value)
         {
-            prgInstalled.Value = value;
+            RunOnMainThread(() =>
+            {
+                prgInstalled.Value = value;
+            });
         }
 
         /// <summary>
         /// Load Installed Packages into Datagrid 
         /// </summary>
         /// <param name="progress"></param>
-        private async void LoadInstalledListAsync(IProgress<int> progress)
+        private void LoadInstalledList(IProgress<int> progress, IEnumerable<HWGPackageModel> list)
         {
             var installedList = new ThreadSafeObservableCollection<HWGInstalledPackageModel>();
             var installedAppList = GetInstalledAppList();
@@ -254,7 +293,7 @@ namespace HandyWinget.Views
                 });
                 return;
             }
-            var allPackages = await GetAllPackageAsync();
+            var allPackages = list;
             var allPackagesCount = allPackages.Count();
             int currentItemIndex = 0;
             foreach (var package in allPackages)
