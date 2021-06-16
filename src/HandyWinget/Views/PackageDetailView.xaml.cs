@@ -132,37 +132,46 @@ namespace HandyWinget.Views
         {
             try
             {
-                var item = cmbArchitectures.SelectedItem as Installer;
-                if (item != null)
-                {
-                    var url = Helper.RemoveUrlComment(item.InstallerUrl);
+                var isConnected = ApplicationHelper.IsConnectedToInternet();
 
-                    if (Helper.Settings.IsIDMEnabled)
+                if (isConnected)
+                {
+                    var item = cmbArchitectures.SelectedItem as Installer;
+                    if (item != null)
                     {
-                        toogleDownload.IsChecked = false;
-                        Helper.DownloadWithIDM(url);
-                    }
-                    else
-                    {
-                        txtStatus.Text = $"Preparing to download {txtId.Text}";
-                        progress.IsIndeterminate = false;
-                        progress.ShowError = false;
-                        progress.Value = 0;
-                        _TempSetupPath = $@"{Consts.TempPath}\{txtId.Text}-{txtVersion.Text}-{(cmbArchitectures.SelectedItem as Installer)?.Architecture}{Helper.GetExtension(url)}".Trim();
-                        if (!File.Exists(_TempSetupPath))
+                        var url = Helper.RemoveUrlComment(item.InstallerUrl);
+
+                        if (Helper.Settings.IsIDMEnabled)
                         {
-                            downloaderService = new DownloadService();
-                            downloaderService.DownloadProgressChanged += DownloaderService_DownloadProgressChanged;
-                            downloaderService.DownloadFileCompleted += DownloaderService_DownloadFileCompleted;
-                            await downloaderService.DownloadFileTaskAsync(url, _TempSetupPath);
+                            toogleDownload.IsChecked = false;
+                            Helper.DownloadWithIDM(url);
                         }
                         else
                         {
-                            txtStatus.Text = $"{txtId.Text} Already downloaded, We are running it now!";
-                            Helper.StartProcess(_TempSetupPath);
-                            toogleDownload.IsChecked = false;
+                            txtStatus.Text = $"Preparing to download {txtId.Text}";
+                            progress.IsIndeterminate = false;
+                            progress.ShowError = false;
+                            progress.Value = 0;
+                            _TempSetupPath = $@"{Consts.TempPath}\{txtId.Text}-{txtVersion.Text}-{(cmbArchitectures.SelectedItem as Installer)?.Architecture}{Helper.GetExtension(url)}".Trim();
+                            if (!File.Exists(_TempSetupPath))
+                            {
+                                downloaderService = new DownloadService();
+                                downloaderService.DownloadProgressChanged += DownloaderService_DownloadProgressChanged;
+                                downloaderService.DownloadFileCompleted += DownloaderService_DownloadFileCompleted;
+                                await downloaderService.DownloadFileTaskAsync(url, _TempSetupPath);
+                            }
+                            else
+                            {
+                                txtStatus.Text = $"{txtId.Text} Already downloaded, We are running it now!";
+                                Helper.StartProcess(_TempSetupPath);
+                                toogleDownload.IsChecked = false;
+                            }
                         }
                     }
+                }
+                else
+                {
+                    Helper.CreateInfoBar("Network UnAvailable", "Unable to connect to the Internet", panel, Severity.Error);
                 }
 
             }
