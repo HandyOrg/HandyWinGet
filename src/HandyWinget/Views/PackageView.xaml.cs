@@ -293,22 +293,22 @@ namespace HandyWinget.Views
         #endregion
 
         #region Filter DataGrid
-
-        private void AddSuggestion(AutoSuggestBoxTextChangedEventArgs args, ICollectionView view)
+        private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
+            if (!string.IsNullOrEmpty(autoBox.Text))
+            {
+                view = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+                if (view == null)
+                    return;
+                view.Filter = new Predicate<object>(filterPackages);
+            }
+            view?.Refresh();
             var suggestions = new List<string>();
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 foreach (var item in view)
                 {
-                    if (GetCurrentActiveDataGrid() == dataGrid)
-                    {
-                        suggestions.Add((item as HWGPackageModel).Name);
-                    }
-                    else
-                    {
-                        suggestions.Add((item as HWGInstalledPackageModel).Name);
-                    }
+                    suggestions.Add((item as HWGPackageModel).Name);
                 }
 
                 if (suggestions.Count > 0)
@@ -324,18 +324,6 @@ namespace HandyWinget.Views
                 }
             }
         }
-        private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-            if (!string.IsNullOrEmpty(autoBox.Text))
-            {
-                view = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
-                if (view == null)
-                    return;
-                view.Filter = new Predicate<object>(filterPackages);
-            }
-            view?.Refresh();
-            AddSuggestion(args, view);
-        }
         private void autoBoxInstalled_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!string.IsNullOrEmpty(autoBoxInstalled.Text))
@@ -346,7 +334,26 @@ namespace HandyWinget.Views
                 viewInstalled.Filter = new Predicate<object>(filterInstalledPackages);
             }
             viewInstalled?.Refresh();
-            AddSuggestion(args, viewInstalled);
+            var suggestions = new List<string>();
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                foreach (var item in viewInstalled)
+                {
+                    suggestions.Add((item as HWGInstalledPackageModel).Name);
+                }
+
+                if (suggestions.Count > 0)
+                {
+                    for (int i = 0; i < suggestions.Count; i++)
+                    {
+                        autoBoxInstalled.ItemsSource = suggestions;
+                    }
+                }
+                else
+                {
+                    autoBoxInstalled.ItemsSource = new string[] { "No result found" };
+                }
+            }
         }
         private bool filterPackages(object item)
         {
