@@ -67,6 +67,7 @@ namespace HandyWinget.Views
             toogleSaveDGColumnWidth.IsChecked = Settings.IsStoreDataGridColumnWidth;
             toogleAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
             toogleShowInstalled.IsChecked = Settings.IdentifyInstalledPackage;
+            toogleShowNotification.IsChecked = Settings.IsShowNotifications;
 
             if (Settings.Theme == ApplicationTheme.Light)
             {
@@ -157,6 +158,15 @@ namespace HandyWinget.Views
             if (state != Settings.IsStoreDataGridColumnWidth)
             {
                 Settings.IsStoreDataGridColumnWidth = state;
+            }
+        }
+
+        private void toogleShowNotification_Checked(object sender, RoutedEventArgs e)
+        {
+            var state = toogleShowNotification.IsChecked.Value;
+            if (state != Settings.IsShowNotifications)
+            {
+                Settings.IsShowNotifications = state;
             }
         }
 
@@ -262,7 +272,6 @@ namespace HandyWinget.Views
             }
         }
         #endregion
-
     }
 }
 

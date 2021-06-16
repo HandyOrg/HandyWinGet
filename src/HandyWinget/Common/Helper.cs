@@ -163,31 +163,45 @@ namespace HandyWinget.Common
 
         public static InfoBar CreateInfoBar(string title, string message, StackPanel panel, Severity severity)
         {
-            var bar = new InfoBar();
-            bar.Severity = severity;
-            bar.Title = title;
-            bar.Message = message;
-            bar.Margin = new Thickness(0, 5, 0, 0);
+            if (Settings.IsShowNotifications)
+            {
+                var bar = new InfoBar();
+                bar.Severity = severity;
+                bar.Title = title;
+                bar.Message = message;
+                bar.Margin = new Thickness(0, 5, 0, 0);
 
-            panel.Children.Insert(0, bar);
-            return bar;
+                panel.Children.Insert(0, bar);
+                return bar;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static InfoBar CreateInfoBarWithAction(string title, string message, StackPanel panel, Severity severity, string buttonContent, Action action)
         {
-            var bar = new InfoBar();
-            bar.Severity = severity;
-            bar.Title = title;
-            bar.Message = message;
-            bar.Margin = new Thickness(0, 5, 0, 0);
+            if (Settings.IsShowNotifications)
+            {
+                var bar = new InfoBar();
+                bar.Severity = severity;
+                bar.Title = title;
+                bar.Message = message;
+                bar.Margin = new Thickness(0, 5, 0, 0);
 
-            var btnAction = new Button();
-            btnAction.Content = buttonContent;
-            btnAction.Click += (e, s) => { action(); };
+                var btnAction = new Button();
+                btnAction.Content = buttonContent;
+                btnAction.Click += (e, s) => { action(); };
 
-            bar.ActionButton = btnAction;
-            panel.Children.Insert(0, bar);
-            return bar;
+                bar.ActionButton = btnAction;
+                panel.Children.Insert(0, bar);
+                return bar;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>

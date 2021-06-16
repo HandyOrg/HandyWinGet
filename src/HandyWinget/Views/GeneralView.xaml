@@ -20,18 +20,23 @@
                         <ToggleButton x:Name="toogleShowInstalled" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleShowInstalled_Checked" Unchecked="toogleShowInstalled_Checked"/>
                         <TextBlock VerticalAlignment="Center" Text="Show Installed Package"/>
                     </StackPanel>
-                    
+
                     <StackPanel Margin="0,10" Orientation="Horizontal">
+                        <ToggleButton x:Name="toogleShowNotification" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleShowNotification_Checked" Unchecked="toogleShowNotification_Checked"/>
+                        <TextBlock VerticalAlignment="Center" Text="Show Notifications"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
                         <ToggleButton x:Name="toogleGroup" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleGroup_Checked" Unchecked="toogleGroup_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Group packages by publisher"/>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="toogleAutoRefresh" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleAutoRefresh_Checked" Unchecked="toogleAutoRefresh_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Auto Refresh Packages When Application Startup"/>
                     </StackPanel>
 
-                    <StackPanel Margin="0,10" Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                         <ToggleButton x:Name="toogleSaveDGColumnWidth" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleSaveDGColumnWidth_Checked" Unchecked="toogleSaveDGColumnWidth_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Save and Restore DataGrid Columns Width"/>
                     </StackPanel>

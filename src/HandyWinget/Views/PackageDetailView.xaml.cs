@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using Downloader;
 using HandyControl.Tools;
@@ -17,10 +19,11 @@ namespace HandyWinget.Views
 {
     public partial class PackageDetailView : UserControl
     {
-        private string _TempSetupPath = string.Empty;
-        public DownloadService downloaderService;
-        bool hasLoaded = false;
+        string downloadedInstallerPath = string.Empty;
         string yamlLink = string.Empty;
+        bool hasLoaded = false;
+        DownloadService downloaderService;
+        Process wingetProcess;
         List<PackageVersion> versions;
         public PackageDetailView(string yamlLink, List<PackageVersion> versions, bool isInstalled = false)
         {
@@ -36,13 +39,13 @@ namespace HandyWinget.Views
 
         private void HideControls()
         {
-            stackComboBox.Visibility = System.Windows.Visibility.Collapsed;
-            toogleDownload.Visibility = System.Windows.Visibility.Collapsed;
-            progress.Visibility = System.Windows.Visibility.Collapsed;
-            progressLoaded.Visibility = System.Windows.Visibility.Collapsed;
+            stackComboBox.Visibility = Visibility.Collapsed;
+            toogleDownload.Visibility = Visibility.Collapsed;
+            progress.Visibility = Visibility.Collapsed;
+            progressLoaded.Visibility = Visibility.Collapsed;
             progressLoaded.IsIndeterminate = false;
         }
-        private async void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (!hasLoaded)
             {
@@ -112,14 +115,18 @@ namespace HandyWinget.Views
             }
         }
 
-        private void toogleDownload_Checked(object sender, System.Windows.RoutedEventArgs e)
+        private void toogleDownload_Checked(object sender, RoutedEventArgs e)
         {
             SetToogleDownloadContent();
             if (toogleDownload.IsChecked.Value)
             {
                 if (Helper.Settings.InstallMode == InstallMode.Internal)
                 {
-                    DownloadPackage();
+                    DownloadPackageWithInternalDownloader();
+                }
+                else
+                {
+                    DownloadPackageWithWinGet();
                 }
             }
             else
@@ -127,8 +134,95 @@ namespace HandyWinget.Views
                 downloaderService?.CancelAsync();
             }
         }
+        private void DownloadPackageWithWinGet()
+        {
+            if (txtId.Text != null)
+            {
+                toogleDownload.IsChecked = false;
+                toogleDownload.IsEnabled = false;
+                txtStatus.Text = $"Preparing to download {txtId.Text}";
+                progress.IsIndeterminate = true;
+                progress.ShowError = false;
+                progress.Value = 0;
+                var startInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true
+                };
 
-        private async void DownloadPackage()
+                startInfo.FileName = @"winget";
+                startInfo.Arguments = $"install {txtId.Text} -v {txtVersion.Text}";
+
+                wingetProcess = new Process
+                {
+                    StartInfo = startInfo,
+                    EnableRaisingEvents = true
+                };
+
+                wingetProcess.OutputDataReceived += (o, args) =>
+                {
+                    var line = args.Data ?? "";
+
+                    DispatcherHelper.RunOnMainThread(() =>
+                    {
+                        if (line.Contains("Download"))
+                        {
+                            txtStatus.Text = $"Downloading {txtId.Text} - {txtVersion.Text}...";
+                        }
+
+                        if (line.Contains("hash"))
+                        {
+                            txtStatus.Text = $"Validated hash for {txtId.Text} - {txtVersion.Text}";
+                        }
+
+                        if (line.Contains("Installing"))
+                        {
+                            txtStatus.Text = $"Installing {txtId.Text} - {txtVersion.Text}";
+                        }
+
+                        if (line.Contains("Failed"))
+                        {
+                            txtStatus.Text = $"Installation of {txtId.Text} - {txtVersion.Text} failed";
+                            progress.ShowError = true;
+                            toogleDownload.IsEnabled = true;
+                        }
+
+                        if (line.Contains("Please update the client"))
+                        {
+                            txtStatus.Text = $"Installation of {txtId.Text} - {txtVersion.Text} failed, Please update the winget-cli client.";
+                            progress.ShowError = true;
+                            toogleDownload.IsEnabled = true;
+                            Helper.CreateInfoBar("Error", "Please update the winget-cli client.", panel, Severity.Error);
+                        }
+                    });
+                };
+                wingetProcess.Exited += (o, _) =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        var installFailed = (o as Process).ExitCode != 0;
+                        if (installFailed)
+                        {
+                            txtStatus.Text = $"Installation of {txtId.Text} - {txtVersion.Text} failed";
+                            toogleDownload.IsEnabled = true;
+                            progress.ShowError = true;
+                        }
+                        else
+                        {
+                            txtStatus.Text = $"{txtId.Text} - {txtVersion.Text} Installed.";
+                        }
+                        progress.ShowError = false;
+                        progress.IsIndeterminate = false;
+                        toogleDownload.IsEnabled = true;
+                    });
+                };
+
+                wingetProcess.Start();
+                wingetProcess.BeginOutputReadLine();
+            }
+        }
+        private async void DownloadPackageWithInternalDownloader()
         {
             try
             {
@@ -152,18 +246,18 @@ namespace HandyWinget.Views
                             progress.IsIndeterminate = false;
                             progress.ShowError = false;
                             progress.Value = 0;
-                            _TempSetupPath = $@"{Consts.TempPath}\{txtId.Text}-{txtVersion.Text}-{(cmbArchitectures.SelectedItem as Installer)?.Architecture}{Helper.GetExtension(url)}".Trim();
-                            if (!File.Exists(_TempSetupPath))
+                            downloadedInstallerPath = $@"{Consts.TempPath}\{txtId.Text}-{txtVersion.Text}-{(cmbArchitectures.SelectedItem as Installer)?.Architecture}{Helper.GetExtension(url)}".Trim();
+                            if (!File.Exists(downloadedInstallerPath))
                             {
                                 downloaderService = new DownloadService();
                                 downloaderService.DownloadProgressChanged += DownloaderService_DownloadProgressChanged;
                                 downloaderService.DownloadFileCompleted += DownloaderService_DownloadFileCompleted;
-                                await downloaderService.DownloadFileTaskAsync(url, _TempSetupPath);
+                                await downloaderService.DownloadFileTaskAsync(url, downloadedInstallerPath);
                             }
                             else
                             {
                                 txtStatus.Text = $"{txtId.Text} Already downloaded, We are running it now!";
-                                Helper.StartProcess(_TempSetupPath);
+                                Helper.StartProcess(downloadedInstallerPath);
                                 toogleDownload.IsChecked = false;
                             }
                         }
@@ -208,7 +302,7 @@ namespace HandyWinget.Views
             }
             else
             {
-                Helper.StartProcess(_TempSetupPath);
+                Helper.StartProcess(downloadedInstallerPath);
                 DispatcherHelper.RunOnMainThread(() =>
                 {
                     txtStatus.Text = "Download Completed!";

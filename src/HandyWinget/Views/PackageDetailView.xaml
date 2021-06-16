@@ -21,7 +21,7 @@
             <Separator/>
             <ToggleButton x:Name="toogleDownload" IsEnabled="False" Checked="toogleDownload_Checked" Unchecked="toogleDownload_Checked" Margin="10" MinWidth="250" HorizontalAlignment="Center" Content="Download" Style="{StaticResource DefaultToggleButtonStyle}"/>
             <ui:ProgressBar x:Name="progress" Margin="10" Value="0"/>
-            <TextBlock Visibility="{Binding ElementName=progress, Path=Visibility}" Text="{Binding ElementName=progress, Path=Value, StringFormat={}{0}%}" Margin="5" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="txtPercent" Visibility="{Binding ElementName=progress, Path=Visibility}" Text="{Binding ElementName=progress, Path=Value, StringFormat={}{0}%}" Margin="5" HorizontalAlignment="Center"/>
             <TextBlock x:Name="txtStatus" Margin="5" HorizontalAlignment="Center"/>
         </StackPanel>
     </ScrollViewer>
