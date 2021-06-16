@@ -29,20 +29,14 @@ namespace HandyWinget
 
         internal void UpdateTheme(ApplicationTheme theme)
         {
-            if (ThemeManager.Current.ApplicationTheme != theme)
-            {
-                ThemeManager.Current.ApplicationTheme = theme;
-                ModernWpf.ThemeManager.Current.ApplicationTheme = theme == ApplicationTheme.Light ? ModernWpf.ApplicationTheme.Light : ModernWpf.ApplicationTheme.Dark;
-            }
+            ThemeManager.Current.ApplicationTheme = theme;
+            ModernWpf.ThemeManager.Current.ApplicationTheme = theme == ApplicationTheme.Light ? ModernWpf.ApplicationTheme.Light : ModernWpf.ApplicationTheme.Dark;
         }
 
         internal void UpdateAccent(Brush accent)
         {
-            if (ThemeManager.Current.AccentColor != accent)
-            {
-                ThemeManager.Current.AccentColor = accent;
-                ModernWpf.ThemeManager.Current.AccentColor = accent == null ? null : ColorHelper.GetColorFromBrush(accent);
-            }
+            ThemeManager.Current.AccentColor = accent;
+            ModernWpf.ThemeManager.Current.AccentColor = accent == null ? null : ColorHelper.GetColorFromBrush(accent);
         }
     }
 }

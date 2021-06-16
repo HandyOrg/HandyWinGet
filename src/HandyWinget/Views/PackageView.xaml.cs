@@ -46,7 +46,6 @@ namespace HandyWinget.Views
         private void InitSettings()
         {
             txtUpdateDate.Text = $"Last Update: {Settings.UpdatedDate}";
-            ((App) Application.Current).UpdateAccent(Settings.Accent);
         }
 
         private void PackageView_Loaded(object sender, RoutedEventArgs e)
