@@ -27,7 +27,7 @@ namespace HandyWinget
         public virtual bool IdentifyInstalledPackage { get; set; } = false;
         public virtual bool AutoDownloadPackage { get; set; } = false;
         public virtual DateTime UpdatedDate { get; set; } = DateTime.Now;
-        public virtual NavigationViewPaneDisplayMode PaneDisplayMode { get; set; } = NavigationViewPaneDisplayMode.Top;
+        public virtual NavigationViewPaneDisplayMode PaneDisplayMode { get; set; } = NavigationViewPaneDisplayMode.Auto;
         public virtual InstallMode InstallMode { get; set; } = InstallMode.Internal;
         public virtual ApplicationTheme Theme { get; set; } = ApplicationTheme.Light;
         public virtual Brush Accent { get; set; }

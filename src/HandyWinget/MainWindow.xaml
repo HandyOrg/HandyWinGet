@@ -22,7 +22,7 @@
                     <ui:PathIcon Data="{DynamicResource GeneralGeometry}"/>
                 </ui:NavigationViewItem.Icon>
             </ui:NavigationViewItem>
-            <ui:NavigationViewItem IsSelected="True" Tag="PackageView" Content="Packages">
+            <ui:NavigationViewItem Tag="PackageView" Content="Packages">
                 <ui:NavigationViewItem.Icon>
                     <ui:PathIcon Data="{DynamicResource PackageGeometry}"/>
                 </ui:NavigationViewItem.Icon>

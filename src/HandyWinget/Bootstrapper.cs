@@ -1,9 +1,9 @@
 ﻿using System.Windows;
 using HandyWinget.Common;
 using HandyWinget.Views;
+using ModernWpf.Controls;
 using Prism.DryIoc;
 using Prism.Ioc;
-using Prism.Regions;
 
 namespace HandyWinget
 {
@@ -14,11 +14,11 @@ namespace HandyWinget
             base.InitializeShell(shell);
             if (Helper.Settings.IsFirstRun)
             {
-                Container.Resolve<IRegionManager>().RequestNavigate("ContentRegion", "GeneralView");
+                MainWindow.Instance.navView.SelectedItem = MainWindow.Instance.navView.MenuItems[0] as NavigationViewItem;
             }
             else
             {
-                Container.Resolve<IRegionManager>().RequestNavigate("ContentRegion", "PackageView");
+                MainWindow.Instance.navView.SelectedItem = MainWindow.Instance.navView.MenuItems[1] as NavigationViewItem;
             }
         }
         protected override DependencyObject CreateShell()

@@ -13,7 +13,11 @@ namespace HandyWinget
             InitializeComponent();
             _regionManager = regionManager;
             Instance = this;
+            Loaded += MainWindow_Loaded;
+        }
 
+        private void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
             LoadSettings();
         }
 
@@ -21,7 +25,6 @@ namespace HandyWinget
         {
             if (Settings.IsFirstRun)
             {
-                navView.SelectedItem = navView.MenuItems[0];
                 Settings.IsFirstRun = false;
             }
 
