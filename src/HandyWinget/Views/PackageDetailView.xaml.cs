@@ -49,7 +49,11 @@ namespace HandyWinget.Views
         {
             if (!hasLoaded)
             {
-                await GetManifestAsync(yamlLink);
+                var result = await GetManifestAsync(yamlLink);
+                if (Helper.Settings.AutoDownloadPackage && result != null)
+                {
+                    toogleDownload_Checked(null, null);
+                }
             }
         }
 

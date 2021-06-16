@@ -4,14 +4,18 @@
 	<b>🙌 Use <a href="https://blockchain.com/btc/payment_request?address=19cmmVkh4ZsEdrcumbRMvQXmCFfw8nAbX5&amount=0.00041825&message=Buy a cup of tea">donations</a> to help support <b>your</b> projects! 🙌</b>
 </p>
 <br> 
-provides a GUI for installing apps through WinGet.
+provides a GUI for installing apps with or without WinGet.
 
+ Version 4 Features:
+
+- Redesigned user interface
+- Auto Download Packages
+- Upgrade Packages
 - Very fast and flexible
-- Search between packages with Suggestion box
+- Search between packages
 - Customizable user interface 
-- View Package Details
+- View Multiple Packages Details
 - Group Packages by Publisher
-- Completely redesigned
 - Uninstall Installed Packages
 - Install Multiple Packages
 - Export PowerShell Script
@@ -21,9 +25,8 @@ provides a GUI for installing apps through WinGet.
 - Windows 7 Supported
 - Support Internal Downloader and Winget-cli
 - Ability to download with Internet Download Manager (IDM)
-- Ability to cache data and no need to download all information
 - Ability to install different versions
-- Ability to recognize Installed Packages (Internal Method and WingetCli Method Supported)
+- Ability to recognize Installed Packages
 - Powered by .NET 5
 - Create Package
 - Light/Dark Theme

@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Downloader;
+using DryIoc;
 using HandyControl.Controls;
 using HandyControl.Tools;
 using HandyWinget.Common;
@@ -293,6 +294,29 @@ namespace HandyWinget.Views
 
         #region Filter DataGrid
 
+        private void AddSuggestion(AutoSuggestBoxTextChangedEventArgs args, ICollectionView view)
+        {
+            var suggestions = new List<string>();
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                foreach (var item in view)
+                {
+                    suggestions.Add((item as HWGPackageModel).Name);
+                }
+
+                if (suggestions.Count > 0)
+                {
+                    for (int i = 0; i < suggestions.Count; i++)
+                    {
+                        autoBox.ItemsSource = suggestions;
+                    }
+                }
+                else
+                {
+                    autoBox.ItemsSource = new string[] { "No result found" };
+                }
+            }
+        }
         private void AutoSuggestBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!string.IsNullOrEmpty(autoBox.Text))
@@ -303,6 +327,7 @@ namespace HandyWinget.Views
                 view.Filter = new Predicate<object>(filterPackages);
             }
             view?.Refresh();
+            AddSuggestion(args, view);
         }
         private void autoBoxInstalled_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
@@ -314,6 +339,7 @@ namespace HandyWinget.Views
                 viewInstalled.Filter = new Predicate<object>(filterInstalledPackages);
             }
             viewInstalled?.Refresh();
+            AddSuggestion(args, viewInstalled);
         }
         private bool filterPackages(object item)
         {

@@ -10,33 +10,35 @@
                 <StackPanel Margin="10">
                     <ComboBox Name="cmbInstall" SelectionChanged="cmbInstall_SelectionChanged" ItemsSource="{Binding Source={hc:EnumBindingSource {x:Type enum:InstallMode}}}"
                           ui:ControlHelper.Header="Package Install Mode" MinWidth="450" Margin="0,10,50,10" HorizontalAlignment="Left"/>
-
                     <StackPanel x:Name="stackIDM" Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="toogleIDM" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleIDM_Checked" Unchecked="toogleIDM_Checked"/>
                         <TextBlock VerticalAlignment="Center" Text="Download with Internet Download Manager (IDM)"/>
                     </StackPanel>
-
                     <StackPanel Orientation="Horizontal">
+                        <ToggleButton x:Name="toogleAutoDownloadPackage" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleAutoDownloadPackage_Checked" Unchecked="toogleAutoDownloadPackage_Checked"/>
+                        <TextBlock VerticalAlignment="Center" Text="Auto Download Package After Details View Opened"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="toogleShowInstalled" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleShowInstalled_Checked" Unchecked="toogleShowInstalled_Checked"/>
                         <TextBlock VerticalAlignment="Center" Text="Show Installed Package"/>
                     </StackPanel>
 
-                    <StackPanel Margin="0,10" Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                         <ToggleButton x:Name="toogleShowNotification" VerticalAlignment="Center" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleShowNotification_Checked" Unchecked="toogleShowNotification_Checked"/>
                         <TextBlock VerticalAlignment="Center" Text="Show Notifications"/>
                     </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal">
+
+                    <StackPanel Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="toogleGroup" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleGroup_Checked" Unchecked="toogleGroup_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Group packages by publisher"/>
                     </StackPanel>
 
-                    <StackPanel Margin="0,10" Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                         <ToggleButton x:Name="toogleAutoRefresh" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleAutoRefresh_Checked" Unchecked="toogleAutoRefresh_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Auto Refresh Packages When Application Startup"/>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="0,10" Orientation="Horizontal">
                         <ToggleButton x:Name="toogleSaveDGColumnWidth" Style="{StaticResource ToggleButtonSwitch}" HorizontalAlignment="Left" Checked="toogleSaveDGColumnWidth_Checked" Unchecked="toogleSaveDGColumnWidth_Checked" />
                         <TextBlock VerticalAlignment="Center" Text="Save and Restore DataGrid Columns Width"/>
                     </StackPanel>
