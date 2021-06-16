@@ -37,9 +37,6 @@ you can download latest setup from GitHub [Release](https://github.com/HandyOrg/
 run the following command from the command line / PowerShell:
 `WinGet install handywinget`
 
-![HandyWinGet](ScreenShot/12.png)
-![HandyWinGet](ScreenShot/11.gif)
-![HandyWinGet](ScreenShot/10.png)
 ![HandyWinGet](ScreenShot/1.png)
 ![HandyWinGet](ScreenShot/2.png)
 ![HandyWinGet](ScreenShot/3.png)
@@ -47,8 +44,4 @@ run the following command from the command line / PowerShell:
 ![HandyWinGet](ScreenShot/5.png)
 ![HandyWinGet](ScreenShot/6.png)
 ![HandyWinGet](ScreenShot/7.png)
-![HandyWinGet](ScreenShot/8.png)
-![HandyWinGet](ScreenShot/9.png)
-![HandyWinGet](ScreenShot/13.png)
-![HandyWinGet](ScreenShot/14.png)
 
