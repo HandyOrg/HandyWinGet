@@ -339,10 +339,18 @@ namespace HandyWinget.Common
             {
                 return null;
             }
+            try
+            {
+                string input = _wingetData.Substring(_wingetData.IndexOf("Name"));
+                var lines = input.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Skip(2);
+                return lines;
 
-            string input = _wingetData.Substring(_wingetData.IndexOf("Name"));
-            var lines = input.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Skip(2);
-            return lines;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
+            return null;
         }
 
         /// <summary>
