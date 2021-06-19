@@ -69,6 +69,13 @@ namespace HandyWinget.Common
             var data = await query.ToArrayAsyncLinqToDB();
             hwgDB.AddRange(data);
             await hwgDB.SaveChangesAsync();
+
+            var duplicates = hwgDB.ManifestTable.AsEnumerable()
+            .GroupBy(s => new { s.PackageId, s.Version })
+            .SelectMany(g => g.Skip(1)).ToList();
+
+            hwgDB.ManifestTable.RemoveRange(duplicates);
+            await hwgDB.SaveChangesAsync();
         }
 
         /// <summary>
