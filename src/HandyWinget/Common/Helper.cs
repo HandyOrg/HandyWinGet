@@ -141,17 +141,31 @@ namespace HandyWinget.Common
             picker.SelectedColorChanged += delegate
             {
                 ((App) Application.Current).UpdateAccent(picker.SelectedBrush);
-                Settings.Accent = picker.SelectedBrush;
             };
 
+            bool isConfirmed = false;
             picker.Confirmed += delegate
             {
+                Settings.Accent = picker.SelectedBrush;
+                isConfirmed = true;
                 window.Close();
             };
 
             picker.Canceled += delegate
             {
+                ((App) Application.Current).UpdateAccent(tempAccent);
+                Settings.Accent = tempAccent;
+                isConfirmed = false;
                 window.Close();
+            };
+
+            window.Closing += (s, e) =>
+            {
+                if (!isConfirmed)
+                {
+                    ((App) Application.Current).UpdateAccent(tempAccent);
+                    Settings.Accent = tempAccent;
+                }
             };
             window.Show();
         }

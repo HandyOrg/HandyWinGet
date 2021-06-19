@@ -33,7 +33,7 @@
     <None Remove="Resources\Warning.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HandyControls" Version="3.3.5" />
+    <PackageReference Include="HandyControls" Version="3.3.6" />
     <PackageReference Include="Downloader" Version="2.2.8" />
     <PackageReference Include="linq2db.EntityFrameworkCore" Version="5.3.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.6" />
