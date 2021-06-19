@@ -71,7 +71,7 @@ namespace HandyWinget.Common
         /// <summary>
         /// ApplicationData\HandyWinGet\Database\indexV4.db
         /// </summary>
-        public static readonly string HWGDatabasePath = Path.Combine(DatabasePath, "indexV4.db");
+        public static readonly string HWGDatabasePath = Path.Combine(DatabasePath, "indexV401.db");
 
         #endregion
     }

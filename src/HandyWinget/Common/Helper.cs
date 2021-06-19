@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -226,50 +225,6 @@ namespace HandyWinget.Common
         public static string BytesToMegabytes(long bytes)
         {
             return ((bytes / 1024f) / 1024f).ToString("0.00");
-        }
-
-        /// <summary>
-        /// Get Publisher and Application Name from YamlUri eg: manifests/e/microsoft/visualstudio/...
-        /// </summary>
-        /// <param name="ymlUri"></param>
-        /// <returns></returns>
-        public static (string publisher, string name) GetPublisherAndName(string ymlUri)
-        {
-            String[] breakApart = ymlUri.Split('/');
-            return (publisher: breakApart[2], name: breakApart[3]);
-        }
-
-        /// <summary>
-        /// Add spaces before Capital Letters
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static string AddSpacesBeforeCapital(string text)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(text))
-                    return text;
-
-                if (text.Length <= 3)
-                    return text;
-
-                StringBuilder newCaption = new StringBuilder(text.Length * 2);
-                newCaption.Append(text[0]);
-                int pos = 1;
-                for (pos = 1; pos < text.Length - 1; pos++)
-                {
-                    if (char.IsUpper(text[pos]) && !(char.IsUpper(text[pos - 1]) && char.IsUpper(text[pos + 1])))
-                        newCaption.Append(' ');
-                    newCaption.Append(text[pos]);
-                }
-                newCaption.Append(text[pos]);
-                return newCaption.ToString();
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return text;
-            }
         }
 
         /// <summary>

@@ -25,5 +25,6 @@ namespace HandyWinget.Database
         public DbSet<ProductCodesMSIXTable> ProductCodesMSIXTable { get; set; }
         public DbSet<ProductCodesMapMSIXTable> ProductCodesMapMSIXTable { get; set; }
         public DbSet<VersionsMSIXTable> VersionsMSIXTable { get; set; }
+        public DbSet<NameTable> NameTable { get; set; }
     }
 }

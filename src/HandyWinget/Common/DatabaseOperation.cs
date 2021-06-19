@@ -58,9 +58,14 @@ namespace HandyWinget.Common
                 from productMap in msixDB.ProductCodesMapMSIXTable.Where(e => e.manifest == manifest.rowid).DefaultIfEmpty()
                 from prdCode in msixDB.ProductCodesMSIXTable.Where(e => e.rowid == productMap.productcode).DefaultIfEmpty()
                 from version in msixDB.VersionsMSIXTable.Where(e => e.rowid == manifest.version)
+                from name in msixDB.NameTable.Where(e => e.rowid == manifest.name)
+                from publishermap in msixDB.PublishersMapMSIXTable.Where(e => e.manifest == manifest.rowid)
+                from publisher in msixDB.PublishersMSIXTable.Where(e => e.rowid == publishermap.norm_publisher)
                 select new ManifestTable
                 {
                     PackageId = item.id,
+                    Name = name.name,
+                    Publisher = publisher.norm_publisher,
                     ProductCode = prdCode.productcode,
                     YamlUri = $@"{pathPart.path}/{pathPartPublisher.pathpart}/{pathPartAppName.pathpart}/{pathPartVersion.pathpart}/{yml.pathpart}",
                     Version = version.version
@@ -89,6 +94,8 @@ namespace HandyWinget.Common
             var dbQuery = hwgDB.ManifestTable.Select(x => new
             {
                 x.PackageId,
+                x.Name,
+                x.Publisher,
                 x.YamlUri,
                 x.ProductCode,
                 x.Version
@@ -101,8 +108,8 @@ namespace HandyWinget.Common
                 .Select(g => new HWGPackageModel
                 {
                     PackageId = g.Key,
-                    Name = g.Select(x => Helper.AddSpacesBeforeCapital(Helper.GetPublisherAndName(x.YamlUri).name)).First(),
-                    Publisher = g.Select(x => Helper.GetPublisherAndName(x.YamlUri).publisher).First(),
+                    Name = g.Select(x => x.Name).First(),
+                    Publisher = g.Select(x => x.Publisher).First(),
                     YamlUri = g.Select(x => x.YamlUri).First(),
                     ProductCode = g.Select(x => x.ProductCode).First(),
                     PackageVersion = g.Select(x => new PackageVersion { Version = x.Version, YamlUri = x.YamlUri }).OrderByDescending(x => x.Version).First(),
