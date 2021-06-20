@@ -80,6 +80,8 @@ namespace HandyWinget.Views
                             progressLoaded.IsIndeterminate = false;
                             txtId.Text = result.PackageIdentifier;
                             txtName.Text = result.PackageName;
+                            txtMoniker.Text = result.Moniker;
+                            txtAuthor.Text = result.Author;
                             txtPublisher.Text = result.Publisher;
                             txtVersion.Text = result.PackageVersion;
                             txtLicense.Text = result.License;

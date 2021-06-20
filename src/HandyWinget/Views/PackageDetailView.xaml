@@ -8,15 +8,17 @@
     <ScrollViewer>
         <StackPanel x:Name="panel">
             <ui:ProgressBar x:Name="progressLoaded" IsIndeterminate="True" Margin="10"/>
-            <TextBox x:Name="txtId" Margin="10" ui:ControlHelper.Header="Package Id" IsReadOnly="True"/>
-            <TextBox x:Name="txtName" Margin="10,0" ui:ControlHelper.Header="Package Name" IsReadOnly="True"/>
-            <TextBox x:Name="txtPublisher" Margin="10" ui:ControlHelper.Header="Package Publisher" IsReadOnly="True"/>
-            <TextBox x:Name="txtVersion" Margin="10,0" ui:ControlHelper.Header="Package Version" IsReadOnly="True"/>
-            <TextBox x:Name="txtLicense" Margin="10" ui:ControlHelper.Header="Package License" IsReadOnly="True"/>
-            <TextBox x:Name="txtDescription" TextWrapping="Wrap" Margin="10,0" Height="120" ui:ControlHelper.Header="Package Description" IsReadOnly="True"/>
+            <TextBox x:Name="txtId" Margin="10" ui:ControlHelper.Header="Package Id" ui:ControlHelper.PlaceholderText="Id" IsReadOnly="True"/>
+            <TextBox x:Name="txtName" Margin="10,0" ui:ControlHelper.Header="Package Name" ui:ControlHelper.PlaceholderText="Name" IsReadOnly="True"/>
+            <TextBox x:Name="txtMoniker" Margin="10" ui:ControlHelper.Header="Moniker" ui:ControlHelper.PlaceholderText="Moniker" IsReadOnly="True"/>
+            <TextBox x:Name="txtPublisher" Margin="10,0" ui:ControlHelper.Header="Package Publisher" ui:ControlHelper.PlaceholderText="Publisher" IsReadOnly="True"/>
+            <TextBox x:Name="txtAuthor" Margin="10" ui:ControlHelper.Header="Package Author" ui:ControlHelper.PlaceholderText="Author" IsReadOnly="True"/>
+            <TextBox x:Name="txtVersion" Margin="10,0" ui:ControlHelper.Header="Package Version" ui:ControlHelper.PlaceholderText="Version" IsReadOnly="True"/>
+            <TextBox x:Name="txtLicense" Margin="10" ui:ControlHelper.Header="Package License" ui:ControlHelper.PlaceholderText="License" IsReadOnly="True"/>
+            <TextBox x:Name="txtDescription" TextWrapping="Wrap" Margin="10,0" Height="120" ui:ControlHelper.Header="Package Description" ui:ControlHelper.PlaceholderText="Description" IsReadOnly="True"/>
             <StackPanel x:Name="stackComboBox" Orientation="Horizontal">
-                <ComboBox x:Name="cmbVersions" SelectionChanged="cmbVersions_SelectionChanged" SelectedIndex="0" DisplayMemberPath="Version" Margin="10" ui:ControlHelper.Header="Available Versions" MinWidth="200"/>
-                <ComboBox x:Name="cmbArchitectures" SelectedIndex="0" Margin="10" ui:ControlHelper.Header="Available Architecture" MinWidth="200">
+                <ComboBox x:Name="cmbVersions" SelectionChanged="cmbVersions_SelectionChanged" SelectedIndex="0" DisplayMemberPath="Version" Margin="10" ui:ControlHelper.Header="Available Versions" ui:ControlHelper.PlaceholderText="Versions" MinWidth="200"/>
+                <ComboBox x:Name="cmbArchitectures" SelectedIndex="0" Margin="10" ui:ControlHelper.Header="Available Architecture" ui:ControlHelper.PlaceholderText="Architecture" MinWidth="200">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
