@@ -58,13 +58,13 @@ namespace HandyWinget.Common
                 from productMap in msixDB.ProductCodesMapMSIXTable.Where(e => e.manifest == manifest.rowid).DefaultIfEmpty()
                 from prdCode in msixDB.ProductCodesMSIXTable.Where(e => e.rowid == productMap.productcode).DefaultIfEmpty()
                 from version in msixDB.VersionsMSIXTable.Where(e => e.rowid == manifest.version)
-                from name in msixDB.NameTable.Where(e => e.rowid == manifest.name)
-                from publishermap in msixDB.PublishersMapMSIXTable.Where(e => e.manifest == manifest.rowid)
-                from publisher in msixDB.PublishersMSIXTable.Where(e => e.rowid == publishermap.norm_publisher)
+                from names in msixDB.NameTable.Where(e => e.rowid == manifest.name)
+                from publisherMap in msixDB.PublishersMapMSIXTable.Where(e => e.manifest == manifest.rowid)
+                from publisher in msixDB.PublishersMSIXTable.Where(e => e.rowid == publisherMap.norm_publisher)
                 select new ManifestTable
                 {
                     PackageId = item.id,
-                    Name = name.name,
+                    Name = names.name,
                     Publisher = publisher.norm_publisher,
                     ProductCode = prdCode.productcode,
                     YamlUri = $@"{pathPart.path}/{pathPartPublisher.pathpart}/{pathPartAppName.pathpart}/{pathPartVersion.pathpart}/{yml.pathpart}",
@@ -76,7 +76,7 @@ namespace HandyWinget.Common
             await hwgDB.SaveChangesAsync();
 
             var duplicates = hwgDB.ManifestTable.AsEnumerable()
-            .GroupBy(s => new { s.PackageId, s.Version })
+            .GroupBy(d => new { d.PackageId, d.Version })
             .SelectMany(g => g.Skip(1)).ToList();
 
             hwgDB.ManifestTable.RemoveRange(duplicates);
