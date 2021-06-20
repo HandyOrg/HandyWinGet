@@ -16,6 +16,7 @@ using Nucs.JsonSettings.Autosave;
 using Nucs.JsonSettings.Fluent;
 using Nucs.JsonSettings.Modulation;
 using Nucs.JsonSettings.Modulation.Recovery;
+using MessageBox = HandyControl.Controls.MessageBox;
 using Path = System.IO.Path;
 
 namespace HandyWinget.Common
@@ -361,7 +362,7 @@ namespace HandyWinget.Common
             }
             else
             {
-                Growl.ErrorGlobal("Internet Download Manager (IDM) is not installed on your system, please download and install it first");
+                MessageBox.Error("Internet Download Manager (IDM) is not installed on your system, please download and install it first", "Not Found");
             }
         }
 
