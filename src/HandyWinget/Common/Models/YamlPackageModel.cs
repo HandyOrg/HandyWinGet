@@ -23,5 +23,6 @@ namespace HandyWinget.Common
         public string Architecture { get; set; }
         public string InstallerUrl { get; set; }
         public string InstallerSha256 { get; set; }
+        public string InstallerType { get; set; }
     }
 }

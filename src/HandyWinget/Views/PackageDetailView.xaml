@@ -16,7 +16,28 @@
             <TextBox x:Name="txtDescription" TextWrapping="Wrap" Margin="10,0" Height="120" ui:ControlHelper.Header="Package Description" IsReadOnly="True"/>
             <StackPanel x:Name="stackComboBox" Orientation="Horizontal">
                 <ComboBox x:Name="cmbVersions" SelectionChanged="cmbVersions_SelectionChanged" SelectedIndex="0" DisplayMemberPath="Version" Margin="10" ui:ControlHelper.Header="Available Versions" MinWidth="200"/>
-                <ComboBox x:Name="cmbArchitectures" DisplayMemberPath="Architecture" SelectedIndex="0" Margin="10" ui:ControlHelper.Header="Available Architecture" MinWidth="200"/>
+                <ComboBox x:Name="cmbArchitectures" SelectedIndex="0" Margin="10" ui:ControlHelper.Header="Available Architecture" MinWidth="200">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Architecture}"/>
+                                <TextBlock Text=" - ">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding InstallerType}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding InstallerType}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
             <Separator/>
             <ToggleButton x:Name="toogleDownload" IsEnabled="False" Checked="toogleDownload_Checked" Unchecked="toogleDownload_Checked" Margin="10" MinWidth="250" HorizontalAlignment="Center" Content="Download" Style="{StaticResource DefaultToggleButtonStyle}"/>

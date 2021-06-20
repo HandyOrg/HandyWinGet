@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using HandyControl.Themes;
 using HandyControl.Tools;
 
 namespace HandyWinget.Control
@@ -81,6 +82,12 @@ namespace HandyWinget.Control
         public InfoBar()
         {
             InitializeComponent();
+            ChangeBackground(Severity);
+            ThemeManager.Current.ActualApplicationThemeChanged = OnThemeChanged;
+        }
+
+        private void OnThemeChanged(ThemeManager sender, object args)
+        {
             ChangeBackground(Severity);
         }
 
