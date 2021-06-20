@@ -68,6 +68,7 @@ namespace HandyWinget.Views
             toogleAutoRefresh.IsChecked = Settings.AutoRefreshInStartup;
             toogleShowInstalled.IsChecked = Settings.IdentifyInstalledPackage;
             toogleShowNotification.IsChecked = Settings.IsShowNotifications;
+            toogleDoubleClickShowDetail.IsChecked = Settings.IsShowDetailByDoubleClick;
             toogleAutoDownloadPackage.IsChecked = Settings.AutoDownloadPackage;
 
             if (Settings.Theme == ApplicationTheme.Light)
@@ -133,6 +134,15 @@ namespace HandyWinget.Views
             if (state != Settings.IdentifyInstalledPackage)
             {
                 Settings.IdentifyInstalledPackage = state;
+            }
+        }
+
+        private void toogleDoubleClickShowDetail_Checked(object sender, RoutedEventArgs e)
+        {
+            var state = toogleDoubleClickShowDetail.IsChecked.Value;
+            if (state != Settings.IsShowDetailByDoubleClick)
+            {
+                Settings.IsShowDetailByDoubleClick = state;
             }
         }
 
@@ -280,7 +290,6 @@ namespace HandyWinget.Views
             }
         }
         #endregion
-
     }
 }
 

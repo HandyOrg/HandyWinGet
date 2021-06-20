@@ -50,9 +50,12 @@ namespace HandyWinget.Views
 
         private void PackageView_Loaded(object sender, RoutedEventArgs e)
         {
+            // if the view is recreated (switch between views), the information will not be received again
             if (!hasViewLoaded)
             {
                 hasViewLoaded = true;
+
+                // if indexVx.db not found or AutoRefresh is True we should Download MSIX otherwise we Load Database
                 if (!File.Exists(Consts.HWGDatabasePath) || Settings.AutoRefreshInStartup)
                 {
                     btnUpdate_Click(null, null);
@@ -62,6 +65,7 @@ namespace HandyWinget.Views
                     LoadDatabaseAsync();
                 }
 
+                // set Datagrid Columns Width from Settings
                 if (Settings.IsStoreDataGridColumnWidth)
                 {
                     if (Settings.DataGridColumnWidth.Count > 0)
@@ -82,10 +86,14 @@ namespace HandyWinget.Views
 
                     hasLoaded = true;
                 }
+
                 CheckLastTimeDatabaseUpdate();
             }
         }
 
+        /// <summary>
+        /// Display a notification if 24 hours have elapsed since the last update
+        /// </summary>
         private void CheckLastTimeDatabaseUpdate()
         {
             var lastDT = Settings.UpdatedDate;
@@ -152,7 +160,7 @@ namespace HandyWinget.Views
         }
 
         /// <summary>
-        /// Extract MSIX into indexV4.db
+        /// Extract MSIX into indexVx.db
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -704,7 +712,7 @@ namespace HandyWinget.Views
 
         #endregion
 
-        private void UserControl_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void UserControl_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.Key == Key.P)
             {
@@ -772,20 +780,23 @@ namespace HandyWinget.Views
         }
         private void Row_DoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var currentDataGrid = GetCurrentActiveDataGrid();
-
-            if (currentDataGrid.SelectedItems.Count == 1)
+            if (Settings.IsShowDetailByDoubleClick)
             {
-                if (mainTab.SelectedIndex == 1)
+                var currentDataGrid = GetCurrentActiveDataGrid();
+
+                if (currentDataGrid.SelectedItems.Count == 1)
                 {
-                    GetYamlLink(true);
+                    if (mainTab.SelectedIndex == 1)
+                    {
+                        GetYamlLink(true);
+                    }
+                    else
+                    {
+                        GetYamlLink();
+                    }
+                    mainTabItemDetail.IsEnabled = true;
+                    mainTab.SelectedIndex = 2;
                 }
-                else
-                {
-                    GetYamlLink();
-                }
-                mainTabItemDetail.IsEnabled = true;
-                mainTab.SelectedIndex = 2;
             }
             e.Handled = true;
         }

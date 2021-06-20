@@ -69,7 +69,7 @@ namespace HandyWinget.Common
         public static readonly string MSIXDatabasePath = Path.Combine(MSIXPath, "Public", "index.db");
 
         /// <summary>
-        /// ApplicationData\HandyWinGet\Database\indexV4.db
+        /// ApplicationData\HandyWinGet\Database\indexVx.db
         /// </summary>
         public static readonly string HWGDatabasePath = Path.Combine(DatabasePath, "indexV401.db");
 

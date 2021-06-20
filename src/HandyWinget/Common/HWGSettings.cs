@@ -24,6 +24,7 @@ namespace HandyWinget
         public virtual bool AutoRefreshInStartup { get; set; } = false;
         public virtual bool IsStoreDataGridColumnWidth { get; set; } = false;
         public virtual bool IsShowNotifications { get; set; } = true;
+        public virtual bool IsShowDetailByDoubleClick { get; set; } = true;
         public virtual bool IdentifyInstalledPackage { get; set; } = false;
         public virtual bool AutoDownloadPackage { get; set; } = false;
         public virtual DateTime UpdatedDate { get; set; } = DateTime.Now;
