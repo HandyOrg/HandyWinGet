@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
@@ -89,6 +90,7 @@ namespace HandyWinget.Views
                             cmbVersions.ItemsSource = versions;
                             hasLoaded = true;
                             toogleDownload.IsEnabled = true;
+                            cmbVersions.SelectedItem = versions.Where(x => x.Version.Equals(result.PackageVersion)).FirstOrDefault();
                             return result;
                         }
                     }
