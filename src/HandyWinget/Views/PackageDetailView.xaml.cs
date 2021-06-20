@@ -23,14 +23,17 @@ namespace HandyWinget.Views
         string downloadedInstallerPath = string.Empty;
         string yamlLink = string.Empty;
         bool hasLoaded = false;
+        bool isInstalled = false;
         DownloadService downloaderService;
         Process wingetProcess;
         List<PackageVersion> versions;
+        
         public PackageDetailView(string yamlLink, List<PackageVersion> versions, bool isInstalled = false)
         {
             InitializeComponent();
             this.yamlLink = yamlLink;
             this.versions = versions;
+            this.isInstalled = isInstalled;
             if (isInstalled)
             {
                 HideControls();
@@ -71,13 +74,13 @@ namespace HandyWinget.Views
                     if (!string.IsNullOrEmpty(responseString))
                     {
                         var deserializer = new DeserializerBuilder()
-                                                               .WithNamingConvention(PascalCaseNamingConvention.Instance)
-                                                               .IgnoreUnmatchedProperties()
-                                                               .Build();
+                            .WithNamingConvention(PascalCaseNamingConvention.Instance)
+                            .IgnoreUnmatchedProperties()
+                            .Build();
                         var result = deserializer.Deserialize<ManifestDetailModel>(responseString);
                         if (result != null)
                         {
-                            progressLoaded.Visibility = System.Windows.Visibility.Collapsed;
+                            progressLoaded.Visibility = Visibility.Collapsed;
                             progressLoaded.IsIndeterminate = false;
                             txtId.Text = result.PackageIdentifier;
                             txtName.Text = result.PackageName;
@@ -87,10 +90,13 @@ namespace HandyWinget.Views
                             txtVersion.Text = result.PackageVersion;
                             txtLicense.Text = result.License;
                             txtDescription.Text = result.ShortDescription;
-                            cmbVersions.ItemsSource = versions;
                             hasLoaded = true;
-                            toogleDownload.IsEnabled = true;
-                            cmbVersions.SelectedItem = versions.Where(x => x.Version.Equals(result.PackageVersion)).FirstOrDefault();
+                            if (!isInstalled)
+                            {
+                                cmbVersions.ItemsSource = versions;
+                                toogleDownload.IsEnabled = true;
+                                cmbVersions.SelectedItem = versions.Where(x => x.Version.Equals(result.PackageVersion)).FirstOrDefault();
+                            }
                             return result;
                         }
                     }

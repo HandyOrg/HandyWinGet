@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using Downloader;
 using HandyControl.Controls;
 using HandyControl.Tools;
@@ -23,6 +24,7 @@ using ModernWpf.Controls;
 using static HandyControl.Tools.DispatcherHelper;
 using static HandyWinget.Common.DatabaseOperation;
 using static HandyWinget.Common.Helper;
+using IconElement = HandyControl.Controls.IconElement;
 using TabItem = HandyControl.Controls.TabItem;
 
 namespace HandyWinget.Views
@@ -828,6 +830,12 @@ namespace HandyWinget.Views
             };
             openedPackages.Add(isInstalled ? header + "installed" : header);
             tabItem.Content = new PackageDetailView(yamlLink, versions, isInstalled);
+            if (isInstalled)
+            {
+                IconElement.SetGeometry(tabItem, ResourceHelper.GetResource<Geometry>("InstalledGeometry"));
+                IconElement.SetWidth(tabItem, 22);
+                IconElement.SetHeight(tabItem, 22);
+            }
             tabItemPackage.Items.Add(tabItem);
             tabItemPackage.Visibility = Visibility.Visible;
             tabItemPackage.SelectedIndex = tabItemPackage.Items.Count - 1;
