@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -329,10 +331,16 @@ namespace HandyWinget.Common
         /// <param name="line">installed app line details, extracted from winget list command</param>
         /// <param name="packageId"></param>
         /// <returns></returns>
+        private static Regex re = new Regex("[ ]{2,}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public static (string packageId, string version, string availableVersion) ParseInstalledApp(string line, string packageId)
         {
-            line = Regex.Replace(line, "[ ]{2,}", " ", RegexOptions.IgnoreCase); // remove more than 2 spaces
-            line = Regex.Replace(line, $@".*(?=({Regex.Escape(packageId)}))", "", RegexOptions.IgnoreCase); // remove everythings before package id
+            line = re.Replace(line, " ");
+            int startIndex = line.IndexOf(packageId);
+            if(startIndex < 0)
+            {
+                return (packageId: null, version: null, availableVersion: null);
+            }
+            line = line.Substring(startIndex);
             var lines = line.Split(" ");
             if (lines.Count() >= 3) // available version exist
             {
